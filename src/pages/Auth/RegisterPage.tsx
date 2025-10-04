@@ -55,7 +55,7 @@ export const RegisterPage: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="w-full max-w-md mx-auto shadow-xl dark:bg-gray-800 dark:border-gray-700">
+      <Card className="w-full max-w-md mx-auto shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Create Account</CardTitle>
           <CardDescription>
