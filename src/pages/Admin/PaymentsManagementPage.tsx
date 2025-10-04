@@ -101,7 +101,7 @@ export const PaymentsManagementPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
       </div>
     );
   }
@@ -116,8 +116,8 @@ export const PaymentsManagementPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Payments & Ledger</h1>
-            <p className="text-gray-600">Monitor and manage all payment transactions</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Payments & Ledger</h1>
+            <p className="text-gray-600 dark:text-gray-300">Monitor and manage all payment transactions</p>
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" onClick={() => handleExport('pdf')}>
@@ -139,14 +139,14 @@ export const PaymentsManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Payments</p>
-                  <p className="text-2xl font-bold text-gray-900">{paymentStats.total}</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Payments</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{paymentStats.total}</p>
                 </div>
-                <CurrencyDollarIcon className="h-8 w-8 text-blue-500" />
+                <CurrencyDollarIcon className="h-8 w-8 text-blue-500 dark:text-blue-400" />
               </div>
             </CardContent>
           </Card>

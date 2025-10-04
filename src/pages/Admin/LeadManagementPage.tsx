@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  UsersIcon,
   MagnifyingGlassIcon,
   FunnelIcon,
   PlusIcon,
   EyeIcon,
   PencilIcon,
   PhoneIcon,
-  EnvelopeIcon,
-  StarIcon
+  EnvelopeIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -121,7 +119,7 @@ export const LeadManagementPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
       </div>
     );
   }
@@ -136,8 +134,8 @@ export const LeadManagementPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Lead Management</h1>
-            <p className="text-gray-600">Manage and track your sales leads with AI-powered insights</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Lead Management</h1>
+            <p className="text-gray-600 dark:text-gray-300">Manage and track your sales leads with AI-powered insights</p>
           </div>
           <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
             <PlusIcon className="h-4 w-4 mr-2" />
@@ -153,10 +151,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-gray-900">{leadStats.total}</p>
-              <p className="text-sm text-gray-600">Total Leads</p>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{leadStats.total}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Total Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -165,10 +163,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-red-600">{leadStats.hot}</p>
-              <p className="text-sm text-gray-600">Hot Leads</p>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">{leadStats.hot}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Hot Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -177,10 +175,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-yellow-600">{leadStats.warm}</p>
-              <p className="text-sm text-gray-600">Warm Leads</p>
+              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{leadStats.warm}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Warm Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -189,10 +187,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-gray-600">{leadStats.cold}</p>
-              <p className="text-sm text-gray-600">Cold Leads</p>
+              <p className="text-2xl font-bold text-gray-600 dark:text-gray-300">{leadStats.cold}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Cold Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -201,10 +199,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-gray-400">{leadStats.dead}</p>
-              <p className="text-sm text-gray-600">Dead Leads</p>
+              <p className="text-2xl font-bold text-gray-400 dark:text-gray-500">{leadStats.dead}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Dead Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -216,12 +214,12 @@ export const LeadManagementPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
                   <Input
                     placeholder="Search leads by name, email, or phone..."
                     value={searchTerm}
@@ -234,7 +232,7 @@ export const LeadManagementPage: React.FC = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                   <option value="all">All Status</option>
                   <option value="hot">Hot</option>
@@ -258,9 +256,9 @@ export const LeadManagementPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.7 }}
       >
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Leads ({filteredLeads.length})</CardTitle>
+            <CardTitle className="dark:text-white">Leads ({filteredLeads.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -279,20 +277,20 @@ export const LeadManagementPage: React.FC = () => {
                 <TableBody>
                   {filteredLeads.map((lead) => (
                     <TableRow key={lead.id}>
-                      <TableCell className="font-medium">{lead.name}</TableCell>
+                      <TableCell className="font-medium dark:text-white">{lead.name}</TableCell>
                       <TableCell>
                         <div className="space-y-1">
-                          <div className="flex items-center text-sm text-gray-600">
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                             <EnvelopeIcon className="h-3 w-3 mr-1" />
                             {lead.email}
                           </div>
-                          <div className="flex items-center text-sm text-gray-600">
+                          <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                             <PhoneIcon className="h-3 w-3 mr-1" />
                             {lead.phone}
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>{lead.source}</TableCell>
+                      <TableCell className="dark:text-white">{lead.source}</TableCell>
                       <TableCell>{getStatusBadge(lead.status)}</TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getScoreColor(lead.score)}`}>
@@ -314,35 +312,35 @@ export const LeadManagementPage: React.FC = () => {
                             </DialogTrigger>
                             <DialogContent className="max-w-2xl">
                               <DialogHeader>
-                                <DialogTitle>Lead Details - {lead.name}</DialogTitle>
-                                <DialogDescription>
+                                <DialogTitle className="dark:text-white">Lead Details - {lead.name}</DialogTitle>
+                                <DialogDescription className="dark:text-gray-300">
                                   View and manage lead information
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
                                   <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-                                    <p className="text-gray-900">{lead.name}</p>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name</label>
+                                    <p className="text-gray-900 dark:text-white">{lead.name}</p>
                                   </div>
                                   <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                    <p className="text-gray-900">{lead.email}</p>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email</label>
+                                    <p className="text-gray-900 dark:text-white">{lead.email}</p>
                                   </div>
                                   <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
-                                    <p className="text-gray-900">{lead.phone}</p>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Phone</label>
+                                    <p className="text-gray-900 dark:text-white">{lead.phone}</p>
                                   </div>
                                   <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Source</label>
-                                    <p className="text-gray-900">{lead.source}</p>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Source</label>
+                                    <p className="text-gray-900 dark:text-white">{lead.source}</p>
                                   </div>
                                   <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>
                                     {getStatusBadge(lead.status)}
                                   </div>
                                   <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Score</label>
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Score</label>
                                     <span className={`px-2 py-1 rounded-full text-sm font-medium ${getScoreColor(lead.score)}`}>
                                       {lead.score}
                                     </span>
@@ -350,16 +348,16 @@ export const LeadManagementPage: React.FC = () => {
                                 </div>
 
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">Notes</label>
-                                  <p className="text-gray-900 bg-gray-50 p-3 rounded-lg">{lead.notes}</p>
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Notes</label>
+                                  <p className="text-gray-900 dark:text-white bg-gray-50 dark:bg-gray-700 p-3 rounded-lg">{lead.notes}</p>
                                 </div>
 
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">Add Note</label>
+                                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Add Note</label>
                                   <textarea
                                     value={newNote}
                                     onChange={(e) => setNewNote(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     rows={3}
                                     placeholder="Add a note about this lead..."
                                   />
@@ -370,7 +368,7 @@ export const LeadManagementPage: React.FC = () => {
                                     <select
                                       value={lead.status}
                                       onChange={(e) => handleStatusUpdate(lead.id, e.target.value as any)}
-                                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                                     >
                                       <option value="hot">Hot</option>
                                       <option value="warm">Warm</option>

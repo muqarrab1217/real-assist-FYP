@@ -1,9 +1,8 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { 
   ArrowRightIcon,
-  CheckCircleIcon,
   StarIcon,
   BuildingOfficeIcon,
   CurrencyDollarIcon,
@@ -11,11 +10,25 @@ import {
   UserGroupIcon,
   ClockIcon,
   ShieldCheckIcon,
-  CogIcon
+  PlayIcon
 } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 
 export const LandingPage: React.FC = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const { scrollY } = useScroll();
+  const y = useTransform(scrollY, [0, 300], [0, -50]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0.8]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
   const features = [
     {
       icon: BuildingOfficeIcon,
@@ -73,28 +86,30 @@ export const LandingPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Navigation */}
-      <nav className="bg-white/95 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-50">
+      <nav className="absolute top-0 left-0 right-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="h-8 w-8 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
-                <span className="text-white font-bold text-sm">RA</span>
+              <div className="h-8 px-2 rounded-lg bg-gradient-to-r from-purple-400 to-blue-600 flex items-center justify-center">
+                <span className="text-white font-bold text-lg">RealAssist.co</span>
               </div>
-              <span className="text-xl font-bold gradient-text">RealAssist</span>
+              {/* <span className="text-xl font-bold text-blue-400">RealAssist</span> */}
             </Link>
             
-            <div className="hidden md:flex items-center space-x-8">
-              <a href="#features" className="text-gray-700 hover:text-purple-600 transition-colors">Features</a>
-              <a href="#testimonials" className="text-gray-700 hover:text-purple-600 transition-colors">Testimonials</a>
-              <a href="#pricing" className="text-gray-700 hover:text-purple-600 transition-colors">Pricing</a>
+            <div className="hidden md:flex items-center space-x-2 ">
+              <a href="#features" className="px-4 py-2 text-blue-500 font-bold hover:bg-blue-100 hover:text-blue-600 rounded-lg transition-all duration-200">Features</a>
+              <a href="#testimonials" className="px-4 py-2 text-blue-500 font-bold hover:bg-blue-100 hover:text-blue-600  rounded-lg transition-all duration-200">Testimonials</a>
+              <a href="#pricing" className="px-4 py-2 text-blue-500 font-bold hover:bg-blue-100 hover:text-blue-600  rounded-lg transition-all duration-200">Pricing</a>
             </div>
             
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-3">
               <Link to="/login">
-                <Button variant="ghost">Sign In</Button>
+                <Button variant="ghost" className="text-blue-600 font-bold hover:bg-white/10 border-white/20">
+                  Sign In
+                </Button>
               </Link>
               <Link to="/register">
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+                <Button className="bg-white text-gray-900 hover:bg-blue-200 border-0">
                   Get Started
                 </Button>
               </Link>
@@ -104,46 +119,100 @@ export const LandingPage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <section className="relative overflow-hidden bg-gradient-to-br pt-20 from-purple-50 via-blue-50 to-indigo-100 min-h-screen">
+        {/* Animated Background Elements */}
+        <motion.div
+          className="absolute inset-0"
+          style={{ y, opacity }}
+        >
+          <div className="absolute top-20 left-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute top-40 right-10 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        </motion.div>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <motion.div
               initial={{ opacity: 0, x: -50 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
             >
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+              <motion.h1 
+                className="text-5xl lg:text-6xl font-bold text-gray-900 leading-tight"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
                 AI-Powered Real Estate
-                <span className="gradient-text block">Automation</span>
-              </h1>
-              <p className="text-xl text-gray-600 mt-6 leading-relaxed">
+                <motion.span 
+                  className="gradient-text block"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                >
+                  Automation
+                </motion.span>
+              </motion.h1>
+              
+              <motion.p 
+                className="text-xl text-gray-600 mt-6 leading-relaxed"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              >
                 Streamline your property investments with intelligent automation, 
                 real-time insights, and seamless client management. 
                 Transform your real estate business today.
-              </p>
+              </motion.p>
               
-              <div className="flex flex-col sm:flex-row gap-4 mt-8">
+              <motion.div 
+                className="flex flex-col sm:flex-row gap-4 mt-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.8 }}
+              >
                 <Link to="/register">
-                  <Button size="lg" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-lg px-8 py-4">
-                    Start Free Trial
-                    <ArrowRightIcon className="ml-2 h-5 w-5" />
-                  </Button>
+                  <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Button size="lg" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-lg px-8 py-4">
+                      Start Free Trial
+                      <ArrowRightIcon className="ml-2 h-5 w-5" />
+                    </Button>
+                  </motion.div>
                 </Link>
-                <Button size="lg" variant="outline" className="text-lg px-8 py-4">
-                  Watch Demo
-                </Button>
-              </div>
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button size="lg" variant="outline" className="text-lg px-8 py-4">
+                    <PlayIcon className="mr-2 h-5 w-5" />
+                    Watch Demo
+                  </Button>
+                </motion.div>
+              </motion.div>
               
-              <div className="flex items-center space-x-6 mt-8">
+              <motion.div 
+                className="flex items-center space-x-6 mt-8"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 1.0 }}
+              >
                 <div className="flex items-center">
-                  <StarIcon className="h-5 w-5 text-yellow-400 fill-current" />
-                  <StarIcon className="h-5 w-5 text-yellow-400 fill-current" />
-                  <StarIcon className="h-5 w-5 text-yellow-400 fill-current" />
-                  <StarIcon className="h-5 w-5 text-yellow-400 fill-current" />
-                  <StarIcon className="h-5 w-5 text-yellow-400 fill-current" />
+                  {[...Array(5)].map((_, i) => (
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3, delay: 1.2 + i * 0.1 }}
+                    >
+                      <StarIcon className="h-5 w-5 text-yellow-400 fill-current" />
+                    </motion.div>
+                  ))}
                   <span className="ml-2 text-gray-600">4.9/5 from 500+ users</span>
                 </div>
-              </div>
+              </motion.div>
             </motion.div>
             
             <motion.div
@@ -152,39 +221,73 @@ export const LandingPage: React.FC = () => {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="relative"
             >
-              <div className="bg-white rounded-2xl shadow-2xl p-8 floating-animation">
+              {/* Inverted Dashboard Card */}
+              <motion.div 
+                className="bg-gray-900 rounded-2xl shadow-2xl p-8 text-white"
+                whileHover={{ scale: 1.02, rotateY: 5 }}
+                transition={{ duration: 0.3 }}
+              >
                 <div className="space-y-6">
                   <div className="flex items-center justify-between">
-                    <h3 className="text-lg font-semibold">Dashboard Overview</h3>
+                    <h3 className="text-lg font-semibold text-white">Dashboard Overview</h3>
                     <div className="flex space-x-2">
-                      <div className="w-3 h-3 bg-red-400 rounded-full"></div>
+                      <motion.div 
+                        className="w-3 h-3 bg-red-400 rounded-full"
+                        animate={{ scale: [1, 1.2, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                      ></motion.div>
                       <div className="w-3 h-3 bg-yellow-400 rounded-full"></div>
                       <div className="w-3 h-3 bg-green-400 rounded-full"></div>
                     </div>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gradient-to-r from-purple-100 to-blue-100 p-4 rounded-lg">
-                      <div className="text-2xl font-bold text-purple-600">$2.4M</div>
-                      <div className="text-sm text-gray-600">Total Revenue</div>
-                    </div>
-                    <div className="bg-gradient-to-r from-green-100 to-emerald-100 p-4 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">+24%</div>
-                      <div className="text-sm text-gray-600">Growth Rate</div>
-                    </div>
+                    <motion.div 
+                      className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 rounded-lg"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="text-2xl font-bold text-white">$2.4M</div>
+                      <div className="text-sm text-purple-100">Total Revenue</div>
+                    </motion.div>
+                    <motion.div 
+                      className="bg-gradient-to-r from-green-600 to-emerald-600 p-4 rounded-lg"
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ duration: 0.2 }}
+                    >
+                      <div className="text-2xl font-bold text-white">+24%</div>
+                      <div className="text-sm text-green-100">Growth Rate</div>
+                    </motion.div>
                   </div>
                   
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-gray-600">Lead Conversion</span>
-                      <span className="text-sm font-medium">85%</span>
+                      <span className="text-sm text-gray-300">Lead Conversion</span>
+                      <span className="text-sm font-medium text-white">85%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full w-4/5"></div>
+                    <div className="w-full bg-gray-700 rounded-full h-2">
+                      <motion.div 
+                        className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full"
+                        initial={{ width: 0 }}
+                        animate={{ width: "85%" }}
+                        transition={{ duration: 2, delay: 1 }}
+                      ></motion.div>
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
+
+              {/* Floating Elements */}
+              <motion.div
+                className="absolute -top-4 -right-4 w-8 h-8 bg-purple-500 rounded-full"
+                animate={{ y: [0, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <motion.div
+                className="absolute -bottom-4 -left-4 w-6 h-6 bg-blue-500 rounded-full"
+                animate={{ y: [0, 10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, delay: 1 }}
+              />
             </motion.div>
           </div>
         </div>
@@ -217,15 +320,24 @@ export const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border border-gray-100"
+                whileHover={{ 
+                  y: -10,
+                  scale: 1.02,
+                  transition: { duration: 0.3 }
+                }}
+                className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-gray-100 group"
               >
-                <div className="h-12 w-12 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg flex items-center justify-center mb-6">
-                  <feature.icon className="h-6 w-6 text-purple-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                <motion.div 
+                  className="h-12 w-12 bg-gradient-to-r from-purple-100 to-blue-100 rounded-lg flex items-center justify-center mb-6 group-hover:from-purple-600 group-hover:to-blue-600 transition-all duration-300"
+                  whileHover={{ rotate: 360 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <feature.icon className="h-6 w-6 text-purple-600 group-hover:text-white transition-colors duration-300" />
+                </motion.div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-4 group-hover:text-purple-600 transition-colors duration-300">
                   {feature.title}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
                   {feature.description}
                 </p>
               </motion.div>
@@ -260,18 +372,30 @@ export const LandingPage: React.FC = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: index * 0.1 }}
                 viewport={{ once: true }}
-                className="bg-white p-8 rounded-xl shadow-lg"
+                whileHover={{ 
+                  y: -5,
+                  scale: 1.02,
+                  transition: { duration: 0.3 }
+                }}
+                className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 group"
               >
                 <div className="flex items-center mb-4">
                   {[...Array(testimonial.rating)].map((_, i) => (
-                    <StarIcon key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    <motion.div
+                      key={i}
+                      initial={{ opacity: 0, scale: 0 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.3, delay: index * 0.1 + i * 0.1 }}
+                    >
+                      <StarIcon className="h-5 w-5 text-yellow-400 fill-current" />
+                    </motion.div>
                   ))}
                 </div>
-                <p className="text-gray-600 mb-6 italic">
+                <p className="text-gray-600 mb-6 italic group-hover:text-gray-700 transition-colors duration-300">
                   "{testimonial.content}"
                 </p>
                 <div>
-                  <div className="font-semibold text-gray-900">{testimonial.name}</div>
+                  <div className="font-semibold text-gray-900 group-hover:text-purple-600 transition-colors duration-300">{testimonial.name}</div>
                   <div className="text-sm text-gray-500">{testimonial.role}</div>
                 </div>
               </motion.div>

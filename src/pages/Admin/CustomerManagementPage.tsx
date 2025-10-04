@@ -62,7 +62,7 @@ export const CustomerManagementPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
       </div>
     );
   }
@@ -77,8 +77,8 @@ export const CustomerManagementPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Customer Management</h1>
-            <p className="text-gray-600">Manage and track your client relationships</p>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Customer Management</h1>
+            <p className="text-gray-600 dark:text-gray-300">Manage and track your client relationships</p>
           </div>
           <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
             <UserGroupIcon className="h-4 w-4 mr-2" />
@@ -94,14 +94,14 @@ export const CustomerManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Clients</p>
-                  <p className="text-2xl font-bold text-gray-900">{clients.length}</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Clients</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{clients.length}</p>
                 </div>
-                <UserGroupIcon className="h-8 w-8 text-blue-500" />
+                <UserGroupIcon className="h-8 w-8 text-blue-500 dark:text-blue-400" />
               </div>
             </CardContent>
           </Card>
