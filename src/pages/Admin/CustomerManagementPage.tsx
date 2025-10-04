@@ -23,7 +23,6 @@ export const CustomerManagementPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedClient] = useState<Client | null>(null);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -246,9 +245,8 @@ export const CustomerManagementPage: React.FC = () => {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => setSelectedClient(client)}
                             >
-                              <EyeIcon className="h-4 w-4" />
+                              <EyeIcon className="h-s4 w-4" />
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-2xl">

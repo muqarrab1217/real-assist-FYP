@@ -17,7 +17,6 @@ import { formatDate } from '@/lib/utils';
 export const ProjectUpdatesPage: React.FC = () => {
   const [updates, setUpdates] = useState<ProjectUpdate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUpdate] = useState<ProjectUpdate | null>(null);
 
   useEffect(() => {
     const fetchUpdates = async () => {
@@ -72,8 +71,8 @@ export const ProjectUpdatesPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Project Updates</h1>
-        <p className="text-gray-600">Stay informed about your investment progress</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Project Updates</h1>
+        <p className="text-gray-600 dark:text-gray-300">Stay informed about your investment progress</p>
       </motion.div>
 
       {/* Project Overview */}
@@ -82,21 +81,21 @@ export const ProjectUpdatesPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Sunset Towers</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Sunset Towers</h3>
                 <div className="space-y-2">
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                     <MapPinIcon className="h-4 w-4 mr-2" />
                     Miami, FL
                   </div>
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                     <BuildingOfficeIcon className="h-4 w-4 mr-2" />
                     Miami Developers LLC
                   </div>
-                  <div className="flex items-center text-sm text-gray-600">
+                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-300">
                     <CalendarIcon className="h-4 w-4 mr-2" />
                     Expected Completion: December 2024
                   </div>
@@ -104,13 +103,13 @@ export const ProjectUpdatesPage: React.FC = () => {
               </div>
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium text-gray-600">Overall Progress</span>
-                  <span className="text-sm font-medium text-gray-900">35%</span>
+                  <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Overall Progress</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-white">35%</span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-3">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                   <div className="bg-gradient-to-r from-purple-600 to-blue-600 h-3 rounded-full w-1/3"></div>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">On track for completion</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">On track for completion</p>
               </div>
             </div>
           </CardContent>
@@ -123,10 +122,10 @@ export const ProjectUpdatesPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Recent Updates</CardTitle>
-            <p className="text-sm text-gray-600">Latest progress reports and milestones</p>
+            <CardTitle className="dark:text-white">Recent Updates</CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Latest progress reports and milestones</p>
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
@@ -140,27 +139,27 @@ export const ProjectUpdatesPage: React.FC = () => {
                 >
                   <div className="absolute -left-2 top-0 h-4 w-4 bg-purple-500 rounded-full"></div>
                   
-                  <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+                  <div className="bg-white dark:bg-gray-700/50 rounded-lg p-6 shadow-sm border border-gray-100 dark:border-gray-600">
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{update.title}</h3>
+                          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{update.title}</h3>
                           {getMilestoneBadge(update.milestone)}
                         </div>
-                        <p className="text-sm text-gray-600 mb-4">{update.description}</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">{update.description}</p>
                         
                         <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center text-sm text-gray-500">
+                          <div className="flex items-center text-sm text-gray-500 dark:text-gray-400">
                             <CalendarIcon className="h-4 w-4 mr-1" />
                             {formatDate(update.createdAt)}
                           </div>
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium text-gray-600">Progress:</span>
-                            <span className="text-sm font-medium text-gray-900">{update.progress}%</span>
+                            <span className="text-sm font-medium text-gray-600 dark:text-gray-300">Progress:</span>
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">{update.progress}%</span>
                           </div>
                         </div>
                         
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
+                        <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mb-4">
                           <div 
                             className={`h-2 rounded-full ${getProgressColor(update.progress)}`}
                             style={{ width: `${update.progress}%` }}
@@ -182,14 +181,14 @@ export const ProjectUpdatesPage: React.FC = () => {
                     
                     {/* Mock Images */}
                     <div className="grid grid-cols-3 gap-2 mt-4">
-                      <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
-                        <PhotoIcon className="h-8 w-8 text-gray-400" />
+                      <div className="aspect-video bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                        <PhotoIcon className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                       </div>
-                      <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
-                        <PhotoIcon className="h-8 w-8 text-gray-400" />
+                      <div className="aspect-video bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                        <PhotoIcon className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                       </div>
-                      <div className="aspect-video bg-gray-200 rounded-lg flex items-center justify-center">
-                        <PhotoIcon className="h-8 w-8 text-gray-400" />
+                      <div className="aspect-video bg-gray-200 dark:bg-gray-600 rounded-lg flex items-center justify-center">
+                        <PhotoIcon className="h-8 w-8 text-gray-400 dark:text-gray-500" />
                       </div>
                     </div>
                   </div>
@@ -206,10 +205,10 @@ export const ProjectUpdatesPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Milestone Progress</CardTitle>
-            <p className="text-sm text-gray-600">Track completion of major project milestones</p>
+            <CardTitle className="dark:text-white">Milestone Progress</CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Track completion of major project milestones</p>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -223,10 +222,10 @@ export const ProjectUpdatesPage: React.FC = () => {
                 <div key={index} className="flex items-center space-x-4">
                   <div className="flex-1">
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-gray-900">{milestone.name}</span>
-                      <span className="text-sm text-gray-600">{milestone.progress}%</span>
+                      <span className="text-sm font-medium text-gray-900 dark:text-white">{milestone.name}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-300">{milestone.progress}%</span>
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2">
                       <div 
                         className={`h-2 rounded-full ${getProgressColor(milestone.progress)}`}
                         style={{ width: `${milestone.progress}%` }}
@@ -249,24 +248,24 @@ export const ProjectUpdatesPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <Card>
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardHeader>
-            <CardTitle>Need More Information?</CardTitle>
-            <p className="text-sm text-gray-600">Contact our project team for detailed updates</p>
+            <CardTitle className="dark:text-white">Need More Information?</CardTitle>
+            <p className="text-sm text-gray-600 dark:text-gray-300">Contact our project team for detailed updates</p>
           </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Project Manager</h4>
-                <p className="text-sm text-gray-600">Sarah Johnson</p>
-                <p className="text-sm text-gray-600">sarah.johnson@miamidevelopers.com</p>
-                <p className="text-sm text-gray-600">+1 (555) 123-4567</p>
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Project Manager</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-300">Sarah Johnson</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">sarah.johnson@miamidevelopers.com</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">+1 (555) 123-4567</p>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Customer Support</h4>
-                <p className="text-sm text-gray-600">RealAssist Support Team</p>
-                <p className="text-sm text-gray-600">support@realassist.com</p>
-                <p className="text-sm text-gray-600">+1 (555) 987-6543</p>
+                <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Customer Support</h4>
+                <p className="text-sm text-gray-600 dark:text-gray-300">RealAssist Support Team</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">support@realassist.com</p>
+                <p className="text-sm text-gray-600 dark:text-gray-300">+1 (555) 987-6543</p>
               </div>
             </div>
           </CardContent>
