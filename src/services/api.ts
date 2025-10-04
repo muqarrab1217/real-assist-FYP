@@ -17,7 +17,7 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 // Auth API
 export const authAPI = {
-  async login(email: string, password: string, role: 'client' | 'admin'): Promise<User> {
+  async login(_email: string, _password: string, role: 'client' | 'admin'): Promise<User> {
     await delay(1000);
     
     if (role === 'client') {
@@ -27,12 +27,12 @@ export const authAPI = {
     }
   },
 
-  async register(userData: any): Promise<User> {
+  async register(_userData: any): Promise<User> {
     await delay(1000);
     return mockUser;
   },
 
-  async forgotPassword(email: string): Promise<void> {
+  async forgotPassword(_email: string): Promise<void> {
     await delay(1000);
   },
 };
@@ -59,7 +59,7 @@ export const clientAPI = {
     return mockProjectUpdates;
   },
 
-  async makePayment(paymentId: string, amount: number, method: string): Promise<Payment> {
+  async makePayment(paymentId: string, _amount: number, method: string): Promise<Payment> {
     await delay(1000);
     
     const payment = mockPayments.find(p => p.id === paymentId);

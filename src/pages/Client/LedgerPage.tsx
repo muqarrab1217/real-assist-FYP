@@ -3,8 +3,6 @@ import { motion } from 'framer-motion';
 import { 
   DocumentTextIcon,
   ArrowDownTrayIcon,
-  EyeIcon,
-  PrinterIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

@@ -193,7 +193,7 @@ export const PaymentsPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {payments.map((payment, index) => (
+                  {payments.map((payment) => (
                     <TableRow key={payment.id}>
                       <TableCell className="font-medium">
                         #{payment.installmentNumber}

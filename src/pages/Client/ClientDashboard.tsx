@@ -5,14 +5,12 @@ import {
   CheckCircleIcon,
   BanknotesIcon,
   ChartBarIcon,
-  ClockIcon,
   ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { clientAPI } from '@/services/api';
 import { DashboardStats } from '@/types';
-import { formatCurrency } from '@/lib/utils';
 
 export const ClientDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats[]>([]);

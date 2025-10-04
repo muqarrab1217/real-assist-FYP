@@ -320,7 +320,7 @@ export const PaymentsManagementPage: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {payments.slice(0, 5).map((payment, index) => (
+              {payments.slice(0, 5).map((payment) => (
                 <div key={payment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                   <div className="flex items-center space-x-3">
                     {getStatusIcon(payment.status)}
