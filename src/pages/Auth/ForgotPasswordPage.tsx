@@ -24,7 +24,7 @@ export const ForgotPasswordPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="w-full max-w-md mx-auto shadow-xl dark:bg-gray-800 dark:border-gray-700">
+        <Card className="w-full max-w-md mx-auto shadow-xl">
           <CardHeader className="text-center">
             <div className="mx-auto h-16 w-16 bg-gradient-to-r from-green-100 to-emerald-100 rounded-full flex items-center justify-center mb-4">
               <EnvelopeIcon className="h-8 w-8 text-green-600" />
@@ -68,7 +68,7 @@ export const ForgotPasswordPage: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="w-full max-w-md mx-auto shadow-xl dark:bg-gray-800 dark:border-gray-700">
+      <Card className="w-full max-w-md mx-auto shadow-xl">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
           <CardDescription>

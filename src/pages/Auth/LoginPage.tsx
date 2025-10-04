@@ -5,21 +5,52 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useAuth } from '@/hooks/useAuth';
 
 export const LoginPage: React.FC = () => {
+  const { login } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     role: 'client' as 'client' | 'admin',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Mock authentication
-    if (formData.email && formData.password) {
-      navigate(`/${formData.role}/dashboard`);
+    setIsLoading(true);
+
+    try {
+      // Mock authentication - replace with actual API call
+      if (formData.email && formData.password) {
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Mock user data
+        const mockUser = {
+          id: '1',
+          email: formData.email,
+          firstName: 'John',
+          lastName: 'Doe',
+          role: formData.role,
+        };
+        
+        const mockToken = 'mock-jwt-token-' + Date.now();
+        
+        // Login user
+        login(mockUser, mockToken);
+        
+        // Navigate to appropriate dashboard
+        const redirectPath = formData.role === 'admin' ? '/admin/dashboard' : '/client/dashboard';
+        navigate(redirectPath, { replace: true });
+      }
+    } catch (error) {
+      console.error('Login failed:', error);
+      // Handle login error
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -36,17 +67,17 @@ export const LoginPage: React.FC = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <Card className="w-full max-w-md mx-auto shadow-xl dark:bg-gray-800 dark:border-gray-700">
+      <Card className="w-full max-w-md mx-auto shadow-xl">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold dark:text-white">Welcome Back</CardTitle>
-          <CardDescription className="dark:text-gray-300">
+          <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+          <CardDescription>
             Sign in to your RealAssist account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
                 Account Type
               </label>
               <select
@@ -124,9 +155,10 @@ export const LoginPage: React.FC = () => {
 
             <Button
               type="submit"
+              disabled={isLoading}
               className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
             >
-              Sign In
+              {isLoading ? 'Signing In...' : 'Sign In'}
             </Button>
           </form>
 

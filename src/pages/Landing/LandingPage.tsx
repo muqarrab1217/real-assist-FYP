@@ -15,19 +15,9 @@ import {
 import { Button } from '@/components/ui/button';
 
 export const LandingPage: React.FC = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 300], [0, -50]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0.8]);
-
-  useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY });
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
 
   const features = [
     {
@@ -86,7 +76,7 @@ export const LandingPage: React.FC = () => {
   return (
     <div className="bg-white">
       {/* Navigation */}
-      <nav className="absolute top-0 left-0 right-0 z-50">
+      <nav className="fixed top-2 left-0 right-0 z-50 max-w-7xl mx-auto rounded-lg bg-blue/80 backdrop-blur-md border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link to="/" className="flex items-center space-x-2">
@@ -97,19 +87,19 @@ export const LandingPage: React.FC = () => {
             </Link>
             
             <div className="hidden md:flex items-center space-x-2 ">
-              <a href="#features" className="px-4 py-2 text-blue-500 font-bold hover:bg-blue-100 hover:text-blue-600 rounded-lg transition-all duration-200">Features</a>
-              <a href="#testimonials" className="px-4 py-2 text-blue-500 font-bold hover:bg-blue-100 hover:text-blue-600  rounded-lg transition-all duration-200">Testimonials</a>
-              <a href="#pricing" className="px-4 py-2 text-blue-500 font-bold hover:bg-blue-100 hover:text-blue-600  rounded-lg transition-all duration-200">Pricing</a>
+              <a href="#features" className="px-4 py-2 text-gray-700 font-bold hover:bg-white/50 hover:text-purple-600 rounded-lg transition-all duration-200">Features</a>
+              <a href="#testimonials" className="px-4 py-2 text-gray-700 font-bold hover:bg-white/50 hover:text-purple-600 rounded-lg transition-all duration-200">Testimonials</a>
+              <a href="#pricing" className="px-4 py-2 text-gray-700 font-bold hover:bg-white/50 hover:text-purple-600 rounded-lg transition-all duration-200">Pricing</a>
             </div>
             
             <div className="flex items-center space-x-3">
               <Link to="/login">
-                <Button variant="ghost" className="text-blue-600 font-bold hover:bg-white/10 border-white/20">
+                <Button variant="ghost" className="text-gray-700 font-semibold hover:bg-white/50 hover:text-purple-600">
                   Sign In
                 </Button>
               </Link>
               <Link to="/register">
-                <Button className="bg-white text-gray-900 hover:bg-blue-200 border-0">
+                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 border-0 shadow-lg">
                   Get Started
                 </Button>
               </Link>
@@ -119,7 +109,7 @@ export const LandingPage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-gradient-to-br pt-20 from-purple-50 via-blue-50 to-indigo-100 min-h-screen">
+      <section className="relative overflow-hidden bg-gradient-to-br pt-24 from-purple-50 via-blue-50 to-indigo-100 min-h-screen">
         {/* Animated Background Elements */}
         <motion.div
           className="absolute inset-0"

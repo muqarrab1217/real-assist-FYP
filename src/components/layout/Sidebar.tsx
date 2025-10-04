@@ -11,7 +11,8 @@ import {
   UserGroupIcon,
   CurrencyDollarIcon,
   SunIcon,
-  MoonIcon
+  MoonIcon,
+  ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -19,6 +20,7 @@ import { useTheme } from '@/contexts/ThemeContext';
 interface SidebarProps {
   role: 'client' | 'admin';
   onRoleChange?: (role: 'client' | 'admin') => void;
+  onLogout?: () => void;
 }
 
 const clientNavigation = [
@@ -42,7 +44,7 @@ const supportNavigation = [
   { name: 'Submit Feedback', href: '/feedback', icon: DocumentTextIcon },
 ];
 
-export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange, onLogout }) => {
   const location = useLocation();
   const navigation = role === 'client' ? clientNavigation : adminNavigation;
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -236,40 +238,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange }) => {
         </div>
       </nav>
       
-      {/* Theme Toggle */}
-      <div className="px-4 py-2">
-        <button
-          onClick={toggleDarkMode}
-          className={cn(
-            "w-full flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200",
-            isDarkMode 
-              ? "text-gray-300 hover:bg-gray-800 hover:text-white" 
-              : "text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-          )}
-          title={isCollapsed ? (isDarkMode ? "Light Mode" : "Dark Mode") : undefined}
-        >
-          {isDarkMode ? (
-            <SunIcon className="h-5 w-5" />
-          ) : (
-            <MoonIcon className="h-5 w-5" />
-          )}
-          {!isCollapsed && (
-            <span className="ml-3 transition-opacity duration-300">
-              {isDarkMode ? "Light Mode" : "Dark Mode"}
-            </span>
-          )}
-        </button>
-      </div>
-      
       {/* User Profile */}
       <div className="border-t border-gray-200 dark:border-gray-700 p-4">
         <div className={cn(
           "flex items-center",
           isCollapsed ? "justify-center" : "space-x-3"
         )}>
+          
+          {/* Profile Icon */}
           <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
             <span className="text-white text-xs font-medium">JD</span>
           </div>
+          
           {!isCollapsed && (
             <div className="flex-1 transition-opacity duration-300">
               <p className={cn(
@@ -284,7 +264,42 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange }) => {
               )}>
                 {role}
               </p>
-          </div>
+            </div>
+          )}
+          
+          
+          {!isCollapsed && (
+            <button
+              onClick={toggleDarkMode}
+              className={cn(
+                "flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-200 p-2",
+                isDarkMode 
+                  ? "text-gray-300 hover:bg-blue-600 hover:text-white" 
+                  : "text-gray-700 hover:bg-blue-100 hover:text-blue-800"
+              )}
+            >
+              {isDarkMode ? (
+                <SunIcon className="h-5 w-5" />
+              ) : (
+                <MoonIcon className="h-5 w-5" />
+              )}
+            </button>
+          )}
+
+          {/* Logout Icon - Hidden when collapsed */}
+          {onLogout && !isCollapsed && (
+            <button
+              onClick={onLogout}
+              className={cn(
+                "flex items-center justify-center rounded-lg transition-all duration-200 p-2",
+                isDarkMode 
+                  ? "text-gray-400 hover:bg-red-100 hover:text-red-600" 
+                  : "text-gray-500 hover:bg-red-50 hover:text-red-600"
+              )}
+              title="Logout"
+            >
+              <ArrowRightOnRectangleIcon className="h-5 w-5" />
+            </button>
           )}
         </div>
       </div>

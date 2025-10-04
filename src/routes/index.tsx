@@ -3,6 +3,9 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import { DashboardLayout } from '@/layouts/DashboardLayout';
+import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
+import { PublicRoute } from '@/components/auth/PublicRoute';
+import { RoleBasedRoute } from '@/components/auth/RoleBasedRoute';
 import { LandingPage } from '@/pages/Landing/LandingPage';
 import { LoginPage } from '@/pages/Auth/LoginPage';
 import { RegisterPage } from '@/pages/Auth/RegisterPage';
@@ -36,15 +39,27 @@ export const router = createBrowserRouter([
     children: [
       {
         path: 'login',
-        element: <LoginPage />,
+        element: (
+          <PublicRoute>
+            <LoginPage />
+          </PublicRoute>
+        ),
       },
       {
         path: 'register',
-        element: <RegisterPage />,
+        element: (
+          <PublicRoute>
+            <RegisterPage />
+          </PublicRoute>
+        ),
       },
       {
         path: 'forgot-password',
-        element: <ForgotPasswordPage />,
+        element: (
+          <PublicRoute>
+            <ForgotPasswordPage />
+          </PublicRoute>
+        ),
       },
     ],
   },
@@ -62,7 +77,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/client',
-    element: <DashboardLayout role="client" title="Client Dashboard" />,
+    element: (
+      <ProtectedRoute requiredRole="client">
+        <DashboardLayout role="client" title="Client Dashboard" />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
@@ -88,7 +107,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/admin',
-    element: <DashboardLayout role="admin" title="Admin Dashboard" />,
+    element: (
+      <ProtectedRoute requiredRole="admin">
+        <DashboardLayout role="admin" title="Admin Dashboard" />
+      </ProtectedRoute>
+    ),
     children: [
       {
         index: true,
