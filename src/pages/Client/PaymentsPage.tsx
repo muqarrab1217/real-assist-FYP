@@ -87,7 +87,7 @@ export const PaymentsPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
       </div>
     );
   }
@@ -100,8 +100,8 @@ export const PaymentsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Payment Management</h1>
-        <p className="text-gray-600">Track and manage your investment payments</p>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Payment Management</h1>
+        <p className="text-gray-600 dark:text-gray-300">Track and manage your investment payments</p>
       </motion.div>
 
       {/* Payment Summary Cards */}
@@ -111,14 +111,14 @@ export const PaymentsPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Paid</p>
-                  <p className="text-2xl font-bold text-green-600">{formatCurrency(totalPaid)}</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Paid</p>
+                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(totalPaid)}</p>
                 </div>
-                <CheckCircleIcon className="h-8 w-8 text-green-500" />
+                <CheckCircleIcon className="h-8 w-8 text-green-500 dark:text-green-400" />
               </div>
             </CardContent>
           </Card>
@@ -129,14 +129,14 @@ export const PaymentsPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card>
+          <Card className="dark:bg-gray-800 dark:border-gray-700">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Pending Payments</p>
-                  <p className="text-2xl font-bold text-yellow-600">{formatCurrency(totalPending)}</p>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Payments</p>
+                  <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{formatCurrency(totalPending)}</p>
                 </div>
-                <ClockIcon className="h-8 w-8 text-yellow-500" />
+                <ClockIcon className="h-8 w-8 text-yellow-500 dark:text-yellow-400" />
               </div>
             </CardContent>
           </Card>
