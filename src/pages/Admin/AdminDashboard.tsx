@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { adminAPI } from '@/services/api';
 import { DashboardStats } from '@/types';
-import { formatCurrency } from '@/lib/utils';
 
 export const AdminDashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats[]>([]);
@@ -226,7 +225,7 @@ export const AdminDashboard: React.FC = () => {
             </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentActivities.map((activity, index) => (
+                {recentActivities.map((activity) => (
                 <div key={activity.id} className="flex items-center space-x-4 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-lg transition-colors">
                   <div className={`h-2 w-2 rounded-full ${
                     activity.status === 'hot' ? 'bg-red-500' :

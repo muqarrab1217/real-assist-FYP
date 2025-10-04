@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { 
-  NewspaperIcon,
   CalendarIcon,
   MapPinIcon,
   BuildingOfficeIcon,
-  ChartBarIcon,
   PhotoIcon,
   ArrowRightIcon
 } from '@heroicons/react/24/outline';
@@ -19,7 +17,7 @@ import { formatDate } from '@/lib/utils';
 export const ProjectUpdatesPage: React.FC = () => {
   const [updates, setUpdates] = useState<ProjectUpdate[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedUpdate, setSelectedUpdate] = useState<ProjectUpdate | null>(null);
+  const [selectedUpdate] = useState<ProjectUpdate | null>(null);
 
   useEffect(() => {
     const fetchUpdates = async () => {

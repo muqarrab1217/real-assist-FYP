@@ -8,7 +8,6 @@ import {
   EnvelopeIcon,
   MapPinIcon,
   CurrencyDollarIcon,
-  CalendarIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,7 @@ export const CustomerManagementPage: React.FC = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedClient] = useState<Client | null>(null);
 
   useEffect(() => {
     const fetchClients = async () => {
