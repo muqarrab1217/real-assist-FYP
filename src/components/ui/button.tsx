@@ -4,26 +4,28 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold-500 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 transform hover:scale-105 active:scale-95",
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-primary dark:text-primary-foreground dark:hover:bg-primary/90",
+        default: "bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-white shadow-abs hover:shadow-abs-lg hover:shadow-gold",
         destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90 dark:bg-destructive dark:text-destructive-foreground dark:hover:bg-destructive/90",
+          "bg-red-600 text-white hover:bg-red-700 shadow-abs hover:shadow-abs-lg",
         outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground dark:border-gray-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-gray-200",
+          "border-2 border-gold-200 dark:border-gold-800 bg-white/10 dark:bg-charcoal-800/50 backdrop-blur-sm text-charcoal-800 dark:text-charcoal-200 hover:bg-gold-50 dark:hover:bg-gold-900/20 hover:border-gold-300 dark:hover:border-gold-700",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600",
-        ghost: "hover:bg-accent hover:text-accent-foreground dark:hover:bg-gray-800 dark:hover:text-gray-200",
-        link: "text-primary underline-offset-4 hover:underline dark:text-purple-400 dark:hover:text-purple-300",
-        gradient: "bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700 dark:from-purple-500 dark:to-blue-500 dark:hover:from-purple-600 dark:hover:to-blue-600",
+          "bg-charcoal-100 dark:bg-charcoal-700 text-charcoal-900 dark:text-charcoal-100 hover:bg-charcoal-200 dark:hover:bg-charcoal-600 shadow-abs hover:shadow-abs-lg",
+        ghost: "hover:bg-gold-50 dark:hover:bg-gold-900/20 hover:text-gold-600 dark:hover:text-gold-400 text-charcoal-700 dark:text-charcoal-300",
+        link: "text-gold-600 dark:text-gold-400 underline-offset-4 hover:underline hover:text-gold-700 dark:hover:text-gold-300",
+        premium: "bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-white shadow-abs-lg hover:shadow-abs-xl hover:shadow-gold-lg",
+        glass: "abs-glass text-charcoal-800 dark:text-white hover:bg-white/20 dark:hover:bg-charcoal-800/30",
       },
       size: {
-        default: "h-10 px-4 py-2",
-        sm: "h-9 rounded-md px-3",
-        lg: "h-11 rounded-md px-8",
-        icon: "h-10 w-10",
+        default: "h-11 px-6 py-2",
+        sm: "h-9 rounded-lg px-4 text-xs",
+        lg: "h-13 rounded-xl px-8 text-base",
+        xl: "h-15 rounded-2xl px-10 text-lg",
+        icon: "h-11 w-11",
       },
     },
     defaultVariants: {
