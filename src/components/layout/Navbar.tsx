@@ -38,10 +38,10 @@ export const Navbar: React.FC<NavbarProps> = ({ title, onSearch, onLogout, onAcc
   };
 
   return (
-    <div className="bg-white px-6 py-3">
+    <div className="bg-white/95 dark:bg-charcoal-900/95 backdrop-blur-md border-b border-charcoal-100 dark:border-charcoal-700 px-6 py-4 sticky top-0 z-50">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">{title}</h1>
+          <h1 className="text-2xl font-display font-bold text-charcoal-900 dark:text-white">{title}</h1>
         </div>
         
         <div className="flex items-center space-x-4">

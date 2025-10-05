@@ -246,7 +246,7 @@ export const CustomerManagementPage: React.FC = () => {
                               size="sm"
                               variant="outline"
                             >
-                              <EyeIcon className="h-s4 w-4" />
+                              <EyeIcon className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
                           <DialogContent className="max-w-2xl">

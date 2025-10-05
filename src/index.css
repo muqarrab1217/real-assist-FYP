@@ -4,48 +4,50 @@
 
 @layer base {
   :root {
+    /* ABS Developers Light Theme */
     --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --foreground: 220 13% 18%;
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 220 13% 18%;
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 262.1 83.3% 57.8%;
-    --radius: 0.5rem;
+    --popover-foreground: 220 13% 18%;
+    --primary: 45 85% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 220 14% 96%;
+    --secondary-foreground: 220 13% 18%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 220 14% 96%;
+    --accent-foreground: 220 13% 18%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 45 85% 55%;
+    --radius: 0.75rem;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 262.1 83.3% 57.8%;
+    /* ABS Developers Dark Theme */
+    --background: 220 25% 6%;
+    --foreground: 0 0% 98%;
+    --card: 220 25% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 220 25% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 45 85% 55%;
+    --primary-foreground: 220 25% 6%;
+    --secondary: 220 25% 12%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 220 25% 12%;
+    --muted-foreground: 220 9% 65%;
+    --accent: 220 25% 12%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 25% 12%;
+    --input: 220 25% 12%;
+    --ring: 45 85% 55%;
   }
 }
 
@@ -58,40 +60,95 @@
   }
 }
 
-/* Custom gradients and animations */
-.gradient-bg {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+/* ABS Developers Custom Styles */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&display=swap');
+
+/* ABS Developers Gradients */
+.abs-gradient-bg {
+  background: linear-gradient(135deg, #102a43 0%, #243b53 50%, #334e68 100%);
 }
 
-.gradient-text {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.abs-gradient-gold {
+  background: linear-gradient(135deg, #d4af37, #f4e68c);
+}
+
+.abs-gradient-bronze {
+  background: linear-gradient(135deg, #d97706 0%, #c4620a 50%, #a04e0b 100%);
+}
+
+.abs-gradient-text {
+  background: linear-gradient(135deg, #d4af37, #f4e68c);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-.glass-effect {
-  backdrop-filter: blur(10px);
+.abs-gradient-text-dark {
+  background: linear-gradient(135deg, #334e68 0%, #102a43 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Glassmorphism Effects */
+.abs-glass {
+  backdrop-filter: blur(16px);
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
 }
 
-.floating-animation {
-  animation: float 6s ease-in-out infinite;
+.abs-glass-dark {
+  backdrop-filter: blur(16px);
+  background: rgba(16, 42, 67, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
-@keyframes float {
+/* Premium Animations */
+.abs-float {
+  animation: abs-float 6s ease-in-out infinite;
+}
+
+@keyframes abs-float {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-20px); }
 }
 
-.pulse-glow {
-  animation: pulse-glow 2s infinite;
+.abs-pulse-gold {
+  animation: abs-pulse-gold 2s infinite;
 }
 
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.4); }
-  50% { box-shadow: 0 0 40px rgba(102, 126, 234, 0.8); }
+@keyframes abs-pulse-gold {
+  0%, 100% { box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+  50% { box-shadow: 0 0 40px rgba(212, 175, 55, 0.8); }
+}
+
+.abs-glow-hover {
+  transition: all 0.3s ease;
+}
+
+.abs-glow-hover:hover {
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Premium Button Styles */
+.abs-btn-primary {
+  @apply bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-white font-semibold px-8 py-3 rounded-xl shadow-abs hover:shadow-abs-lg transition-all duration-300 hover:scale-105;
+}
+
+.abs-btn-secondary {
+  @apply bg-white/10 backdrop-blur-sm text-charcoal-800 dark:text-white border border-gold-200 dark:border-gold-800 font-semibold px-8 py-3 rounded-xl hover:bg-gold-50 dark:hover:bg-gold-900/20 transition-all duration-300;
+}
+
+/* Card Elevation */
+.abs-card {
+  @apply bg-white dark:bg-charcoal-800 rounded-2xl shadow-abs border border-charcoal-100 dark:border-charcoal-700 transition-all duration-300 hover:shadow-abs-lg hover:-translate-y-1;
+}
+
+.abs-card-premium {
+  @apply bg-gradient-to-br from-white to-charcoal-50 dark:from-charcoal-800 dark:to-charcoal-900 rounded-2xl shadow-abs-lg border border-gold-200/50 dark:border-gold-800/50 transition-all duration-300 hover:shadow-abs-xl hover:-translate-y-2;
 }
 
 /* Blob animations for hero section */
@@ -127,20 +184,56 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* ABS Developers Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  border-radius: 3px;
+  background: linear-gradient(135deg, #d4af37, #f4e68c);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  background: linear-gradient(135deg, #b8860b, #d4af37);
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #d4af37, #f4e68c);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #b8860b, #d4af37);
+}
+
+/* Premium Focus States */
+.abs-focus {
+  @apply focus:outline-none focus:ring-2 focus:ring-gold-500 focus:ring-offset-2 focus:ring-offset-white dark:focus:ring-offset-charcoal-800;
+}
+
+/* Typography Enhancements */
+.abs-heading {
+  @apply font-display font-bold text-charcoal-900 dark:text-white;
+}
+
+.abs-subheading {
+  @apply font-sans font-semibold text-charcoal-800 dark:text-charcoal-200;
+}
+
+.abs-body {
+  @apply font-sans text-charcoal-600 dark:text-charcoal-300;
+}
+
+/* Loading States */
+.abs-loading {
+  @apply animate-pulse bg-gradient-to-r from-charcoal-200 via-charcoal-100 to-charcoal-200 dark:from-charcoal-700 dark:via-charcoal-600 dark:to-charcoal-700;
 }
