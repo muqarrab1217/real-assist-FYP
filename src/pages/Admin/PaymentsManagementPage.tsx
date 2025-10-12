@@ -63,13 +63,13 @@ export const PaymentsManagementPage: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'paid':
-        return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+        return <CheckCircleIcon className="h-5 w-5" style={{ color: '#d4af37' }} />;
       case 'pending':
-        return <ClockIcon className="h-5 w-5 text-yellow-500" />;
+        return <ClockIcon className="h-5 w-5" style={{ color: 'rgba(212,175,55,0.7)' }} />;
       case 'overdue':
-        return <ExclamationTriangleIcon className="h-5 w-5 text-red-500" />;
+        return <ExclamationTriangleIcon className="h-5 w-5" style={{ color: '#ef4444' }} />;
       default:
-        return <ClockIcon className="h-5 w-5 text-gray-500" />;
+        return <ClockIcon className="h-5 w-5" style={{ color: 'rgba(156, 163, 175, 0.7)' }} />;
     }
   };
 
@@ -101,7 +101,7 @@ export const PaymentsManagementPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
       </div>
     );
   }
@@ -116,8 +116,14 @@ export const PaymentsManagementPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Payments & Ledger</h1>
-            <p className="text-gray-600 dark:text-gray-300">Monitor and manage all payment transactions</p>
+            <h1 className="text-3xl font-bold mb-2" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+            }}>Payments & Ledger</h1>
+            <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Monitor and manage all payment transactions</p>
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" onClick={() => handleExport('pdf')}>
@@ -139,14 +145,14 @@ export const PaymentsManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Payments</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{paymentStats.total}</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Total Payments</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{paymentStats.total}</p>
                 </div>
-                <CurrencyDollarIcon className="h-8 w-8 text-blue-500 dark:text-blue-400" />
+                <CurrencyDollarIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
@@ -157,14 +163,14 @@ export const PaymentsManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Paid Amount</p>
-                  <p className="text-2xl font-bold text-green-600">{formatCurrency(paymentStats.paidAmount)}</p>
+                  <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Paid Amount</p>
+                  <p className="text-2xl font-bold" style={{ color: '#d4af37' }}>{formatCurrency(paymentStats.paidAmount)}</p>
                 </div>
-                <CheckCircleIcon className="h-8 w-8 text-green-500" />
+                <CheckCircleIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
@@ -175,14 +181,14 @@ export const PaymentsManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Pending Payments</p>
-                  <p className="text-2xl font-bold text-yellow-600">{paymentStats.pending}</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Pending Payments</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{paymentStats.pending}</p>
                 </div>
-                <ClockIcon className="h-8 w-8 text-yellow-500" />
+                <ClockIcon className="h-8 w-8" style={{ color: 'rgba(212,175,55,0.7)' }} />
               </div>
             </CardContent>
           </Card>
@@ -193,14 +199,14 @@ export const PaymentsManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Overdue Payments</p>
-                  <p className="text-2xl font-bold text-red-600">{paymentStats.overdue}</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Overdue Payments</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{paymentStats.overdue}</p>
                 </div>
-                <ExclamationTriangleIcon className="h-8 w-8 text-red-500" />
+                <ExclamationTriangleIcon className="h-8 w-8" style={{ color: '#ef4444' }} />
               </div>
             </CardContent>
           </Card>
@@ -213,17 +219,18 @@ export const PaymentsManagementPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
       >
-        <Card>
+        <Card className="abs-card">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#d4af37' }} />
                   <Input
                     placeholder="Search payments by ID or client ID..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
+                    style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
                   />
                 </div>
               </div>
@@ -231,7 +238,12 @@ export const PaymentsManagementPage: React.FC = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="px-3 py-2 rounded-lg"
+                  style={{ 
+                    background: '#000000', 
+                    border: '1px solid rgba(212,175,55,0.25)',
+                    color: '#ffffff'
+                  }}
                 >
                   <option value="all">All Status</option>
                   <option value="paid">Paid</option>
@@ -254,9 +266,12 @@ export const PaymentsManagementPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
-        <Card>
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle>Payment Transactions ({filteredPayments.length})</CardTitle>
+            <CardTitle style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>Payment Transactions ({filteredPayments.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -314,27 +329,32 @@ export const PaymentsManagementPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.7 }}
       >
-        <Card>
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle>Recent Payment Activity</CardTitle>
+            <CardTitle style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>Recent Payment Activity</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               {payments.slice(0, 5).map((payment) => (
-                <div key={payment.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div key={payment.id} className="flex items-center justify-between p-3 rounded-lg" style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                }}>
                   <div className="flex items-center space-x-3">
                     {getStatusIcon(payment.status)}
                     <div>
-                      <p className="text-sm font-medium text-gray-900">
+                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>
                         Payment #{payment.installmentNumber} - {payment.clientId}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
                         {payment.paidDate ? formatDate(payment.paidDate) : formatDate(payment.dueDate)}
                       </p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900">{formatCurrency(payment.amount)}</p>
+                    <p className="text-sm font-medium" style={{ color: '#d4af37' }}>{formatCurrency(payment.amount)}</p>
                     {getStatusBadge(payment.status)}
                   </div>
                 </div>

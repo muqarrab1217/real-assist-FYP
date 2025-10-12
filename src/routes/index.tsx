@@ -18,6 +18,7 @@ import { CustomerManagementPage } from '@/pages/Admin/CustomerManagementPage';
 import { PaymentsManagementPage } from '@/pages/Admin/PaymentsManagementPage';
 import { AnalyticsPage } from '@/pages/Admin/AnalyticsPage';
 import { SettingsPage } from '@/pages/Admin/SettingsPage';
+import { SubmitResponse } from '@/pages/SubmitResponse';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export const router = createBrowserRouter([
@@ -101,6 +102,10 @@ export const router = createBrowserRouter([
         path: 'updates',
         element: <ProjectUpdatesPage />,
       },
+      {
+        path: 'submit-feedback',
+        element: <SubmitResponse />,
+      },
     ],
   },
   {
@@ -138,6 +143,10 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: <SettingsPage />,
+      },
+      {
+        path: 'submit-feedback',
+        element: <SubmitResponse />,
       },
     ],
   },

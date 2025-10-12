@@ -90,7 +90,7 @@ export const AdminDashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gold-600 dark:border-gold-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
       </div>
     );
   }
@@ -103,8 +103,14 @@ export const AdminDashboard: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-4xl font-display font-bold text-charcoal-900 dark:text-white mb-3">Admin Dashboard</h1>
-        <p className="text-charcoal-600 dark:text-charcoal-300 text-lg">Overview of your real estate business performance</p>
+        <h1 className="text-4xl font-bold mb-3" style={{ 
+          fontFamily: 'Playfair Display, serif',
+          backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+        }}>Admin Dashboard</h1>
+        <p className="text-lg" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Overview of your real estate business performance</p>
       </motion.div>
 
       {/* Stats Grid */}
@@ -122,21 +128,23 @@ export const AdminDashboard: React.FC = () => {
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-semibold text-charcoal-600 dark:text-charcoal-300">{stat.title}</p>
-                      <p className="text-3xl font-bold text-charcoal-900 dark:text-white mt-2">{stat.value}</p>
+                      <p className="text-sm font-semibold" style={{ color: 'rgba(212,175,55,0.9)' }}>{stat.title}</p>
+                      <p className="text-3xl font-bold mt-2" style={{ color: '#ffffff' }}>{stat.value}</p>
                       <div className="flex items-center mt-2">
                         {stat.changeType === 'increase' ? (
-                          <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
+                          <ArrowUpIcon className="h-4 w-4 mr-1" style={{ color: '#d4af37' }} />
                         ) : (
-                          <ArrowDownIcon className="h-4 w-4 text-red-500 mr-1" />
+                          <ArrowDownIcon className="h-4 w-4 mr-1" style={{ color: '#ef4444' }} />
                         )}
-                        <p className={`text-sm font-medium ${stat.changeType === 'increase' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        <p className="text-sm font-medium" style={{ color: stat.changeType === 'increase' ? '#d4af37' : '#ef4444' }}>
                           +{stat.change}% from last month
                         </p>
                       </div>
                     </div>
-                    <div className="h-14 w-14 bg-gradient-to-br from-gold-100 to-bronze-100 dark:from-gold-900/30 dark:to-bronze-900/30 rounded-xl flex items-center justify-center group-hover:from-gold-500 group-hover:to-bronze-500 transition-all duration-300">
-                      <IconComponent className="h-7 w-7 text-gold-600 dark:text-gold-400 group-hover:text-white transition-colors duration-300" />
+                    <div className="h-14 w-14 rounded-xl flex items-center justify-center transition-all duration-300" style={{
+                      backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                    }}>
+                      <IconComponent className="h-7 w-7" style={{ color: '#000000' }} />
                     </div>
                   </div>
                 </CardContent>
@@ -156,14 +164,19 @@ export const AdminDashboard: React.FC = () => {
         >
           <Card className="abs-card">
             <CardHeader>
-              <CardTitle className="dark:text-white text-xl font-display">Revenue Trend</CardTitle>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Revenue Trend</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="h-64 flex items-center justify-center bg-gradient-to-br from-gold-50 to-bronze-50 dark:from-gold-900/20 dark:to-bronze-900/20 rounded-xl">
+              <div className="h-64 flex items-center justify-center rounded-xl" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
                 <div className="text-center">
-                  <ChartBarIcon className="h-12 w-12 text-gold-600 dark:text-gold-400 mx-auto mb-2" />
-                  <p className="text-charcoal-600 dark:text-charcoal-300">Chart visualization would go here</p>
-                  <p className="text-sm text-charcoal-500 dark:text-charcoal-400">Integration with Chart.js or Recharts</p>
+                  <ChartBarIcon className="h-12 w-12 mx-auto mb-2" style={{ color: '#d4af37' }} />
+                  <p style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Chart visualization would go here</p>
+                  <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Integration with Chart.js or Recharts</p>
                 </div>
               </div>
             </CardContent>
@@ -178,28 +191,35 @@ export const AdminDashboard: React.FC = () => {
         >
           <Card className="abs-card">
             <CardHeader>
-              <CardTitle className="dark:text-white text-xl font-display">Top Leads</CardTitle>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Top Leads</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {topLeads.map((lead, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gradient-to-r from-gold-50 to-bronze-50 dark:from-gold-900/20 dark:to-bronze-900/20 rounded-xl">
+                  <div key={index} className="flex items-center justify-between p-4 rounded-xl" style={{
+                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                  }}>
                     <div className="flex items-center space-x-3">
-                      <div className="h-8 w-8 bg-gradient-to-r from-gold-500 to-bronze-500 rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs font-medium">
+                      <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{
+                        backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                      }}>
+                        <span className="text-xs font-medium" style={{ color: '#000000' }}>
                           {lead.name.split(' ').map(n => n[0]).join('')}
                         </span>
                       </div>
                       <div>
-                        <p className="font-medium text-gray-900 dark:text-white">{lead.name}</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{lead.source}</p>
+                        <p className="font-medium" style={{ color: '#ffffff' }}>{lead.name}</p>
+                        <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>{lead.source}</p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
                       <Badge variant={lead.status === 'hot' ? 'destructive' : lead.status === 'warm' ? 'warning' : 'secondary'}>
                         {lead.status}
                       </Badge>
-                      <span className="text-sm font-medium text-gray-900 dark:text-white">{lead.score}</span>
+                      <span className="text-sm font-medium" style={{ color: '#d4af37' }}>{lead.score}</span>
                     </div>
                   </div>
                 ))}
@@ -221,20 +241,29 @@ export const AdminDashboard: React.FC = () => {
       >
         <Card className="abs-card">
             <CardHeader>
-              <CardTitle className="dark:text-white text-xl font-display">Recent Activity</CardTitle>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Recent Activity</CardTitle>
             </CardHeader>
           <CardContent>
             <div className="space-y-4">
                 {recentActivities.map((activity) => (
-                <div key={activity.id} className="flex items-center space-x-4 p-4 hover:bg-gradient-to-r hover:from-gold-50 hover:to-bronze-50 dark:hover:from-gold-900/20 dark:hover:to-bronze-900/20 rounded-xl transition-all duration-300">
-                  <div className={`h-2 w-2 rounded-full ${
-                    activity.status === 'hot' ? 'bg-red-500' :
-                    activity.status === 'completed' ? 'bg-green-500' :
-                    activity.status === 'active' ? 'bg-blue-500' : 'bg-purple-500'
-                  }`}></div>
+                <div key={activity.id} className="flex items-center space-x-4 p-4 rounded-xl transition-all duration-300" style={{
+                  background: 'transparent'
+                }} onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.8) 100%)';
+                }} onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                }}>
+                  <div className="h-2 w-2 rounded-full" style={{
+                    backgroundColor: activity.status === 'hot' ? '#ef4444' :
+                    activity.status === 'completed' ? '#d4af37' :
+                    activity.status === 'active' ? '#d4af37' : '#d4af37'
+                  }}></div>
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{activity.message}</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">{activity.time}</p>
+                    <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{activity.message}</p>
+                    <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>{activity.time}</p>
                   </div>
                   <Badge variant="outline" className="text-xs">
                     {activity.type}
@@ -254,23 +283,26 @@ export const AdminDashboard: React.FC = () => {
       >
         <Card className="abs-card">
             <CardHeader>
-              <CardTitle className="dark:text-white text-xl font-display">Quick Actions</CardTitle>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Quick Actions</CardTitle>
             </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="glass" className="h-20 flex-col">
                 <UsersIcon className="h-6 w-6 mb-2" />
                 <span className="text-sm">Manage Leads</span>
               </Button>
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="glass" className="h-20 flex-col">
                 <UserGroupIcon className="h-6 w-6 mb-2" />
                 <span className="text-sm">View Clients</span>
               </Button>
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="glass" className="h-20 flex-col">
                 <CurrencyDollarIcon className="h-6 w-6 mb-2" />
                 <span className="text-sm">Check Payments</span>
               </Button>
-              <Button variant="outline" className="h-20 flex-col">
+              <Button variant="glass" className="h-20 flex-col">
                 <ChartBarIcon className="h-6 w-6 mb-2" />
                 <span className="text-sm">View Analytics</span>
               </Button>

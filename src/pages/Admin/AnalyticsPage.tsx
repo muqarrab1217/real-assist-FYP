@@ -96,7 +96,7 @@ export const AnalyticsPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
       </div>
     );
   }
@@ -111,8 +111,14 @@ export const AnalyticsPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Analytics Dashboard</h1>
-            <p className="text-gray-600 dark:text-gray-300">Comprehensive insights into your business performance</p>
+            <h1 className="text-3xl font-bold mb-2" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+            }}>Analytics Dashboard</h1>
+            <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Comprehensive insights into your business performance</p>
           </div>
           <div className="flex space-x-2">
             <Button variant="outline">
@@ -138,25 +144,27 @@ export const AnalyticsPage: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="hover:shadow-lg transition-shadow duration-200 dark:bg-gray-800 dark:border-gray-700">
+              <Card className="abs-card-premium hover:shadow-lg transition-shadow duration-200">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{metric.title}</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{metric.value}</p>
+                      <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>{metric.title}</p>
+                      <p className="text-2xl font-bold mt-1" style={{ color: '#ffffff' }}>{metric.value}</p>
                       <div className="flex items-center mt-1">
                         {metric.changeType === 'increase' ? (
-                          <ArrowUpIcon className="h-4 w-4 text-green-500 mr-1" />
+                          <ArrowUpIcon className="h-4 w-4 mr-1" style={{ color: '#d4af37' }} />
                         ) : (
-                          <ArrowDownIcon className="h-4 w-4 text-red-500 mr-1" />
+                          <ArrowDownIcon className="h-4 w-4 mr-1" style={{ color: '#ef4444' }} />
                         )}
-                        <p className={`text-sm ${metric.changeType === 'increase' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+                        <p className="text-sm" style={{ color: metric.changeType === 'increase' ? '#d4af37' : '#ef4444' }}>
                           +{metric.change}% from last month
                         </p>
                       </div>
                     </div>
-                    <div className={`h-12 w-12 ${metric.bgColor} dark:bg-gray-700/50 rounded-lg flex items-center justify-center`}>
-                      <IconComponent className={`h-6 w-6 ${metric.color}`} />
+                    <div className="h-12 w-12 rounded-lg flex items-center justify-center" style={{
+                      backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                    }}>
+                      <IconComponent className="h-6 w-6" style={{ color: '#000000' }} />
                     </div>
                   </div>
                 </CardContent>
@@ -174,17 +182,22 @@ export const AnalyticsPage: React.FC = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.6 }}
         >
-          <Card>
+          <Card className="abs-card">
             <CardHeader>
-              <CardTitle className="dark:text-white">Revenue Trend</CardTitle>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Monthly revenue over the last 6 months</p>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Revenue Trend</CardTitle>
+              <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Monthly revenue over the last 6 months</p>
             </CardHeader>
             <CardContent>
-              <div className="h-64 flex items-center justify-center bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg">
+              <div className="h-64 flex items-center justify-center rounded-lg" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
                 <div className="text-center">
-                  <ChartBarIcon className="h-12 w-12 text-purple-600 mx-auto mb-2" />
-                  <p className="text-gray-600 dark:text-gray-300">Revenue Chart</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Integration with Chart.js or Recharts</p>
+                  <ChartBarIcon className="h-12 w-12 mx-auto mb-2" style={{ color: '#d4af37' }} />
+                  <p style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Revenue Chart</p>
+                  <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Integration with Chart.js or Recharts</p>
                 </div>
               </div>
             </CardContent>
@@ -197,17 +210,22 @@ export const AnalyticsPage: React.FC = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.7 }}
         >
-          <Card>
+          <Card className="abs-card">
             <CardHeader>
-              <CardTitle className="dark:text-white">Lead Generation</CardTitle>
-              <p className="text-sm text-gray-600 dark:text-gray-300">New leads acquired each month</p>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Lead Generation</CardTitle>
+              <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>New leads acquired each month</p>
             </CardHeader>
             <CardContent>
-              <div className="h-64 flex items-center justify-center bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-lg">
+              <div className="h-64 flex items-center justify-center rounded-lg" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
                 <div className="text-center">
-                  <UsersIcon className="h-12 w-12 text-green-600 mx-auto mb-2" />
-                  <p className="text-gray-600 dark:text-gray-300">Leads Chart</p>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Integration with Chart.js or Recharts</p>
+                  <UsersIcon className="h-12 w-12 mx-auto mb-2" style={{ color: '#d4af37' }} />
+                  <p style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Leads Chart</p>
+                  <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Integration with Chart.js or Recharts</p>
                 </div>
               </div>
             </CardContent>
@@ -221,31 +239,42 @@ export const AnalyticsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.8 }}
       >
-        <Card>
+        <Card className="abs-card">
             <CardHeader>
-              <CardTitle className="dark:text-white">Performance Metrics</CardTitle>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Key performance indicators and benchmarks</p>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Performance Metrics</CardTitle>
+              <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Key performance indicators and benchmarks</p>
             </CardHeader>
           <CardContent>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <p className="text-2xl font-bold text-blue-600">24.5%</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Conversion Rate</p>
+              <div className="text-center p-4 rounded-lg" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
+                <p className="text-2xl font-bold" style={{ color: '#d4af37' }}>24.5%</p>
+                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Conversion Rate</p>
                 <Badge variant="success" className="mt-2">Above Average</Badge>
               </div>
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <p className="text-2xl font-bold text-green-600">2.3 days</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Avg Response Time</p>
+              <div className="text-center p-4 rounded-lg" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
+                <p className="text-2xl font-bold" style={{ color: '#d4af37' }}>2.3 days</p>
+                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Avg Response Time</p>
                 <Badge variant="success" className="mt-2">Excellent</Badge>
               </div>
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <p className="text-2xl font-bold text-purple-600">87%</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Client Satisfaction</p>
+              <div className="text-center p-4 rounded-lg" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
+                <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>87%</p>
+                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Client Satisfaction</p>
                 <Badge variant="success" className="mt-2">Very Good</Badge>
               </div>
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <p className="text-2xl font-bold text-orange-600">156</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Deals Closed</p>
+              <div className="text-center p-4 rounded-lg" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
+                <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>156</p>
+                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Deals Closed</p>
                 <Badge variant="info" className="mt-2">On Track</Badge>
               </div>
             </div>
@@ -259,10 +288,13 @@ export const AnalyticsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.9 }}
       >
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle className="dark:text-white">Top Lead Sources</CardTitle>
-            <p className="text-sm text-gray-600 dark:text-gray-300">Performance by lead source</p>
+            <CardTitle style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>Top Lead Sources</CardTitle>
+            <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Performance by lead source</p>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -273,19 +305,23 @@ export const AnalyticsPage: React.FC = () => {
                 { source: 'Email Campaign', leads: 23, conversion: 31.8, revenue: 89000 },
                 { source: 'Cold Outreach', leads: 18, conversion: 18.9, revenue: 42000 },
               ].map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                <div key={index} className="flex items-center justify-between p-4 rounded-lg" style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                }}>
                   <div className="flex items-center space-x-4">
-                    <div className="h-10 w-10 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white font-medium text-sm">{index + 1}</span>
+                    <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{
+                      backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                    }}>
+                      <span className="font-medium text-sm" style={{ color: '#000000' }}>{index + 1}</span>
                     </div>
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">{item.source}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">{item.leads} leads</p>
+                      <p className="font-medium" style={{ color: '#ffffff' }}>{item.source}</p>
+                      <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>{item.leads} leads</p>
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">{item.conversion}% conversion</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{formatCurrency(item.revenue)}</p>
+                    <p className="text-sm font-medium" style={{ color: '#d4af37' }}>{item.conversion}% conversion</p>
+                    <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>{formatCurrency(item.revenue)}</p>
                   </div>
                 </div>
               ))}

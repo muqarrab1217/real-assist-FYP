@@ -18,7 +18,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="flex h-screen" style={{
+      background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
+    }}>
       <Sidebar role={role} onLogout={handleLogout} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <main className="flex-1 overflow-y-auto p-6">

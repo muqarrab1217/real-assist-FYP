@@ -49,7 +49,7 @@ export const ClientDashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
       </div>
     );
   }
@@ -62,8 +62,14 @@ export const ClientDashboard: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Welcome back, John!</h1>
-        <p className="text-gray-600 dark:text-gray-300">Here's an overview of your investment progress</p>
+        <h1 className="text-3xl font-bold mb-2" style={{ 
+          fontFamily: 'Playfair Display, serif',
+          backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+        }}>Welcome back, John!</h1>
+        <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Here's an overview of your investment progress</p>
       </motion.div>
 
       {/* Stats Grid */}
@@ -77,18 +83,20 @@ export const ClientDashboard: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <Card className="hover:shadow-lg transition-shadow duration-200 dark:bg-gray-800 dark:border-gray-700">
+              <Card className="abs-card-premium group">
                 <CardContent className="p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.title}</p>
-                      <p className="text-2xl font-bold text-gray-900 dark:text-white mt-1">{stat.value}</p>
-                      <p className="text-sm text-green-600 mt-1">
+                      <p className="text-sm font-semibold" style={{ color: 'rgba(212,175,55,0.9)' }}>{stat.title}</p>
+                      <p className="text-2xl font-bold mt-1 dark:text-white">{stat.value}</p>
+                      <p className="text-sm mt-1" style={{ color: '#d4af37' }}>
                         +{stat.change}% from last month
                       </p>
                     </div>
-                    <div className="h-12 w-12 bg-gradient-to-r from-purple-100 to-blue-100 dark:from-purple-900 dark:to-blue-900 rounded-lg flex items-center justify-center">
-                      <IconComponent className="h-6 w-6 text-purple-600 dark:text-purple-400" />
+                    <div className="h-12 w-12 rounded-lg flex items-center justify-center group-hover:from-gold-500 group-hover:to-bronze-500 transition-all duration-300" style={{
+                      backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+                    }}>
+                      <IconComponent className="h-6 w-6 text-black" />
                     </div>
                   </div>
                 </CardContent>
@@ -106,20 +114,23 @@ export const ClientDashboard: React.FC = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Card>
+          <Card className="abs-card">
             <CardHeader>
-              <CardTitle className="dark:text-white">Quick Actions</CardTitle>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Button className="w-full justify-start" variant="outline">
+              <Button className="w-full justify-start" variant="glass">
                 <CurrencyDollarIcon className="h-5 w-5 mr-3" />
                 Make Payment
               </Button>
-              <Button className="w-full justify-start" variant="outline">
+              <Button className="w-full justify-start" variant="glass">
                 <ChartBarIcon className="h-5 w-5 mr-3" />
                 View Ledger
               </Button>
-              <Button className="w-full justify-start" variant="outline">
+              <Button className="w-full justify-start" variant="glass">
                 <CheckCircleIcon className="h-5 w-5 mr-3" />
                 Check Project Updates
               </Button>
@@ -133,40 +144,43 @@ export const ClientDashboard: React.FC = () => {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <Card>
+          <Card className="abs-card">
             <CardHeader>
-              <CardTitle className="dark:text-white">Recent Activity</CardTitle>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Recent Activity</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
                 <div className="flex items-center space-x-3">
-                  <div className="h-2 w-2 bg-green-500 rounded-full"></div>
+                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#d4af37' }}></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium dark:text-white">Payment #8 Completed</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">September 14, 2023</p>
+                    <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>September 14, 2023</p>
                   </div>
-                  <span className="text-sm font-medium text-green-600">$18,750</span>
+                  <span className="text-sm font-medium" style={{ color: '#d4af37' }}>$18,750</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <div className="h-2 w-2 bg-blue-500 rounded-full"></div>
+                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#d4af37' }}></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium dark:text-white">Project Update Available</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">October 1, 2023</p>
+                    <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>October 1, 2023</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <div className="h-2 w-2 bg-yellow-500 rounded-full"></div>
+                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#f4e68c' }}></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium dark:text-white">Payment #9 Due Soon</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">Due October 15, 2023</p>
+                    <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Due October 15, 2023</p>
                   </div>
-                  <span className="text-sm font-medium text-yellow-600">$18,750</span>
+                  <span className="text-sm font-medium" style={{ color: '#f4e68c' }}>$18,750</span>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <div className="h-2 w-2 bg-purple-500 rounded-full"></div>
+                  <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#d4af37' }}></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium dark:text-white">Monthly Statement Generated</p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">October 1, 2023</p>
+                    <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>October 1, 2023</p>
                   </div>
                 </div>
               </div>
@@ -181,20 +195,28 @@ export const ClientDashboard: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
-        <Card>
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle className="dark:text-white">Payment Status</CardTitle>
+            <CardTitle style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>Payment Status</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="flex items-center justify-between p-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+            <div className="flex items-center justify-between p-4 rounded-lg" style={{
+              background: 'rgba(212,175,55,0.1)',
+              border: '1px solid rgba(212,175,55,0.3)',
+            }}>
               <div className="flex items-center space-x-3">
-                <ExclamationTriangleIcon className="h-6 w-6 text-yellow-600" />
+                <ExclamationTriangleIcon className="h-6 w-6" style={{ color: '#d4af37' }} />
                 <div>
-                  <p className="font-medium text-yellow-800 dark:text-yellow-200">Upcoming Payment Due</p>
-                  <p className="text-sm text-yellow-600 dark:text-yellow-400">Payment #9 is due on October 15, 2023</p>
+                  <p className="font-medium" style={{ color: '#d4af37' }}>Upcoming Payment Due</p>
+                  <p className="text-sm" style={{ color: 'rgba(212,175,55,0.8)' }}>Payment #9 is due on October 15, 2023</p>
                 </div>
               </div>
-              <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+              <Button className="text-black font-semibold" style={{
+                backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+              }}>
                 Pay Now
               </Button>
             </div>

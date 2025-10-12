@@ -6,10 +6,12 @@ import {
   CheckCircleIcon,
   ClockIcon,
   ExclamationTriangleIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -22,6 +24,7 @@ export const PaymentsPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
   const [paymentMethod, setPaymentMethod] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -69,13 +72,13 @@ export const PaymentsPage: React.FC = () => {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'paid':
-        return <CheckCircleIcon className="h-5 w-5 text-green-500" />;
+        return <CheckCircleIcon className="h-5 w-5" style={{ color: '#d4af37' }} />;
       case 'pending':
-        return <ClockIcon className="h-5 w-5 text-yellow-500" />;
+        return <ClockIcon className="h-5 w-5" style={{ color: 'rgba(212,175,55,0.7)' }} />;
       case 'overdue':
-        return <ExclamationTriangleIcon className="h-5 w-5 text-red-500" />;
+        return <ExclamationTriangleIcon className="h-5 w-5" style={{ color: '#ef4444' }} />;
       default:
-        return <ClockIcon className="h-5 w-5 text-gray-500" />;
+        return <ClockIcon className="h-5 w-5" style={{ color: 'rgba(156, 163, 175, 0.7)' }} />;
     }
   };
 
@@ -84,10 +87,21 @@ export const PaymentsPage: React.FC = () => {
   const totalPaid = paidPayments.reduce((sum, p) => sum + p.amount, 0);
   const totalPending = pendingPayments.reduce((sum, p) => sum + p.amount, 0);
 
+  const filteredPayments = payments.filter(payment => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      payment.installmentNumber.toString().includes(searchLower) ||
+      payment.method?.toLowerCase().includes(searchLower) ||
+      payment.status.toLowerCase().includes(searchLower) ||
+      'sunset towers'.includes(searchLower) ||
+      'miami'.includes(searchLower)
+    );
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
       </div>
     );
   }
@@ -100,8 +114,14 @@ export const PaymentsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Payment Management</h1>
-        <p className="text-gray-600 dark:text-gray-300">Track and manage your investment payments</p>
+        <h1 className="text-3xl font-bold mb-2" style={{ 
+          fontFamily: 'Playfair Display, serif',
+          backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+        }}>Payment Management</h1>
+        <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Track and manage your investment payments</p>
       </motion.div>
 
       {/* Payment Summary Cards */}
@@ -111,14 +131,14 @@ export const PaymentsPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Paid</p>
-                  <p className="text-2xl font-bold text-green-600 dark:text-green-400">{formatCurrency(totalPaid)}</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Total Paid</p>
+                  <p className="text-2xl font-bold" style={{ color: '#d4af37' }}>{formatCurrency(totalPaid)}</p>
                 </div>
-                <CheckCircleIcon className="h-8 w-8 text-green-500 dark:text-green-400" />
+                <CheckCircleIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
@@ -129,14 +149,14 @@ export const PaymentsPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Pending Payments</p>
-                  <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{formatCurrency(totalPending)}</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Pending Payments</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{formatCurrency(totalPending)}</p>
                 </div>
-                <ClockIcon className="h-8 w-8 text-yellow-500 dark:text-yellow-400" />
+                <ClockIcon className="h-8 w-8" style={{ color: 'rgba(212,175,55,0.7)' }} />
               </div>
             </CardContent>
           </Card>
@@ -147,31 +167,249 @@ export const PaymentsPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Payments Made</p>
-                  <p className="text-2xl font-bold text-purple-600">{paidPayments.length}/24</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Payments Made</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{paidPayments.length}/24</p>
                 </div>
-                <BanknotesIcon className="h-8 w-8 text-purple-500" />
+                <BanknotesIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
         </motion.div>
       </div>
 
+      {/* Payment Overview - Previous & Upcoming */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Previous Payments */}
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+        >
+          <Card className="abs-card">
+            <CardHeader>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Previous Payments</CardTitle>
+              <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Recently completed payments</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {paidPayments.slice(0, 3).map((payment) => (
+                  <Dialog key={payment.id}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="glass" 
+                        className="w-full justify-between h-auto py-4"
+                        onClick={() => setSelectedPayment(payment)}
+                      >
+                        <div className="text-left">
+                          <p className="font-medium" style={{ color: '#ffffff' }}>Payment #{payment.installmentNumber}</p>
+                          <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
+                            Paid: {payment.paidDate ? formatDate(payment.paidDate) : 'N/A'}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold" style={{ color: '#d4af37' }}>{formatCurrency(payment.amount)}</p>
+                          <CheckCircleIcon className="h-4 w-4 inline ml-2" style={{ color: '#d4af37' }} />
+                        </div>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" style={{
+                      background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.04) 0%, rgba(0, 0, 0, 0.95) 100%)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(212, 175, 55, 0.25)',
+                      boxShadow: 'inset 0 0 200px rgba(212, 175, 55, 0.04)'
+                    }}>
+                      <DialogHeader>
+                        <DialogTitle style={{ 
+                          fontFamily: 'Playfair Display, serif',
+                          color: '#d4af37'
+                        }}>Payment Details</DialogTitle>
+                        <DialogDescription style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
+                          Payment #{payment.installmentNumber} - Completed
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 rounded-lg" style={{
+                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                          }}>
+                            <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Amount Paid</p>
+                            <p className="text-xl font-bold" style={{ color: '#d4af37' }}>{formatCurrency(payment.amount)}</p>
+                          </div>
+                          <div className="p-4 rounded-lg" style={{
+                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                          }}>
+                            <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Payment Date</p>
+                            <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.paidDate ? formatDate(payment.paidDate) : 'N/A'}</p>
+                          </div>
+                          <div className="p-4 rounded-lg" style={{
+                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                          }}>
+                            <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Payment Method</p>
+                            <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.method || 'N/A'}</p>
+                          </div>
+                          <div className="p-4 rounded-lg" style={{
+                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                          }}>
+                            <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Transaction ID</p>
+                            <p className="text-xs font-mono" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>#{payment.id.slice(-8)}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                ))}
+                {paidPayments.length === 0 && (
+                  <p className="text-center py-8 text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
+                    No previous payments yet
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        {/* Upcoming Payments */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+        >
+          <Card className="abs-card">
+            <CardHeader>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Upcoming Payments</CardTitle>
+              <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Next payments due</p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {pendingPayments.slice(0, 3).map((payment) => (
+                  <Dialog key={payment.id}>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="glass" 
+                        className="w-full justify-between h-auto py-4"
+                        onClick={() => setSelectedPayment(payment)}
+                      >
+                        <div className="text-left">
+                          <p className="font-medium" style={{ color: '#ffffff' }}>Payment #{payment.installmentNumber}</p>
+                          <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
+                            Due: {formatDate(payment.dueDate)}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="font-semibold" style={{ color: '#ffffff' }}>{formatCurrency(payment.amount)}</p>
+                          <ClockIcon className="h-4 w-4 inline ml-2" style={{ color: 'rgba(212,175,55,0.7)' }} />
+                        </div>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" style={{
+                      background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.04) 0%, rgba(0, 0, 0, 0.95) 100%)',
+                      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                      backdropFilter: 'blur(20px)',
+                      border: '1px solid rgba(212, 175, 55, 0.25)',
+                      boxShadow: 'inset 0 0 200px rgba(212, 175, 55, 0.04)'
+                    }}>
+                      <DialogHeader>
+                        <DialogTitle style={{ 
+                          fontFamily: 'Playfair Display, serif',
+                          color: '#d4af37'
+                        }}>Upcoming Payment Details</DialogTitle>
+                        <DialogDescription style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
+                          Payment #{payment.installmentNumber} - Due Soon
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="p-4 rounded-lg" style={{
+                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                          }}>
+                            <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Amount Due</p>
+                            <p className="text-xl font-bold" style={{ color: '#ffffff' }}>{formatCurrency(payment.amount)}</p>
+                          </div>
+                          <div className="p-4 rounded-lg" style={{
+                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                          }}>
+                            <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Due Date</p>
+                            <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{formatDate(payment.dueDate)}</p>
+                          </div>
+                        </div>
+                        <div className="p-4 rounded-lg" style={{
+                          background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.9) 100%)',
+                          border: '1px solid rgba(212,175,55,0.25)'
+                        }}>
+                          <p className="text-sm font-medium mb-2" style={{ color: '#d4af37' }}>Project: Sunset Towers</p>
+                          <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Miami, FL • Luxury Condominiums</p>
+                        </div>
+                        <Button 
+                          className="w-full text-black font-semibold"
+                          style={{
+                            backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                          }}
+                        >
+                          <CreditCardIcon className="h-4 w-4 mr-2" />
+                          Pay Now
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                ))}
+                {pendingPayments.length === 0 && (
+                  <p className="text-center py-8 text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
+                    No upcoming payments
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </div>
+
+      {/* Search Bar */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6 }}
+      >
+        <Card className="abs-card">
+          <CardContent className="p-6">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#d4af37' }} />
+              <Input
+                placeholder="Search by installment, project, location, status, or payment method..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+                style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
       {/* Payment History Table */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
+        transition={{ duration: 0.5, delay: 0.7 }}
       >
-        <Card>
+        <Card className="abs-card">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Payment History</CardTitle>
-              <p className="text-sm text-gray-600 mt-1">Complete payment history and status</p>
+              <CardTitle style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>Payment History ({filteredPayments.length})</CardTitle>
+              <p className="text-sm mt-1" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Complete payment history and status</p>
             </div>
             <Button variant="outline" size="sm">
               <ArrowDownTrayIcon className="h-4 w-4 mr-2" />
@@ -184,6 +422,7 @@ export const PaymentsPage: React.FC = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Installment</TableHead>
+                    <TableHead>Project</TableHead>
                     <TableHead>Amount</TableHead>
                     <TableHead>Due Date</TableHead>
                     <TableHead>Paid Date</TableHead>
@@ -193,10 +432,16 @@ export const PaymentsPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {payments.map((payment) => (
+                  {filteredPayments.map((payment) => (
                     <TableRow key={payment.id}>
                       <TableCell className="font-medium">
                         #{payment.installmentNumber}
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-medium" style={{ color: '#ffffff' }}>Sunset Towers</p>
+                          <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Miami, FL</p>
+                        </div>
                       </TableCell>
                       <TableCell>{formatCurrency(payment.amount)}</TableCell>
                       <TableCell>{formatDate(payment.dueDate)}</TableCell>
@@ -223,29 +468,115 @@ export const PaymentsPage: React.FC = () => {
                                 Pay Now
                               </Button>
                             </DialogTrigger>
-                            <DialogContent>
+                            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto" style={{
+                              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.04) 0%, rgba(0, 0, 0, 0.95) 100%)',
+                              backgroundColor: 'rgba(0, 0, 0, 0.85)',
+                              backdropFilter: 'blur(20px)',
+                              border: '1px solid rgba(212, 175, 55, 0.25)',
+                              boxShadow: 'inset 0 0 200px rgba(212, 175, 55, 0.04)'
+                            }}>
                               <DialogHeader>
-                                <DialogTitle>Make Payment</DialogTitle>
-                                <DialogDescription>
+                                <DialogTitle style={{ 
+                                  fontFamily: 'Playfair Display, serif',
+                                  color: '#d4af37'
+                                }}>Make Payment</DialogTitle>
+                                <DialogDescription style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
                                   Complete payment for installment #{payment.installmentNumber}
                                 </DialogDescription>
                               </DialogHeader>
-                              <div className="space-y-4">
-                                <div className="p-4 bg-gray-50 rounded-lg">
-                                  <p className="text-sm text-gray-600">Amount Due</p>
-                                  <p className="text-2xl font-bold text-gray-900">
-                                    {formatCurrency(payment.amount)}
+                              <div className="space-y-6">
+                                {/* Project Information */}
+                                <div className="p-6 rounded-lg" style={{
+                                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.9) 100%)',
+                                  border: '1px solid rgba(212,175,55,0.25)'
+                                }}>
+                                  <h3 className="text-lg font-semibold mb-4" style={{ 
+                                    fontFamily: 'Playfair Display, serif',
+                                    color: '#d4af37'
+                                  }}>Project Details</h3>
+                                  <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Project Name</p>
+                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Sunset Towers</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Location</p>
+                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Miami, FL</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Developer</p>
+                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Miami Developers LLC</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Property Type</p>
+                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Luxury Condominiums</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Total Investment</p>
+                                      <p className="text-sm font-medium" style={{ color: '#d4af37' }}>{formatCurrency(450000)}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Expected Completion</p>
+                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>December 2024</p>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Payment Information */}
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div className="p-4 rounded-lg" style={{
+                                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                                  }}>
+                                    <p className="text-sm mb-1" style={{ color: 'rgba(212,175,55,0.9)' }}>Amount Due</p>
+                                    <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>
+                                      {formatCurrency(payment.amount)}
+                                    </p>
+                                  </div>
+                                  <div className="p-4 rounded-lg" style={{
+                                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                                  }}>
+                                    <p className="text-sm mb-1" style={{ color: 'rgba(212,175,55,0.9)' }}>Due Date</p>
+                                    <p className="text-lg font-semibold" style={{ color: '#ffffff' }}>
+                                      {formatDate(payment.dueDate)}
+                                    </p>
+                                  </div>
+                                </div>
+
+                                {/* Payment Progress */}
+                                <div className="p-4 rounded-lg" style={{
+                                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                                }}>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Payment Progress</p>
+                                    <p className="text-sm" style={{ color: '#ffffff' }}>{payment.installmentNumber} of 24</p>
+                                  </div>
+                                  <div className="w-full rounded-full h-2" style={{ background: 'rgba(0,0,0,0.5)' }}>
+                                    <div 
+                                      className="h-2 rounded-full" 
+                                      style={{ 
+                                        width: `${(payment.installmentNumber / 24) * 100}%`,
+                                        backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                                      }}
+                                    ></div>
+                                  </div>
+                                  <p className="text-xs mt-2" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
+                                    {formatCurrency((payment.installmentNumber - 1) * payment.amount)} paid • {formatCurrency((24 - payment.installmentNumber + 1) * payment.amount)} remaining
                                   </p>
                                 </div>
                                 
                                 <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                                  <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>
                                     Payment Method
                                   </label>
                                   <select
                                     value={paymentMethod}
                                     onChange={(e) => setPaymentMethod(e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                                    className="w-full px-3 py-2 rounded-lg"
+                                    style={{ 
+                                      background: '#000000', 
+                                      border: '1px solid rgba(212,175,55,0.25)',
+                                      color: '#ffffff'
+                                    }}
                                   >
                                     <option value="">Select payment method</option>
                                     <option value="Credit Card">Credit Card</option>
@@ -255,16 +586,19 @@ export const PaymentsPage: React.FC = () => {
                                 </div>
 
                                 <div className="flex space-x-3">
+                                  <Button variant="outline" className="flex-1">
+                                    Cancel
+                                  </Button>
                                   <Button
                                     onClick={handleMakePayment}
                                     disabled={!paymentMethod}
-                                    className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                                    className="flex-1 text-black font-semibold"
+                                    style={{
+                                      backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                                    }}
                                   >
                                     <CreditCardIcon className="h-4 w-4 mr-2" />
                                     Pay Now
-                                  </Button>
-                                  <Button variant="outline" className="flex-1">
-                                    Cancel
                                   </Button>
                                 </div>
                               </div>
