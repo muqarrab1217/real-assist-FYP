@@ -17,6 +17,7 @@ const badgeVariants = cva(
         success: "border-transparent bg-green-500 text-white hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700",
         warning: "border-transparent bg-yellow-500 text-white hover:bg-yellow-600 dark:bg-yellow-600 dark:hover:bg-yellow-700",
         info: "border-transparent bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700",
+        gold: "border-transparent text-black hover:opacity-90 dark:text-black dark:hover:opacity-90",
       },
     },
     defaultVariants: {
@@ -30,8 +31,17 @@ export interface BadgeProps
     VariantProps<typeof badgeVariants> {}
 
 function Badge({ className, variant, ...props }: BadgeProps) {
+  const isGold = variant === 'gold';
+  
   return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
+    <div 
+      className={cn(badgeVariants({ variant }), className)} 
+      style={isGold ? { 
+        background: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+        color: '#000000'
+      } : undefined}
+      {...props} 
+    />
   )
 }
 

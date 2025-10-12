@@ -8,6 +8,13 @@ export default defineConfig({
       "@": "/src",
     },
   },
+  publicDir: 'public',
+  base: '/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+    copyPublicDir: true,
+  },
   server: {
     host: true,
     port: 3000,

@@ -26,7 +26,7 @@ export const mockProperties: Property[] = [
     developer: 'Miami Developers LLC',
     price: 450000,
     completionDate: new Date('2024-12-31'),
-    images: ['/api/placeholder/400/300'],
+    images: ['/images/files-apartment-1_800x.jpg'],
     status: 'construction',
   },
   {
@@ -36,7 +36,7 @@ export const mockProperties: Property[] = [
     developer: 'Pacific Coast Properties',
     price: 675000,
     completionDate: new Date('2025-06-30'),
-    images: ['/api/placeholder/400/300'],
+    images: ['/images/files-apartment-1_800x.jpg'],
     status: 'planning',
   },
 ];
@@ -62,6 +62,16 @@ export const mockPayments: Payment[] = [
     paidDate: new Date('2023-02-14'),
     status: 'paid',
     method: 'Bank Transfer',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '4TH',
+      unitNumber: '439',
+      bedrooms: '1 BED',
+      area: '500',
+      view: 'COURTYARD FACING',
+      status: 'SOLD',
+      totalPrice: 13750000
+    }
   },
   {
     id: '2',
@@ -72,6 +82,16 @@ export const mockPayments: Payment[] = [
     paidDate: new Date('2023-03-12'),
     status: 'paid',
     method: 'Credit Card',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '5TH',
+      unitNumber: '501',
+      bedrooms: '2 BED',
+      area: '1000',
+      view: 'FRONT & CORNER',
+      status: 'SOLD',
+      totalPrice: 28750000
+    }
   },
   {
     id: '3',
@@ -82,6 +102,16 @@ export const mockPayments: Payment[] = [
     paidDate: new Date('2023-04-15'),
     status: 'paid',
     method: 'Bank Transfer',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '5TH',
+      unitNumber: '502',
+      bedrooms: '2 BED',
+      area: '1000',
+      view: 'FRONT',
+      status: 'SOLD',
+      totalPrice: 27500000
+    }
   },
   {
     id: '4',
@@ -92,6 +122,16 @@ export const mockPayments: Payment[] = [
     paidDate: new Date('2023-05-10'),
     status: 'paid',
     method: 'Bank Transfer',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '4TH',
+      unitNumber: '440',
+      bedrooms: '1 BED',
+      area: '500',
+      view: 'COURTYARD FACING',
+      status: 'SOLD',
+      totalPrice: 13750000
+    }
   },
   {
     id: '5',
@@ -102,6 +142,16 @@ export const mockPayments: Payment[] = [
     paidDate: new Date('2023-06-14'),
     status: 'paid',
     method: 'Credit Card',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '4TH',
+      unitNumber: '441',
+      bedrooms: '2 BED',
+      area: '800',
+      view: 'COURTYARD FACING',
+      status: 'SOLD',
+      totalPrice: 22000000
+    }
   },
   {
     id: '6',
@@ -112,6 +162,16 @@ export const mockPayments: Payment[] = [
     paidDate: new Date('2023-07-16'),
     status: 'paid',
     method: 'Bank Transfer',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '5TH',
+      unitNumber: '503',
+      bedrooms: '1 BED',
+      area: '500',
+      view: 'FRONT',
+      status: 'SOLD',
+      totalPrice: 13750000
+    }
   },
   {
     id: '7',
@@ -122,6 +182,16 @@ export const mockPayments: Payment[] = [
     paidDate: new Date('2023-08-12'),
     status: 'paid',
     method: 'Bank Transfer',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '5TH',
+      unitNumber: '504',
+      bedrooms: '1 BED',
+      area: '500',
+      view: 'FRONT',
+      status: 'SOLD',
+      totalPrice: 13750000
+    }
   },
   {
     id: '8',
@@ -132,6 +202,16 @@ export const mockPayments: Payment[] = [
     paidDate: new Date('2023-09-14'),
     status: 'paid',
     method: 'Credit Card',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '4TH',
+      unitNumber: '439',
+      bedrooms: '1 BED',
+      area: '500',
+      view: 'COURTYARD FACING',
+      status: 'SOLD',
+      totalPrice: 13750000
+    }
   },
   {
     id: '9',
@@ -140,6 +220,16 @@ export const mockPayments: Payment[] = [
     installmentNumber: 9,
     dueDate: new Date('2023-10-15'),
     status: 'pending',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '5TH',
+      unitNumber: '501',
+      bedrooms: '2 BED',
+      area: '1000',
+      view: 'FRONT & CORNER',
+      status: 'SOLD',
+      totalPrice: 28750000
+    }
   },
   {
     id: '10',
@@ -148,6 +238,16 @@ export const mockPayments: Payment[] = [
     installmentNumber: 10,
     dueDate: new Date('2023-11-15'),
     status: 'pending',
+    apartmentDetails: {
+      building: 'ABS - POC 2 RESIDENTIAL',
+      floor: '5TH',
+      unitNumber: '502',
+      bedrooms: '2 BED',
+      area: '1000',
+      view: 'FRONT',
+      status: 'SOLD',
+      totalPrice: 27500000
+    }
   },
 ];
 
@@ -159,7 +259,7 @@ export const mockProjectUpdates: ProjectUpdate[] = [
     description: 'The foundation work for Sunset Towers has been successfully completed. All concrete pouring and structural foundation elements are now in place.',
     milestone: 'Foundation',
     progress: 100,
-    images: ['/api/placeholder/400/300'],
+    images: ['/images/files-apartment-1_800x.jpg'],
     createdAt: new Date('2023-08-15'),
   },
   {
@@ -169,7 +269,7 @@ export const mockProjectUpdates: ProjectUpdate[] = [
     description: 'The steel framework is 75% complete. The first 15 floors have been fully constructed with steel beams and columns.',
     milestone: 'Structural Framework',
     progress: 75,
-    images: ['/api/placeholder/400/300'],
+    images: ['/images/files-apartment-1_800x.jpg'],
     createdAt: new Date('2023-09-10'),
   },
   {
@@ -179,7 +279,7 @@ export const mockProjectUpdates: ProjectUpdate[] = [
     description: 'Electrical and plumbing systems are being installed on the lower floors. This includes all necessary conduits and piping.',
     milestone: 'MEP Systems',
     progress: 40,
-    images: ['/api/placeholder/400/300'],
+    images: ['/images/files-apartment-1_800x.jpg'],
     createdAt: new Date('2023-09-25'),
   },
   {
@@ -189,7 +289,7 @@ export const mockProjectUpdates: ProjectUpdate[] = [
     description: 'Overall construction is on schedule. We are currently 35% complete with the project and expect to finish on time.',
     milestone: 'General Progress',
     progress: 35,
-    images: ['/api/placeholder/400/300'],
+    images: ['/images/files-apartment-1_800x.jpg'],
     createdAt: new Date('2023-10-01'),
   },
 ];

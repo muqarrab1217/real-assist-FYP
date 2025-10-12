@@ -38,6 +38,16 @@ export interface Payment {
   paidDate?: Date;
   status: 'pending' | 'paid' | 'overdue';
   method?: string;
+  apartmentDetails?: {
+    building: string;
+    floor: string;
+    unitNumber: string;
+    bedrooms: string;
+    area: string;
+    view: string;
+    status: string;
+    totalPrice: number;
+  };
 }
 
 export interface ProjectUpdate {
