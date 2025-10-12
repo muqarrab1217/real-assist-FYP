@@ -39,37 +39,43 @@ const adminNavigation = [
   { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
 ];
 
-const supportNavigation = [
-  { name: 'Get Help', href: '/help', icon: UsersIcon },
-  { name: 'Submit Feedback', href: '/feedback', icon: DocumentTextIcon },
-];
-
 export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange, onLogout }) => {
   const location = useLocation();
   const navigation = role === 'client' ? clientNavigation : adminNavigation;
+  
+  const supportNavigation = [
+    { name: 'Get Help', href: '/help', icon: UsersIcon },
+    { name: 'Submit Feedback', href: `/${role}/submit-feedback`, icon: DocumentTextIcon },
+  ];
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { isDarkMode, toggleDarkMode } = useTheme();
 
   return (
     <div 
       className={cn(
-        "flex h-full flex-col shadow-abs-lg transition-all duration-300 ease-in-out abs-gradient-bg border-r border-gold-200/20 dark:border-gold-800/20",
+        "flex h-full flex-col transition-all duration-300 ease-in-out border-r border-gold-200/20 dark:border-gold-800/20",
         isCollapsed ? "w-16" : "w-64"
       )}
+      style={{ 
+        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.95) 100%)',
+        backgroundColor: 'rgba(212, 175, 55, 0.05)',
+        backdropFilter: 'blur(20px)',
+        boxShadow: 'inset 0 0 200px rgba(212, 175, 55, 0.08)'
+      }}
       onMouseEnter={() => setIsCollapsed(false)}
       onMouseLeave={() => setIsCollapsed(true)}
     >
       {/* Header */}
       <div className="flex h-16 items-center justify-center border-b border-gold-200/20 dark:border-gold-800/20">
-        <Link to="/" className="flex items-center space-x-3 group">
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#f4e68c] flex items-center justify-center shadow-gold group-hover:shadow-gold-lg transition-all duration-300">
-            <span className="text-white font-bold text-sm">RA</span>
-          </div>
-          {!isCollapsed && (
-            <span className="text-xl font-display font-bold text-white transition-opacity duration-300 group-hover:abs-gradient-text">
-              RealAssist
-            </span>
-          )}
+        <Link to="/" className="flex items-center justify-center group mt-4">
+          <img 
+            src="/images/logo.png" 
+            alt="RealAssist" 
+            className={cn(
+              "transition-all duration-300",
+              isCollapsed ? "h-8 w-auto" : "h-12 w-auto"
+            )}
+          />
         </Link>
       </div>
       
@@ -225,20 +231,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange, onLogout }
           "flex items-center",
           isCollapsed ? "justify-center" : "space-x-3"
         )}>
-          
-          {/* Logout Icon - Hidden when collapsed */}
-          {onLogout && !isCollapsed && (
-            <button
-              onClick={onLogout}
-              className="flex items-center justify-center rounded-lg transition-all duration-200 p-2 text-charcoal-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
-              title="Logout"
-            >
-              <ArrowRightOnRectangleIcon className="h-5 w-5" />
-            </button>
-          )}
-          
+                    
           {/* Profile Icon */}
-          <div className="h-10 w-10 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#f4e68c] flex items-center justify-center shadow-gold">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-[#d4af37] to-[#f4e68c] flex items-center justify-center shadow-gold">
             <span className="text-white text-sm font-bold">JD</span>
           </div>
           
@@ -263,6 +258,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange, onLogout }
               ) : (
                 <MoonIcon className="h-5 w-5" />
               )}
+            </button>
+          )}
+          
+          {/* Logout Icon - Hidden when collapsed */}
+          {onLogout && !isCollapsed && (
+            <button
+              onClick={onLogout}
+              className="flex items-center justify-center rounded-lg transition-all duration-200 p-2 text-charcoal-400 hover:bg-red-100 hover:text-red-600 dark:hover:bg-red-900/20 dark:hover:text-red-400"
+              title="Logout"
+            >
+              <ArrowRightOnRectangleIcon className="h-5 w-5" />
             </button>
           )}
         </div>

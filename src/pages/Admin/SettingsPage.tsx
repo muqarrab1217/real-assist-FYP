@@ -34,8 +34,14 @@ export const SettingsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Settings</h1>
-        <p className="text-gray-600 dark:text-gray-300">Manage your account preferences and system settings</p>
+        <h1 className="text-3xl font-bold mb-2" style={{ 
+          fontFamily: 'Playfair Display, serif',
+          backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+        }}>Settings</h1>
+        <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Manage your account preferences and system settings</p>
       </motion.div>
 
       {/* Profile Settings */}
@@ -44,9 +50,12 @@ export const SettingsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle className="flex items-center dark:text-white">
+            <CardTitle className="flex items-center" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>
               <UserIcon className="h-5 w-5 mr-2" />
               Profile Settings
             </CardTitle>
@@ -54,23 +63,25 @@ export const SettingsPage: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Full Name</label>
-                <Input defaultValue="Admin User" />
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Full Name</label>
+                <Input defaultValue="Admin User" style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email</label>
-                <Input defaultValue="admin@realassist.com" />
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Email</label>
+                <Input defaultValue="admin@realassist.com" style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Phone</label>
-                <Input defaultValue="+1 (555) 123-4567" />
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Phone</label>
+                <Input defaultValue="+1 (555) 123-4567" style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Role</label>
-                <Input defaultValue="Administrator" disabled />
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Role</label>
+                <Input defaultValue="Administrator" disabled style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
             </div>
-            <Button>Save Changes</Button>
+            <Button className="text-black font-semibold" style={{ 
+              backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+            }}>Save Changes</Button>
           </CardContent>
         </Card>
       </motion.div>
@@ -81,9 +92,12 @@ export const SettingsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle className="flex items-center dark:text-white">
+            <CardTitle className="flex items-center" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>
               <BellIcon className="h-5 w-5 mr-2" />
               Notification Settings
             </CardTitle>
@@ -92,8 +106,8 @@ export const SettingsPage: React.FC = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Push Notifications</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Receive notifications in the app</p>
+                  <p className="font-medium" style={{ color: '#ffffff' }}>Push Notifications</p>
+                  <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Receive notifications in the app</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -102,13 +116,13 @@ export const SettingsPage: React.FC = () => {
                     onChange={(e) => handleSettingChange('notifications', e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all" style={{ '--tw-ring-color': 'rgba(212,175,55,0.3)' } as any} data-checked={settings.notifications ? 'true' : 'false'}></div>
                 </label>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">Email Updates</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Receive email notifications</p>
+                  <p className="font-medium" style={{ color: '#ffffff' }}>Email Updates</p>
+                  <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Receive email notifications</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -117,13 +131,13 @@ export const SettingsPage: React.FC = () => {
                     onChange={(e) => handleSettingChange('emailUpdates', e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all" style={{ background: settings.emailUpdates ? '#d4af37' : undefined }}></div>
                 </label>
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium text-gray-900 dark:text-white">SMS Alerts</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Receive SMS notifications for urgent matters</p>
+                  <p className="font-medium" style={{ color: '#ffffff' }}>SMS Alerts</p>
+                  <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Receive SMS notifications for urgent matters</p>
                 </div>
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input
@@ -132,7 +146,7 @@ export const SettingsPage: React.FC = () => {
                     onChange={(e) => handleSettingChange('smsAlerts', e.target.checked)}
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all" style={{ background: settings.smsAlerts ? '#d4af37' : undefined }}></div>
                 </label>
               </div>
             </div>
@@ -146,9 +160,12 @@ export const SettingsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.3 }}
       >
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle className="flex items-center dark:text-white">
+            <CardTitle className="flex items-center" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>
               <PaintBrushIcon className="h-5 w-5 mr-2" />
               Appearance
             </CardTitle>
@@ -156,8 +173,8 @@ export const SettingsPage: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-gray-900 dark:text-white">Dark Mode</p>
-                <p className="text-sm text-gray-600 dark:text-gray-300">Switch to dark theme</p>
+                <p className="font-medium" style={{ color: '#ffffff' }}>Dark Mode</p>
+                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Switch to dark theme</p>
               </div>
               <label className="relative inline-flex items-center cursor-pointer">
                 <input
@@ -166,16 +183,21 @@ export const SettingsPage: React.FC = () => {
                   onChange={(e) => handleSettingChange('darkMode', e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"></div>
+                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all" style={{ background: settings.darkMode ? '#d4af37' : undefined }}></div>
               </label>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Language</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Language</label>
                 <select
                   value={settings.language}
                   onChange={(e) => handleSettingChange('language', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 rounded-lg"
+                  style={{ 
+                    background: '#000000', 
+                    border: '1px solid rgba(212,175,55,0.25)',
+                    color: '#ffffff'
+                  }}
                 >
                   <option value="en">English</option>
                   <option value="es">Spanish</option>
@@ -184,11 +206,16 @@ export const SettingsPage: React.FC = () => {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Timezone</label>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Timezone</label>
                 <select
                   value={settings.timezone}
                   onChange={(e) => handleSettingChange('timezone', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-3 py-2 rounded-lg"
+                  style={{ 
+                    background: '#000000', 
+                    border: '1px solid rgba(212,175,55,0.25)',
+                    color: '#ffffff'
+                  }}
                 >
                   <option value="UTC-5">UTC-5 (EST)</option>
                   <option value="UTC-8">UTC-8 (PST)</option>
@@ -207,9 +234,12 @@ export const SettingsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle className="flex items-center dark:text-white">
+            <CardTitle className="flex items-center" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>
               <ShieldCheckIcon className="h-5 w-5 mr-2" />
               Security
             </CardTitle>
@@ -217,17 +247,17 @@ export const SettingsPage: React.FC = () => {
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Current Password</label>
-                <Input type="password" placeholder="Enter current password" />
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Current Password</label>
+                <Input type="password" placeholder="Enter current password" style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">New Password</label>
-                <Input type="password" placeholder="Enter new password" />
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>New Password</label>
+                <Input type="password" placeholder="Enter new password" style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Confirm New Password</label>
-              <Input type="password" placeholder="Confirm new password" />
+              <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Confirm New Password</label>
+              <Input type="password" placeholder="Confirm new password" style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
             </div>
             <Button variant="outline">Change Password</Button>
           </CardContent>
@@ -240,25 +270,34 @@ export const SettingsPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
       >
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle className="flex items-center dark:text-white">
+            <CardTitle className="flex items-center" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>
               <GlobeAltIcon className="h-5 w-5 mr-2" />
               System Information
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <p className="text-sm text-gray-600 dark:text-gray-300">Version</p>
-                <p className="font-semibold text-gray-900 dark:text-white">v1.0.0</p>
+              <div className="text-center p-4 rounded-lg" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
+                <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Version</p>
+                <p className="font-semibold" style={{ color: '#ffffff' }}>v1.0.0</p>
               </div>
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <p className="text-sm text-gray-600 dark:text-gray-300">Last Updated</p>
-                <p className="font-semibold text-gray-900 dark:text-white">Oct 15, 2023</p>
+              <div className="text-center p-4 rounded-lg" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
+                <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Last Updated</p>
+                <p className="font-semibold" style={{ color: '#ffffff' }}>Oct 15, 2023</p>
               </div>
-              <div className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
-                <p className="text-sm text-gray-600 dark:text-gray-300">Status</p>
+              <div className="text-center p-4 rounded-lg" style={{
+                background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+              }}>
+                <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Status</p>
                 <Badge variant="success">Active</Badge>
               </div>
             </div>

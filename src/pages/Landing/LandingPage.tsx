@@ -134,7 +134,7 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <section 
-        className="relative overflow-hidden pt-10 min-h-screen pt-24"
+        className="relative overflow-hidden pt-6 min-h-screen pt-24"
         style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)' }}
       >
         {/* subtle gold dot pattern overlay */}

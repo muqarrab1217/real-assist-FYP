@@ -3,9 +3,11 @@ import { motion } from 'framer-motion';
 import { 
   DocumentTextIcon,
   ArrowDownTrayIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { clientAPI } from '@/services/api';
@@ -17,6 +19,7 @@ export const LedgerPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [balance, setBalance] = useState(0);
   const [totalPaid, setTotalPaid] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -68,10 +71,20 @@ export const LedgerPage: React.FC = () => {
     }
   };
 
+  const filteredPayments = payments.filter(payment => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      payment.installmentNumber.toString().includes(searchLower) ||
+      payment.id.toLowerCase().includes(searchLower) ||
+      payment.status.toLowerCase().includes(searchLower) ||
+      formatCurrency(payment.amount).toLowerCase().includes(searchLower)
+    );
+  });
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
       </div>
     );
   }
@@ -86,8 +99,14 @@ export const LedgerPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Investment Ledger</h1>
-            <p className="text-gray-600">Complete transaction history and balance tracking</p>
+            <h1 className="text-3xl font-bold mb-2" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+            }}>Investment Ledger</h1>
+            <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Complete transaction history and balance tracking</p>
           </div>
           <div className="flex space-x-2">
             <Button variant="outline" onClick={() => handleExport('pdf')}>
@@ -109,14 +128,14 @@ export const LedgerPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Investment</p>
-                  <p className="text-2xl font-bold text-gray-900">{formatCurrency(450000)}</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Total Investment</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{formatCurrency(450000)}</p>
                 </div>
-                <DocumentTextIcon className="h-8 w-8 text-blue-500" />
+                <DocumentTextIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
@@ -127,14 +146,14 @@ export const LedgerPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Amount Paid</p>
-                  <p className="text-2xl font-bold text-green-600">{formatCurrency(totalPaid)}</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Amount Paid</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{formatCurrency(totalPaid)}</p>
                 </div>
-                <ArrowDownTrayIcon className="h-8 w-8 text-green-500" />
+                <ArrowDownTrayIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
@@ -145,30 +164,55 @@ export const LedgerPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Remaining Balance</p>
-                  <p className="text-2xl font-bold text-purple-600">{formatCurrency(balance)}</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Remaining Balance</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{formatCurrency(balance)}</p>
                 </div>
-                <DocumentTextIcon className="h-8 w-8 text-purple-500" />
+                <DocumentTextIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
         </motion.div>
       </div>
 
-      {/* Ledger Table */}
+      {/* Search Bar */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.4 }}
       >
-        <Card>
+        <Card className="abs-card">
+          <CardContent className="p-6">
+            <div className="relative">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#d4af37' }} />
+              <Input
+                placeholder="Search by installment number, transaction ID, status, or amount..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+                style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Ledger Table */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle>Transaction Ledger</CardTitle>
-            <p className="text-sm text-gray-600">Complete record of all payments and transactions</p>
+            <CardTitle style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>Transaction Ledger ({filteredPayments.length})</CardTitle>
+            <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Complete record of all payments and transactions</p>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -185,8 +229,8 @@ export const LedgerPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {payments.map((payment, index) => {
-                    const runningBalance = 450000 - payments.slice(0, index + 1).filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
+                  {filteredPayments.map((payment, index) => {
+                    const runningBalance = 450000 - filteredPayments.slice(0, index + 1).filter(p => p.status === 'paid').reduce((sum, p) => sum + p.amount, 0);
                     return (
                       <TableRow key={payment.id}>
                         <TableCell>
@@ -226,28 +270,37 @@ export const LedgerPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
       >
-        <Card>
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle>Payment Schedule</CardTitle>
-            <p className="text-sm text-gray-600">Upcoming payment schedule and due dates</p>
+            <CardTitle style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>Payment Schedule</CardTitle>
+            <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Upcoming payment schedule and due dates</p>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Next Payment</p>
-                  <p className="text-lg font-semibold text-gray-900">October 15, 2023</p>
-                  <p className="text-sm text-purple-600">{formatCurrency(18750)}</p>
+                <div className="text-center p-4 rounded-lg" style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                }}>
+                  <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Next Payment</p>
+                  <p className="text-lg font-semibold" style={{ color: '#ffffff' }}>October 15, 2023</p>
+                  <p className="text-sm" style={{ color: '#d4af37' }}>{formatCurrency(18750)}</p>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Total Installments</p>
-                  <p className="text-lg font-semibold text-gray-900">24</p>
-                  <p className="text-sm text-gray-600">8 completed</p>
+                <div className="text-center p-4 rounded-lg" style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                }}>
+                  <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Total Installments</p>
+                  <p className="text-lg font-semibold" style={{ color: '#ffffff' }}>24</p>
+                  <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>8 completed</p>
                 </div>
-                <div className="text-center p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">Completion Date</p>
-                  <p className="text-lg font-semibold text-gray-900">January 2025</p>
-                  <p className="text-sm text-gray-600">16 months remaining</p>
+                <div className="text-center p-4 rounded-lg" style={{
+                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
+                }}>
+                  <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Completion Date</p>
+                  <p className="text-lg font-semibold" style={{ color: '#ffffff' }}>January 2025</p>
+                  <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>16 months remaining</p>
                 </div>
               </div>
             </div>

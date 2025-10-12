@@ -119,7 +119,7 @@ export const LeadManagementPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
       </div>
     );
   }
@@ -134,10 +134,18 @@ export const LeadManagementPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Lead Management</h1>
-            <p className="text-gray-600 dark:text-gray-300">Manage and track your sales leads with AI-powered insights</p>
+            <h1 className="text-3xl font-bold mb-2" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+            }}>Lead Management</h1>
+            <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Manage and track your sales leads with AI-powered insights</p>
           </div>
-          <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+          <Button className="text-black font-semibold" style={{ 
+            backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+          }}>
             <PlusIcon className="h-4 w-4 mr-2" />
             Add Lead
           </Button>
@@ -151,10 +159,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <Card className="abs-card-premium">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{leadStats.total}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Total Leads</p>
+              <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{leadStats.total}</p>
+              <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Total Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -163,10 +171,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <Card className="abs-card-premium">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-red-600 dark:text-red-400">{leadStats.hot}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Hot Leads</p>
+              <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{leadStats.hot}</p>
+              <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Hot Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -175,10 +183,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <Card className="abs-card-premium">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{leadStats.warm}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Warm Leads</p>
+              <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{leadStats.warm}</p>
+              <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Warm Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -187,10 +195,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <Card className="abs-card-premium">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-gray-600 dark:text-gray-300">{leadStats.cold}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Cold Leads</p>
+              <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{leadStats.cold}</p>
+              <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Cold Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -199,10 +207,10 @@ export const LeadManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.5 }}
         >
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <Card className="abs-card-premium">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold text-gray-400 dark:text-gray-500">{leadStats.dead}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-300">Dead Leads</p>
+              <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{leadStats.dead}</p>
+              <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Dead Leads</p>
             </CardContent>
           </Card>
         </motion.div>
@@ -214,17 +222,18 @@ export const LeadManagementPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <Card className="abs-card">
           <CardContent className="p-6">
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
-                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+                  <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#d4af37' }} />
                   <Input
                     placeholder="Search leads by name, email, or phone..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
+                    style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
                   />
                 </div>
               </div>
@@ -232,7 +241,12 @@ export const LeadManagementPage: React.FC = () => {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="px-3 py-2 rounded-lg"
+                  style={{ 
+                    background: '#000000', 
+                    border: '1px solid rgba(212,175,55,0.25)',
+                    color: '#ffffff'
+                  }}
                 >
                   <option value="all">All Status</option>
                   <option value="hot">Hot</option>
@@ -256,9 +270,12 @@ export const LeadManagementPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.7 }}
       >
-        <Card className="dark:bg-gray-800 dark:border-gray-700">
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle className="dark:text-white">Leads ({filteredLeads.length})</CardTitle>
+            <CardTitle style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>Leads ({filteredLeads.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">

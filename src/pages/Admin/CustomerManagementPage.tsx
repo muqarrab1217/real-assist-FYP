@@ -60,7 +60,7 @@ export const CustomerManagementPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 dark:border-purple-400"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
       </div>
     );
   }
@@ -75,10 +75,18 @@ export const CustomerManagementPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Customer Management</h1>
-            <p className="text-gray-600 dark:text-gray-300">Manage and track your client relationships</p>
+            <h1 className="text-3xl font-bold mb-2" style={{ 
+              fontFamily: 'Playfair Display, serif',
+              backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent',
+            }}>Customer Management</h1>
+            <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Manage and track your client relationships</p>
           </div>
-          <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700">
+          <Button className="text-black font-semibold" style={{ 
+            backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+          }}>
             <UserGroupIcon className="h-4 w-4 mr-2" />
             Add Customer
           </Button>
@@ -92,14 +100,14 @@ export const CustomerManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
         >
-          <Card className="dark:bg-gray-800 dark:border-gray-700">
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Clients</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{clients.length}</p>
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Total Clients</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{clients.length}</p>
                 </div>
-                <UserGroupIcon className="h-8 w-8 text-blue-500 dark:text-blue-400" />
+                <UserGroupIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
@@ -110,16 +118,16 @@ export const CustomerManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Active Clients</p>
-                  <p className="text-2xl font-bold text-green-600">
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Active Clients</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>
                     {clients.filter(c => c.status === 'active').length}
                   </p>
                 </div>
-                <UserGroupIcon className="h-8 w-8 text-green-500" />
+                <UserGroupIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
@@ -130,16 +138,16 @@ export const CustomerManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Investment</p>
-                  <p className="text-2xl font-bold text-purple-600">
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Total Investment</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>
                     {formatCurrency(clients.reduce((sum, c) => sum + c.investmentAmount, 0))}
                   </p>
                 </div>
-                <CurrencyDollarIcon className="h-8 w-8 text-purple-500" />
+                <CurrencyDollarIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
@@ -150,16 +158,16 @@ export const CustomerManagementPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
         >
-          <Card>
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Avg Investment</p>
-                  <p className="text-2xl font-bold text-orange-600">
+                  <p className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Avg Investment</p>
+                  <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>
                     {formatCurrency(clients.reduce((sum, c) => sum + c.investmentAmount, 0) / clients.length || 0)}
                   </p>
                 </div>
-                <CurrencyDollarIcon className="h-8 w-8 text-orange-500" />
+                <CurrencyDollarIcon className="h-8 w-8" style={{ color: '#d4af37' }} />
               </div>
             </CardContent>
           </Card>
@@ -172,15 +180,16 @@ export const CustomerManagementPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.5 }}
       >
-        <Card>
+        <Card className="abs-card">
           <CardContent className="p-6">
             <div className="relative">
-              <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" style={{ color: '#d4af37' }} />
               <Input
                 placeholder="Search customers by name, email, or ID..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
+                style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
               />
             </div>
           </CardContent>
@@ -193,9 +202,12 @@ export const CustomerManagementPage: React.FC = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
       >
-        <Card>
+        <Card className="abs-card">
           <CardHeader>
-            <CardTitle>Customer List ({filteredClients.length})</CardTitle>
+            <CardTitle style={{ 
+              fontFamily: 'Playfair Display, serif',
+              color: '#d4af37'
+            }}>Customer List ({filteredClients.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -215,24 +227,28 @@ export const CustomerManagementPage: React.FC = () => {
                     <TableRow key={client.id}>
                       <TableCell className="font-medium">
                         <div className="flex items-center space-x-3">
-                          <div className="h-8 w-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full flex items-center justify-center">
-                            <span className="text-white text-xs font-medium">
+                          <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ 
+                            backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                          }}>
+                            <span className="text-black text-xs font-bold">
                               {client.id.slice(-2)}
                             </span>
                           </div>
-                          <span>{client.id}</span>
                         </div>
                       </TableCell>
                       <TableCell>{formatCurrency(client.investmentAmount)}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          <div className="w-20 bg-gray-200 rounded-full h-2">
+                          <div className="w-20 rounded-full h-2" style={{ background: 'rgba(91, 85, 85, 0.5)' }}>
                             <div 
-                              className="bg-gradient-to-r from-purple-600 to-blue-600 h-2 rounded-full"
-                              style={{ width: `${(client.currentInstallment / client.totalInstallments) * 100}%` }}
+                              className="h-2 rounded-full"
+                              style={{ 
+                                width: `${(client.currentInstallment / client.totalInstallments) * 100}%`,
+                                backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                              }}
                             ></div>
                           </div>
-                          <span className="text-sm text-gray-600">
+                          <span className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
                             {client.currentInstallment}/{client.totalInstallments}
                           </span>
                         </div>
