@@ -61,15 +61,18 @@ export const Chatbot: React.FC = () => {
     <>
       {/* Floating Button */}
       <motion.button
-        className="fixed bottom-6 right-6 h-14 w-14 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 z-40 flex items-center justify-center"
+        className="fixed bottom-6 right-6 h-14 w-14 text-black rounded-full shadow-lg hover:shadow-xl transition-shadow duration-200 z-40 flex items-center justify-center"
+        style={{
+          backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+        }}
         onClick={() => setIsOpen(true)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         animate={{ 
           boxShadow: [
-            "0 0 0 0 rgba(102, 126, 234, 0.4)",
-            "0 0 0 10px rgba(102, 126, 234, 0)",
-            "0 0 0 0 rgba(102, 126, 234, 0)"
+            "0 0 0 0 rgba(212, 175, 55, 0.4)",
+            "0 0 0 10px rgba(212, 175, 55, 0)",
+            "0 0 0 0 rgba(212, 175, 55, 0)"
           ]
         }}
         transition={{ duration: 2, repeat: Infinity }}
@@ -84,17 +87,32 @@ export const Chatbot: React.FC = () => {
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-6 right-6 w-80 h-96 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-200 dark:border-gray-700 z-50 flex flex-col"
+            className="fixed bottom-6 right-6 w-200 h-96 rounded-lg shadow-2xl z-50 flex flex-col"
+            style={{
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.04) 0%, rgba(0, 0, 0, 0.95) 100%)',
+              backgroundColor: 'rgba(0, 0, 0, 0.85)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(212, 175, 55, 0.25)',
+              boxShadow: 'inset 0 0 200px rgba(212, 175, 55, 0.04)'
+            }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-t-lg">
+            <div className="flex items-center justify-between p-4 rounded-t-lg" style={{
+              borderBottom: '1px solid rgba(212, 175, 55, 0.25)',
+              background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.9) 100%)'
+            }}>
               <div className="flex items-center space-x-2">
-                <div className="h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">AI</span>
+                <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{
+                  backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                }}>
+                  <span className="text-xs font-bold" style={{ color: '#000000' }}>AI</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 dark:text-white">AI Assistant</h3>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Online</p>
+                  <h3 className="font-semibold" style={{ 
+                    fontFamily: 'Playfair Display, serif',
+                    color: '#d4af37'
+                  }}>AI Assistant</h3>
+                  <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Online</p>
                 </div>
               </div>
               <Button
@@ -117,11 +135,15 @@ export const Chatbot: React.FC = () => {
                   className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
                 >
                   <div
-                    className={`max-w-xs px-3 py-2 rounded-lg text-sm ${
-                      message.isUser
-                        ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white'
-                        : 'bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100'
-                    }`}
+                    className="max-w-xs px-3 py-2 rounded-lg text-sm"
+                    style={message.isUser ? {
+                      backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+                      color: '#000000'
+                    } : {
+                      background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.8) 100%)',
+                      border: '1px solid rgba(212, 175, 55, 0.2)',
+                      color: '#ffffff'
+                    }}
                   >
                     {message.text}
                   </div>
@@ -130,7 +152,7 @@ export const Chatbot: React.FC = () => {
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-gray-200 dark:border-gray-700">
+            <div className="p-4" style={{ borderTop: '1px solid rgba(212, 175, 55, 0.25)' }}>
               <div className="flex space-x-2">
                 <input
                   type="text"
@@ -138,12 +160,20 @@ export const Chatbot: React.FC = () => {
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder="Type your message..."
-                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm dark:bg-gray-700 dark:text-gray-100 dark:placeholder:text-gray-400"
+                  className="flex-1 px-3 py-2 rounded-lg text-sm"
+                  style={{
+                    background: '#000000',
+                    border: '1px solid rgba(212, 175, 55, 0.25)',
+                    color: '#ffffff'
+                  }}
                 />
                 <Button
                   onClick={handleSendMessage}
                   size="sm"
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700"
+                  className="text-black font-semibold"
+                  style={{
+                    backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
+                  }}
                 >
                   <PaperAirplaneIcon className="h-4 w-4" />
                 </Button>
