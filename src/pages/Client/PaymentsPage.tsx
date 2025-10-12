@@ -89,12 +89,15 @@ export const PaymentsPage: React.FC = () => {
 
   const filteredPayments = payments.filter(payment => {
     const searchLower = searchTerm.toLowerCase();
+    const apartmentSearch = payment.apartmentDetails ? 
+      `${payment.apartmentDetails.building} ${payment.apartmentDetails.floor} ${payment.apartmentDetails.unitNumber} ${payment.apartmentDetails.bedrooms} ${payment.apartmentDetails.view}`.toLowerCase() : '';
+    
     return (
       payment.installmentNumber.toString().includes(searchLower) ||
       payment.method?.toLowerCase().includes(searchLower) ||
       payment.status.toLowerCase().includes(searchLower) ||
-      'sunset towers'.includes(searchLower) ||
-      'miami'.includes(searchLower)
+      apartmentSearch.includes(searchLower) ||
+      'abs poc 2 residential'.includes(searchLower)
     );
   });
 
@@ -209,6 +212,11 @@ export const PaymentsPage: React.FC = () => {
                       >
                         <div className="text-left">
                           <p className="font-medium" style={{ color: '#ffffff' }}>Payment #{payment.installmentNumber}</p>
+                          {payment.apartmentDetails && (
+                            <p className="text-xs" style={{ color: 'rgba(212,175,55,0.8)' }}>
+                              {payment.apartmentDetails.building} - {payment.apartmentDetails.floor} Floor, Unit {payment.apartmentDetails.unitNumber}
+                            </p>
+                          )}
                           <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
                             Paid: {payment.paidDate ? formatDate(payment.paidDate) : 'N/A'}
                           </p>
@@ -236,6 +244,42 @@ export const PaymentsPage: React.FC = () => {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
+                        {/* Apartment Details */}
+                        {payment.apartmentDetails && (
+                          <div className="p-4 rounded-lg" style={{
+                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.9) 100%)',
+                            border: '1px solid rgba(212,175,55,0.25)'
+                          }}>
+                            <h4 className="text-lg font-semibold mb-3" style={{ color: '#d4af37' }}>Apartment Details</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Building</p>
+                                <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.building}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Unit</p>
+                                <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.floor} - {payment.apartmentDetails.unitNumber}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Type & Area</p>
+                                <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.bedrooms} - {payment.apartmentDetails.area} sq ft</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>View</p>
+                                <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.view}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Total Price</p>
+                                <p className="text-sm font-bold" style={{ color: '#d4af37' }}>{formatCurrency(payment.apartmentDetails.totalPrice)}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Status</p>
+                                <Badge variant="gold">{payment.apartmentDetails.status}</Badge>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
                         <div className="grid grid-cols-2 gap-4">
                           <div className="p-4 rounded-lg" style={{
                             background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
@@ -302,6 +346,11 @@ export const PaymentsPage: React.FC = () => {
                       >
                         <div className="text-left">
                           <p className="font-medium" style={{ color: '#ffffff' }}>Payment #{payment.installmentNumber}</p>
+                          {payment.apartmentDetails && (
+                            <p className="text-xs" style={{ color: 'rgba(212,175,55,0.8)' }}>
+                              {payment.apartmentDetails.building} - {payment.apartmentDetails.floor} Floor, Unit {payment.apartmentDetails.unitNumber}
+                            </p>
+                          )}
                           <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
                             Due: {formatDate(payment.dueDate)}
                           </p>
@@ -329,6 +378,42 @@ export const PaymentsPage: React.FC = () => {
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
+                        {/* Apartment Details */}
+                        {payment.apartmentDetails && (
+                          <div className="p-4 rounded-lg" style={{
+                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.9) 100%)',
+                            border: '1px solid rgba(212,175,55,0.25)'
+                          }}>
+                            <h4 className="text-lg font-semibold mb-3" style={{ color: '#d4af37' }}>Apartment Details</h4>
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Building</p>
+                                <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.building}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Unit</p>
+                                <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.floor} - {payment.apartmentDetails.unitNumber}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Type & Area</p>
+                                <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.bedrooms} - {payment.apartmentDetails.area} sq ft</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>View</p>
+                                <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.view}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Total Price</p>
+                                <p className="text-sm font-bold" style={{ color: '#d4af37' }}>{formatCurrency(payment.apartmentDetails.totalPrice)}</p>
+                              </div>
+                              <div>
+                                <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Status</p>
+                                <Badge variant="gold">{payment.apartmentDetails.status}</Badge>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                        
                         <div className="grid grid-cols-2 gap-4">
                           <div className="p-4 rounded-lg" style={{
                             background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)'
@@ -422,7 +507,7 @@ export const PaymentsPage: React.FC = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Installment</TableHead>
-                    <TableHead>Project</TableHead>
+                    <TableHead>Apartment Details</TableHead>
                     <TableHead>Amount</TableHead>
                     <TableHead>Due Date</TableHead>
                     <TableHead>Paid Date</TableHead>
@@ -439,8 +524,22 @@ export const PaymentsPage: React.FC = () => {
                       </TableCell>
                       <TableCell>
                         <div>
-                          <p className="font-medium" style={{ color: '#ffffff' }}>Sunset Towers</p>
-                          <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Miami, FL</p>
+                          {payment.apartmentDetails ? (
+                            <>
+                              <p className="font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.building}</p>
+                              <p className="text-xs" style={{ color: 'rgba(212,175,55,0.8)' }}>
+                                {payment.apartmentDetails.floor} Floor, Unit {payment.apartmentDetails.unitNumber}
+                              </p>
+                              <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
+                                {payment.apartmentDetails.bedrooms} • {payment.apartmentDetails.area} sq ft • {payment.apartmentDetails.view}
+                              </p>
+                            </>
+                          ) : (
+                            <>
+                              <p className="font-medium" style={{ color: '#ffffff' }}>ABS - POC 2 RESIDENTIAL</p>
+                              <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Apartment Investment</p>
+                            </>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>{formatCurrency(payment.amount)}</TableCell>
@@ -485,42 +584,44 @@ export const PaymentsPage: React.FC = () => {
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="space-y-6">
-                                {/* Project Information */}
-                                <div className="p-6 rounded-lg" style={{
-                                  background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.9) 100%)',
-                                  border: '1px solid rgba(212,175,55,0.25)'
-                                }}>
-                                  <h3 className="text-lg font-semibold mb-4" style={{ 
-                                    fontFamily: 'Playfair Display, serif',
-                                    color: '#d4af37'
-                                  }}>Project Details</h3>
-                                  <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Project Name</p>
-                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Sunset Towers</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Location</p>
-                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Miami, FL</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Developer</p>
-                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Miami Developers LLC</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Property Type</p>
-                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>Luxury Condominiums</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Total Investment</p>
-                                      <p className="text-sm font-medium" style={{ color: '#d4af37' }}>{formatCurrency(450000)}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Expected Completion</p>
-                                      <p className="text-sm font-medium" style={{ color: '#ffffff' }}>December 2024</p>
+                                {/* Apartment Information */}
+                                {payment.apartmentDetails && (
+                                  <div className="p-6 rounded-lg" style={{
+                                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.9) 100%)',
+                                    border: '1px solid rgba(212,175,55,0.25)'
+                                  }}>
+                                    <h3 className="text-lg font-semibold mb-4" style={{ 
+                                      fontFamily: 'Playfair Display, serif',
+                                      color: '#d4af37'
+                                    }}>Apartment Details</h3>
+                                    <div className="grid grid-cols-2 gap-4">
+                                      <div>
+                                        <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Building</p>
+                                        <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.building}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Unit</p>
+                                        <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.floor} - {payment.apartmentDetails.unitNumber}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Type & Area</p>
+                                        <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.bedrooms} - {payment.apartmentDetails.area} sq ft</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>View</p>
+                                        <p className="text-sm font-medium" style={{ color: '#ffffff' }}>{payment.apartmentDetails.view}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Total Price</p>
+                                        <p className="text-sm font-bold" style={{ color: '#d4af37' }}>{formatCurrency(payment.apartmentDetails.totalPrice)}</p>
+                                      </div>
+                                      <div>
+                                        <p className="text-xs mb-1" style={{ color: 'rgba(212,175,55,0.7)' }}>Status</p>
+                                        <Badge variant="gold">{payment.apartmentDetails.status}</Badge>
+                                      </div>
                                     </div>
                                   </div>
-                                </div>
+                                )}
 
                                 {/* Payment Information */}
                                 <div className="grid grid-cols-2 gap-4">

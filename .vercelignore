@@ -1,0 +1,36 @@
+# Vercel Ignore File
+# Files and directories to ignore during Vercel deployment
+
+# Development files
+node_modules
+.git
+
+# Build cache
+.next
+.nuxt
+.cache
+
+# Test files
+coverage
+*.test.ts
+*.test.tsx
+*.spec.ts
+*.spec.tsx
+
+# Documentation (optional - comment out if you want docs deployed)
+# *.md
+
+# Environment files (should be set in Vercel dashboard)
+.env.local
+.env.development
+
+# Editor files
+.vscode
+.idea
+*.swp
+*.swo
+
+# DO NOT IGNORE:
+# public/ - We need this for images and assets!
+# src/ - We need this for the application code!
+

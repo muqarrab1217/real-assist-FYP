@@ -41,15 +41,15 @@ export const ProjectUpdatesPage: React.FC = () => {
   };
 
   const getMilestoneBadge = (milestone: string) => {
-    const colors = {
-      'Foundation': 'rgba(247, 191, 5, 0.05)',
-      'Structural Framework': 'bg-purple-100 text-purple-800',
-      'MEP Systems': 'bg-green-100 text-green-800',
-      'General Progress': 'bg-gray-100 text-gray-800',
+    const variants = {
+      'Foundation': 'gold',
+      'Structural Framework': 'secondary',
+      'MEP Systems': 'gold',
+      'General Progress': 'gold',
     };
     
     return (
-      <Badge className={colors[milestone as keyof typeof colors] || 'bg-gray-100 text-gray-800'}>
+      <Badge variant={variants[milestone as keyof typeof variants] as any || 'secondary'}>
         {milestone}
       </Badge>
     );
