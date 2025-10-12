@@ -1,6 +1,7 @@
 import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { Sidebar } from '@/components/layout/Sidebar';
+import { Chatbot } from '@/components/ui/Chatbot';
 import { useAuth } from '@/hooks/useAuth';
 
 interface DashboardLayoutProps {
@@ -27,6 +28,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
           <Outlet />
         </main>
       </div>
+      <Chatbot />
     </div>
   );
 };

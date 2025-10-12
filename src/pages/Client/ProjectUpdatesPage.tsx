@@ -42,7 +42,7 @@ export const ProjectUpdatesPage: React.FC = () => {
 
   const getMilestoneBadge = (milestone: string) => {
     const colors = {
-      'Foundation': 'bg-blue-100 text-blue-800',
+      'Foundation': 'rgba(247, 191, 5, 0.05)',
       'Structural Framework': 'bg-purple-100 text-purple-800',
       'MEP Systems': 'bg-green-100 text-green-800',
       'General Progress': 'bg-gray-100 text-gray-800',

@@ -10,12 +10,9 @@ import {
   Cog6ToothIcon,
   UserGroupIcon,
   CurrencyDollarIcon,
-  SunIcon,
-  MoonIcon,
   ArrowRightOnRectangleIcon
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
-import { useTheme } from '@/contexts/ThemeContext';
 
 interface SidebarProps {
   role: 'client' | 'admin';
@@ -48,7 +45,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange, onLogout }
     { name: 'Submit Feedback', href: `/${role}/submit-feedback`, icon: DocumentTextIcon },
   ];
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { isDarkMode, toggleDarkMode } = useTheme();
 
   return (
     <div 
@@ -248,18 +244,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange, onLogout }
             </div>
           )}
           
-          {!isCollapsed && (
-            <button
-              onClick={toggleDarkMode}
-              className="flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-300 p-2 text-charcoal-400 hover:bg-gold-900/20 hover:text-gold-400"
-            >
-              {isDarkMode ? (
-                <SunIcon className="h-5 w-5" />
-              ) : (
-                <MoonIcon className="h-5 w-5" />
-              )}
-            </button>
-          )}
           
           {/* Logout Icon - Hidden when collapsed */}
           {onLogout && !isCollapsed && (

@@ -12,29 +12,15 @@ interface ThemeProviderProps {
 }
 
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    // Check localStorage first, then system preference
-    const saved = localStorage.getItem('darkMode');
-    if (saved !== null) {
-      return JSON.parse(saved);
-    }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
+  const [isDarkMode] = useState(true); // Always dark mode
 
   useEffect(() => {
-    // Update localStorage when theme changes
-    localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
-    
-    // Update document class for Tailwind dark mode
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
+    // Always enable dark mode
+    document.documentElement.classList.add('dark');
+  }, []);
 
   const toggleDarkMode = () => {
-    setIsDarkMode((prev: boolean) => !prev);
+    // No-op function to maintain compatibility
   };
 
   return (
