@@ -3,20 +3,16 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { 
   ArrowRightIcon,
-  BuildingOffice2Icon,
   ShieldCheckIcon,
   UserGroupIcon,
   ChatBubbleLeftRightIcon,
   DocumentTextIcon,
   CheckCircleIcon,
-  SparklesIcon,
   TrophyIcon,
   ChartBarIcon,
   ClockIcon,
   HomeModernIcon,
   PhoneIcon,
-  EnvelopeIcon,
-  MapPinIcon,
   HandThumbUpIcon,
   LightBulbIcon,
   RocketLaunchIcon

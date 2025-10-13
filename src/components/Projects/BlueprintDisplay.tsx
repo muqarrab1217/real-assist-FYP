@@ -59,8 +59,6 @@ const statusColors = {
 
 export const BlueprintDisplay: React.FC<BlueprintDisplayProps> = ({ 
   projectId, 
-  useSvgBlueprint = false, 
-  project,
   activeTab: controlledTab,
   showTabs = true 
 }) => {
@@ -94,15 +92,6 @@ export const BlueprintDisplay: React.FC<BlueprintDisplayProps> = ({
     setHoveredRoom(room);
     setTooltipPosition({ x: event.clientX, y: event.clientY });
   };
-
-  const getStatusCounts = () => {
-    const vacant = rooms.filter(r => r.status === 'vacant').length;
-    const occupied = rooms.filter(r => r.status === 'occupied').length;
-    const maintenance = rooms.filter(r => r.status === 'maintenance').length;
-    return { vacant, occupied, maintenance, total: rooms.length };
-  };
-
-  const counts = getStatusCounts();
 
   const handleTabChange = (type: FlatType) => {
     if (controlledTab === undefined) {
