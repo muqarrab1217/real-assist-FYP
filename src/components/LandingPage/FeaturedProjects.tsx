@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { detailedProjects } from '@/data/extractedMockData';
 
 type BadgeVariant =
   | 'flagship'
@@ -341,138 +342,63 @@ const Card: React.FC<{ project: Project; index: number }> = ({ project, index })
 export const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({
   title = 'Explore All Our Developments',
   subtitle = 'Discover the complete portfolio of our exceptional projects',
-  projects = [
-    {
-      href: '/pearl-one-courtyard.html',
-      image: '/images/files-POC-1_1_1375e22c-6fbc-4623-bbff-6f72a6f9709f_600x400.png',
-      logo: '/images/files-Pearl_One_Courtyard_3_120x100.png',
-      title: 'Pearl One Courtyard',
-      description: 'Flagship luxury residential development featuring world-class amenities and Islamic-compliant architecture in the heart of Bahria Town.',
-      tags: ['Luxury Apartments', 'Commercial Spaces', 'Islamic Design'],
-      badge: { label: 'Flagship', variant: 'flagship' },
-      location: 'Bahria Town, Lahore',
-      price: 'PKR 45 Lakh - 1.2 Cr',
-      area: '2.5 Acres',
-      units: '500+ Units',
-      completion: 'Q4 2025',
-      features: ['Swimming Pool', 'Gymnasium', 'Mosque', 'Parking', 'Security'],
-      developer: 'ABS Developers',
-    },
-    {
-      href: '/pearl-one-courtyard-2.html',
-      image: '/images/files-POC-2_600x400.png',
-      logo: '/images/files-perl-one-courtyrd-1_120x100.png',
-      title: 'Pearl One Courtyard 2',
-      description: 'Luxury residential complex with modern amenities, featuring premium finishes and state-of-the-art facilities.',
-      tags: ['Landmark Architecture', 'Engineering Marvel'],
-      badge: { label: 'Booking Open', variant: 'booking-open' },
-      location: 'Bahria Town, Lahore',
-      price: 'PKR 55 Lakh - 1.5 Cr',
-      area: '3.2 Acres',
-      units: '650+ Units',
-      completion: 'Q2 2026',
-      features: ['Rooftop Garden', 'Kids Play Area', 'Community Center', '24/7 Security'],
-      developer: 'ABS Developers',
-    },
-    {
-      href: '/pearl-one-courtyard-3.html',
-      image: '/images/files-POC-3_600x400.png',
-      logo: '/images/files-perl-one-courtyrd-1_120x100.png',
-      title: 'Pearl One Courtyard 3',
-      description: 'Next phase of our flagship residential series with enhanced features and premium location benefits.',
-      tags: ['Mixed-Use', 'Retail Spaces', 'Community Hub'],
-      badge: { label: 'Booking Closed', variant: 'booking-closed' },
-      location: 'Bahria Town, Lahore',
-      price: 'PKR 60 Lakh - 2 Cr',
-      area: '4.1 Acres',
-      units: '800+ Units',
-      completion: 'Q3 2026',
-      features: ['Shopping Mall', 'Restaurants', 'Medical Center', 'School'],
-      developer: 'ABS Developers',
-    },
-    {
-      href: '/mall-residency.html',
-      image: '/images/files-ABS-MALL_600x400.png',
-      logo: '/images/files-mall-residancy_7675dedb-694d-4331-b692-bbc3e1c53166_120x100.png',
-      title: 'ABS Mall & Residency',
-      description: 'Mixed-use development combining luxury residential units with premium retail spaces and entertainment facilities.',
-      tags: ['Mixed-Use', 'Retail Spaces', 'Community Hub'],
-      badge: { label: 'Available', variant: 'available' },
-      location: 'Bahria Town, Lahore',
-      price: 'PKR 35 Lakh - 85 Lakh',
-      area: '5.8 Acres',
-      units: '400+ Units',
-      completion: 'Q1 2025',
-      features: ['Shopping Complex', 'Food Court', 'Cinema', 'Parking'],
-      developer: 'ABS Developers',
-    },
-    {
-      href: '/mall-residency-2.html',
-      image: '/images/files-ABS-MALL-2_600x400.png',
-      logo: '/images/files-mall-residancy-2_120x100.png',
-      title: 'ABS Mall & Residency 2',
-      description: 'Integrated shopping and living experience with modern retail outlets and comfortable residential spaces.',
-      tags: ['Mixed-Use', 'Retail Spaces', 'Community Hub'],
-      badge: { label: 'Available', variant: 'available' },
-      location: 'Bahria Town, Lahore',
-      price: 'PKR 40 Lakh - 95 Lakh',
-      area: '4.5 Acres',
-      units: '350+ Units',
-      completion: 'Q2 2025',
-      features: ['Hypermarket', 'Restaurants', 'Entertainment Zone', 'Gym'],
-      developer: 'ABS Developers',
-    },
-    {
-      href: '/pearl-one-tower.html',
-      image: '/images/files-POT_600x400.png',
-      logo: '/images/files-pearlone-tower_120x100.png',
-      title: 'Pearl One Tower',
-      description: 'Iconic tower with panoramic city views, featuring premium office spaces and luxury residential units.',
-      tags: ['Mixed-Use', 'Retail Spaces', 'Community Hub'],
-      badge: { label: 'Delivered', variant: 'delivered' },
-      location: 'Bahria Town, Lahore',
-      price: 'PKR 80 Lakh - 3 Cr',
-      area: '2.8 Acres',
-      units: '200+ Units',
-      completion: 'Completed 2023',
-      features: ['Sky Lounge', 'Business Center', 'Concierge Service', 'Valet Parking'],
-      developer: 'ABS Developers',
-    },
-    {
-      href: '/pearl-one-premium.html',
-      image: '/images/files-POP_600x400.png',
-      logo: '/images/files-perl-one-premium-logo_120x100.png',
-      title: 'Pearl One Premium',
-      description: 'Ultra-luxury residential development with exclusive amenities and premium finishes for discerning investors.',
-      tags: ['Mixed-Use', 'Retail Spaces', 'Community Hub'],
-      badge: { label: 'Available', variant: 'available' },
-      location: 'Bahria Town, Lahore',
-      price: 'PKR 1.5 Cr - 5 Cr',
-      area: '6.2 Acres',
-      units: '150+ Units',
-      completion: 'Q4 2025',
-      features: ['Private Garden', 'Wine Cellar', 'Home Theater', 'Butler Service'],
-      developer: 'ABS Developers',
-    },
-    {
-      href: '/pearl-one-capital.html',
-      image: '/images/files-POCAPITAL_600x400.png',
-      logo: '/images/files-capital_6334f1cf-4372-4b96-ad52-4f9d08a345f6_120x100.png',
-      title: 'Pearl One Capital',
-      description: 'Premier mixed-use development project combining luxury living with commercial opportunities in prime location.',
-      tags: ['Mixed-Use', 'Retail Spaces', 'Community Hub'],
-      badge: { label: 'Available', variant: 'available' },
-      location: 'Bahria Town, Lahore',
-      price: 'PKR 70 Lakh - 2.5 Cr',
-      area: '7.5 Acres',
-      units: '600+ Units',
-      completion: 'Q1 2026',
-      features: ['Business District', 'Luxury Hotel', 'Convention Center', 'Helipad'],
-      developer: 'ABS Developers',
-    },
-  ],
+  projects,
   className = '',
 }) => {
+  // Map extracted projects to component format
+  const displayProjects = projects || detailedProjects.map((project) => {
+    const formatPrice = (min: number | null, max: number | null) => {
+      if (!min || !max) return 'Contact for Pricing';
+      const minCr = min / 10000000;
+      const maxCr = max / 10000000;
+      if (minCr >= 1 || maxCr >= 1) {
+        return `PKR ${minCr.toFixed(1)} Cr - ${maxCr.toFixed(1)} Cr`;
+      }
+      const minLakh = min / 100000;
+      const maxLakh = max / 100000;
+      return `PKR ${minLakh.toFixed(0)} Lakh - ${maxLakh.toFixed(0)} Lakh`;
+    };
+
+    const getTagsForType = (type: string) => {
+      switch (type) {
+        case 'residential':
+          return ['Luxury Apartments', 'Premium Living', 'Modern Design'];
+        case 'commercial':
+          return ['Office Spaces', 'Retail Units', 'Business Hub'];
+        case 'mixed-use':
+          return ['Mixed-Use', 'Retail Spaces', 'Community Hub'];
+        default:
+          return ['Premium Development', 'Modern Amenities'];
+      }
+    };
+
+    const getBadge = (status: string, type: string) => {
+      if (status === 'completed') {
+        return { label: 'Delivered', variant: 'delivered' as BadgeVariant };
+      }
+      if (type === 'mixed-use') {
+        return { label: 'Flagship', variant: 'flagship' as BadgeVariant };
+      }
+      return { label: 'Available', variant: 'available' as BadgeVariant };
+    };
+
+    return {
+      href: `/projects/${project.id}`,
+      image: project.images?.[0] || '/images/placeholder.png',
+      title: project.name,
+      description: project.description,
+      tags: getTagsForType(project.type),
+      badge: getBadge(project.status, project.type),
+      location: project.location,
+      price: formatPrice(project.priceRange.min, project.priceRange.max),
+      area: '2.5 - 7.5 Acres',
+      units: '150 - 800+ Units',
+      completion: project.status === 'completed' ? 'Completed' : 'Q1-Q4 2025-2026',
+      features: project.amenities,
+      developer: project.developer,
+    };
+  });
+
   return (
     <section
       aria-labelledby="featured-projects-title"
@@ -527,7 +453,7 @@ export const FeaturedProjects: React.FC<FeaturedProjectsProps> = ({
         {/* Grid */}
         <div className="grid gap-8 md:gap-10"
              style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
-          {projects.map((p, i) => (
+          {displayProjects.map((p, i) => (
             <Card key={`${p.title}-${i}`} project={p} index={i} />
           ))}
         </div>

@@ -87,6 +87,7 @@ export const detailedProjects = [
     description: 'Premium mixed-use development with residential and commercial units under the Asaan Ghar Offer 2025',
     status: 'construction',
     brochure: '/projectFiles/ABS MALL & RESIDENCY 2 - ASAAN GHAR OFFER 2025.pdf',
+    images: ['/Commercial Projects/ABS_Mall_Residency.png'],
     priceRange: {
       min: 3000000,
       max: 25000000,
@@ -101,6 +102,9 @@ export const detailedProjects = [
     ],
     unitTypes: [],
     paymentPlan: {
+      downPaymentPercentage: 20,
+      durationMonths: 36,
+      totalInstallments: 36,
     },
   },
   {
@@ -112,6 +116,7 @@ export const detailedProjects = [
     description: 'Commercial mall development with retail spaces and flexible payment plans',
     status: 'construction',
     brochure: '/projectFiles/ABS Mall Payment Plan.pdf',
+    images: ['/Commercial Projects/ABS_Mall_Residency.png'],
     priceRange: {
       min: 2500000,
       max: 15000000,
@@ -124,6 +129,9 @@ export const detailedProjects = [
     ],
     unitTypes: [],
     paymentPlan: {
+      downPaymentPercentage: 15,
+      durationMonths: 24,
+      totalInstallments: 24,
     },
   },
   {
@@ -135,6 +143,7 @@ export const detailedProjects = [
     description: 'Premium commercial office spaces with modern amenities under the Asaan Ghar Offer 2025',
     status: 'construction',
     brochure: '/projectFiles/PEARL ONE CAPITAL - COMMERCIAL - ASAAN GHAR OFFER 2025.pdf',
+    images: ['/Commercial Projects/Pearl_One_Capital.png'],
     priceRange: {
       min: 5000000,
       max: 50000000,
@@ -148,6 +157,8 @@ export const detailedProjects = [
     ],
     unitTypes: [],
     paymentPlan: {
+      downPaymentPercentage: 10,
+      durationMonths: 48,
       totalInstallments: 41,
     },
   },
@@ -160,6 +171,7 @@ export const detailedProjects = [
     description: 'Luxury residential apartments with 1, 2, and 3 bedroom units under the Asaan Ghar Offer',
     status: 'construction',
     brochure: '/projectFiles/PEARL ONE CAPITAL - RESIDENTIAL - ASAAN GHAR OFFER.pdf',
+    images: ['/Commercial Projects/Pearl_One_Capital.png'],
     priceRange: {
       min: 1060000,
       max: 1801800,
@@ -205,6 +217,8 @@ export const detailedProjects = [
       },
     ],
     paymentPlan: {
+      downPaymentPercentage: 15,
+      durationMonths: 42,
       totalInstallments: 45,
     },
   },
@@ -217,6 +231,7 @@ export const detailedProjects = [
     description: 'Luxury residential project with exclusive courtyard design and early investor development deal',
     status: 'construction',
     brochure: '/projectFiles/PEARL ONE COURTYARD - DEVELOPMENT DEAL.pdf',
+    images: ['/Commercial Projects/Pearl_One_Courtyard_2.png'],
     priceRange: {
       min: 4000000,
       max: 20000000,
@@ -231,6 +246,9 @@ export const detailedProjects = [
     ],
     unitTypes: [],
     paymentPlan: {
+      downPaymentPercentage: 25,
+      durationMonths: 36,
+      totalInstallments: 36,
     },
   },
   {
@@ -242,6 +260,7 @@ export const detailedProjects = [
     description: 'Ultra-premium residential development with high-end finishes and exclusive amenities',
     status: 'construction',
     brochure: '/projectFiles/PEARL ONE PREMIUM - (DEVELOPMENT DEAL).pdf',
+    images: ['/Commercial Projects/Pearl_One_Premium.png'],
     priceRange: {
       min: 6000000,
       max: 30000000,
@@ -256,6 +275,9 @@ export const detailedProjects = [
     ],
     unitTypes: [],
     paymentPlan: {
+      downPaymentPercentage: 20,
+      durationMonths: 48,
+      totalInstallments: 48,
     },
   },
   {
@@ -267,6 +289,7 @@ export const detailedProjects = [
     description: 'Commercial development with business-friendly payment plans under the Asaan Karobar Deal 2025',
     status: 'construction',
     brochure: '/projectFiles/POC3-ASAAN KAROBAR DEAL 2025.pdf',
+    images: ['/Commercial Projects/Pearl_One_Courtyard_3.png'],
     priceRange: {
       min: 3500000,
       max: 18000000,
@@ -280,6 +303,9 @@ export const detailedProjects = [
     ],
     unitTypes: [],
     paymentPlan: {
+      downPaymentPercentage: 15,
+      durationMonths: 36,
+      totalInstallments: 36,
     },
   },
 ];
