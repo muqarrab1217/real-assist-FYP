@@ -1,0 +1,769 @@
+[
+  {
+    "id": "abs_mall_&_residency_2_-_asaan_ghar_offer_2025",
+    "name": "ABS Mall & Residency",
+    "type": "commercial",
+    "location": "At ABS Developers",
+    "developer": "ABS Developers",
+    "description": "Premium commercial project in At ABS Developers",
+    "status": "construction",
+    "price_range": {
+      "min": null,
+      "max": null
+    },
+    "unit_types": [],
+    "amenities": [
+      "Lift"
+    ],
+    "payment_plan": {
+      "down_payment": null,
+      "installments": [],
+      "duration_months": null,
+      "monthly_amount": null,
+      "quarterly_amount": null
+    },
+    "images": [],
+    "brochure": "/projectFiles/ABS MALL & RESIDENCY 2 - ASAAN GHAR OFFER 2025.pdf",
+    "raw_text_sample": "GARSAANADN EGIHDA URL O AFFDEHRA 2 O02FF5ER100 % SHARIAH COMPLIANT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding these values, we\nprovide a trustworthy and 100% Shariah-compliant real estate\ninvestment ",
+    "total_tables_extracted": 5
+  },
+  {
+    "id": "abs_mall_payment_plan",
+    "name": "ABS Mall",
+    "type": "commercial",
+    "location": "Lahore, Pakistan",
+    "developer": "ABS Developers",
+    "description": "Premium commercial project in Lahore, Pakistan",
+    "status": "construction",
+    "price_range": {
+      "min": null,
+      "max": null
+    },
+    "unit_types": [],
+    "amenities": [],
+    "payment_plan": {
+      "down_payment": null,
+      "installments": [],
+      "duration_months": null,
+      "monthly_amount": null,
+      "quarterly_amount": null
+    },
+    "images": [],
+    "brochure": "/projectFiles/ABS Mall Payment Plan.pdf",
+    "raw_text_sample": "",
+    "total_tables_extracted": 0
+  },
+  {
+    "id": "pearl_one_capital_-_commercial_-_asaan_ghar_offer_2025",
+    "name": "Pearl One Capital - Commercial",
+    "type": "commercial",
+    "location": "At ABS Developers",
+    "developer": "ABS Developers",
+    "description": "Premium commercial project in At ABS Developers",
+    "status": "construction",
+    "price_range": {
+      "min": null,
+      "max": null
+    },
+    "unit_types": [],
+    "amenities": [
+      "Lobby"
+    ],
+    "payment_plan": {
+      "down_payment": null,
+      "installments": [
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 60000,
+          "percentage": 10
+        },
+        {
+          "number": null,
+          "amount": 3000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 3000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 3000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 3000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 3000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 3000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 4000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 4000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 5000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 6000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 6000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 50000,
+          "percentage": 15
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1000000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 720000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1346875,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 10
+        }
+      ],
+      "duration_months": null,
+      "monthly_amount": null,
+      "quarterly_amount": null
+    },
+    "images": [],
+    "brochure": "/projectFiles/PEARL ONE CAPITAL - COMMERCIAL - ASAAN GHAR OFFER 2025.pdf",
+    "raw_text_sample": "100 % SHARIAH COMPLIANT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding these values, we\nprovide a trustworthy and 100% Shariah-compliant real estate\ninvestment for our clients.PEARL ONE COURTYARD PEARL O",
+    "total_tables_extracted": 33
+  },
+  {
+    "id": "pearl_one_capital_-_residential_-_asaan_ghar_offer",
+    "name": "Pearl One Capital - Residential",
+    "type": "residential",
+    "location": "At ABS Developers",
+    "developer": "ABS Developers",
+    "description": "Premium residential project in At ABS Developers",
+    "status": "construction",
+    "price_range": {
+      "min": null,
+      "max": null
+    },
+    "unit_types": [
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1700000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1717500
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1794650
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1794650
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1631500
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1801800
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1060000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1070000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1080000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1090000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1100000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1110000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1220000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1250000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 2500000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 2500000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 2400000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 2450000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1370000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 1610000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 3150000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 3330000
+      },
+      {
+        "type": null,
+        "area": null,
+        "bedrooms": null,
+        "price": 3200000
+      }
+    ],
+    "amenities": [
+      "Lift"
+    ],
+    "payment_plan": {
+      "down_payment": null,
+      "installments": [
+        {
+          "number": null,
+          "amount": 1700000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1717500,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1794650,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1794650,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1631500,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1801800,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 15
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 10
+        },
+        {
+          "number": null,
+          "amount": 449000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 484750,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 806500,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 842250,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 913750,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 199750,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 271250,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 986250,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 20000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 322000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 106875,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 255000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 15
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 10
+        },
+        {
+          "number": null,
+          "amount": 906250,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 752500,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2500000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2500000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2400000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 2450000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 10
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 10
+        },
+        {
+          "number": null,
+          "amount": 1370000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 1610000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 3150000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 3330000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 164000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 3200000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 15
+        },
+        {
+          "number": null,
+          "amount": 120000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 532500,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 200000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 51000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": 500000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 10
+        },
+        {
+          "number": null,
+          "amount": 51000,
+          "percentage": null
+        },
+        {
+          "number": null,
+          "amount": null,
+          "percentage": 10
+        }
+      ],
+      "duration_months": null,
+      "monthly_amount": null,
+      "quarterly_amount": null
+    },
+    "images": [],
+    "brochure": "/projectFiles/PEARL ONE CAPITAL - RESIDENTIAL - ASAAN GHAR OFFER.pdf",
+    "raw_text_sample": "100 % SHARIAH COMPLIANT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding these values, we\nprovide a trustworthy and 100% Shariah-compliant real estate\ninvestment for our clients.PEARL ONE COURTYARD PEARL O",
+    "total_tables_extracted": 18
+  },
+  {
+    "id": "pearl_one_courtyard_-_development_deal",
+    "name": "Pearl One Courtyard",
+    "type": "residential",
+    "location": "At ABS Developers",
+    "developer": "ABS Developers",
+    "description": "Premium residential project in At ABS Developers",
+    "status": "construction",
+    "price_range": {
+      "min": null,
+      "max": null
+    },
+    "unit_types": [],
+    "amenities": [
+      "Park",
+      "Parking",
+      "Fitness Center",
+      "Lobby"
+    ],
+    "payment_plan": {
+      "down_payment": null,
+      "installments": [],
+      "duration_months": null,
+      "monthly_amount": null,
+      "quarterly_amount": null
+    },
+    "images": [],
+    "brochure": "/projectFiles/PEARL ONE COURTYARD - DEVELOPMENT DEAL.pdf",
+    "raw_text_sample": "100 % SHARIAH COMPLIANT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding these values, we\nprovide a trustworthy and 100% Shariah-compliant real estate\ninvestment for our clients.PEARL ONE COURTYARD PEARL O",
+    "total_tables_extracted": 3
+  },
+  {
+    "id": "pearl_one_premium_-_(development_deal)",
+    "name": "Pearl One Premium",
+    "type": "residential",
+    "location": "At ABS Developers",
+    "developer": "ABS Developers",
+    "description": "Premium residential project in At ABS Developers",
+    "status": "construction",
+    "price_range": {
+      "min": null,
+      "max": null
+    },
+    "unit_types": [],
+    "amenities": [
+      "Lobby",
+      "Lift"
+    ],
+    "payment_plan": {
+      "down_payment": null,
+      "installments": [],
+      "duration_months": null,
+      "monthly_amount": null,
+      "quarterly_amount": null
+    },
+    "images": [],
+    "brochure": "/projectFiles/PEARL ONE PREMIUM - (DEVELOPMENT DEAL).pdf",
+    "raw_text_sample": "GRAND EID UL ADHA OFFER100 % SHARIAH COMPLIANT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding these values, we\nprovide a trustworthy and 100% Shariah-compliant real estate\ninvestment for our clients.PEAR",
+    "total_tables_extracted": 2
+  },
+  {
+    "id": "poc3-asaan_karobar_deal_2025",
+    "name": "Pearl One Courtyard",
+    "type": "residential",
+    "location": "At ABS Developers",
+    "developer": "ABS Developers",
+    "description": "Premium residential project in At ABS Developers",
+    "status": "construction",
+    "price_range": {
+      "min": null,
+      "max": null
+    },
+    "unit_types": [],
+    "amenities": [],
+    "payment_plan": {
+      "down_payment": null,
+      "installments": [],
+      "duration_months": null,
+      "monthly_amount": null,
+      "quarterly_amount": null
+    },
+    "images": [],
+    "brochure": "/projectFiles/POC3-ASAAN KAROBAR DEAL 2025.pdf",
+    "raw_text_sample": "TALLEST TOWER OF PUNJABSHARIAH COMPLIANT\nREFUND POLICY\nBEFORE-TIME DELIVERY\n100%\nSAME RATE ON CASH/INSTALMENTS\n100 % SHARILAAHB T ECSTOEDM MAPTELRIIAALNT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding th",
+    "total_tables_extracted": 12
+  }
+]

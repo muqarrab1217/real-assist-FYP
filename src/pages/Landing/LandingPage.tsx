@@ -77,16 +77,13 @@ export const LandingPage: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="flex justify-between items-center h-18">
-            <Link to="/" className="flex items-center space-x-3 group">
-              <motion.div 
-                whileHover={{ scale: 1.05, rotate: 5 }}
-                className="h-10 w-10 rounded-xl bg-gradient-to-r from-[#d4af37] to-[#f4e68c] flex items-center justify-center shadow-gold group-hover:shadow-gold-lg transition-all duration-300"
-              >
-                <BuildingOfficeIcon className="h-6 w-6 text-white" />
-              </motion.div>
-              <span className="text-xl font-display font-bold text-charcoal-900 dark:text-white group-hover:abs-gradient-text transition-all duration-300">
-                RealAssist
-              </span>
+            <Link to="/" className="flex items-center group">
+              <motion.img 
+                src="/images/logo.png"
+                alt="ABS Developers"
+                whileHover={{ scale: 1.05 }}
+                className="h-14 w-auto transition-all duration-300"
+              />
             </Link>
             
             <div className="hidden md:flex items-center space-x-1">

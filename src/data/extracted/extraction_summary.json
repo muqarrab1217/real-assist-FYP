@@ -1,0 +1,48 @@
+{
+  "total_projects": 7,
+  "extraction_date": "2025-10-14T00:34:10.910242",
+  "projects": [
+    {
+      "id": "abs_mall_&_residency_2_-_asaan_ghar_offer_2025",
+      "name": "ABS Mall & Residency",
+      "type": "commercial",
+      "location": "At ABS Developers"
+    },
+    {
+      "id": "abs_mall_payment_plan",
+      "name": "ABS Mall",
+      "type": "commercial",
+      "location": "Lahore, Pakistan"
+    },
+    {
+      "id": "pearl_one_capital_-_commercial_-_asaan_ghar_offer_2025",
+      "name": "Pearl One Capital - Commercial",
+      "type": "commercial",
+      "location": "At ABS Developers"
+    },
+    {
+      "id": "pearl_one_capital_-_residential_-_asaan_ghar_offer",
+      "name": "Pearl One Capital - Residential",
+      "type": "residential",
+      "location": "At ABS Developers"
+    },
+    {
+      "id": "pearl_one_courtyard_-_development_deal",
+      "name": "Pearl One Courtyard",
+      "type": "residential",
+      "location": "At ABS Developers"
+    },
+    {
+      "id": "pearl_one_premium_-_(development_deal)",
+      "name": "Pearl One Premium",
+      "type": "residential",
+      "location": "At ABS Developers"
+    },
+    {
+      "id": "poc3-asaan_karobar_deal_2025",
+      "name": "Pearl One Courtyard",
+      "type": "residential",
+      "location": "At ABS Developers"
+    }
+  ]
+}

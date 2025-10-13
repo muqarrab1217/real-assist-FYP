@@ -1,0 +1,328 @@
+{
+  "projects": [
+    {
+      "id": "abs_mall_residency_2_asaan_ghar_2025",
+      "name": "ABS Mall & Residency 2",
+      "type": "mixed-use",
+      "location": "Lahore, Pakistan",
+      "developer": "ABS Developers",
+      "description": "Premium mixed-use development with residential and commercial units",
+      "status": "construction",
+      "offer_type": "Asaan Ghar Offer 2025",
+      "brochure_path": "/projectFiles/ABS MALL & RESIDENCY 2 - ASAAN GHAR OFFER 2025.pdf",
+      
+      "pricing": {
+        "residential": {
+          "min_price": null,
+          "max_price": null,
+          "currency": "PKR"
+        },
+        "commercial": {
+          "min_price": null,
+          "max_price": null,
+          "currency": "PKR"
+        }
+      },
+      
+      "unit_types": [
+        {
+          "type": "Studio Apartment",
+          "area": "",
+          "bedrooms": 0,
+          "price": null
+        },
+        {
+          "type": "1 Bed Apartment",
+          "area": "",
+          "bedrooms": 1,
+          "price": null
+        },
+        {
+          "type": "2 Bed Apartment",
+          "area": "",
+          "bedrooms": 2,
+          "price": null
+        },
+        {
+          "type": "Shop",
+          "area": "",
+          "price": null
+        }
+      ],
+      
+      "payment_plan": {
+        "down_payment_percentage": null,
+        "duration_months": null,
+        "monthly_installments": null,
+        "quarterly_installments": null,
+        "on_possession_percentage": null,
+        "installment_schedule": []
+      },
+      
+      "amenities": [
+        "24/7 Security",
+        "CCTV Surveillance",
+        "Parking",
+        "Elevators",
+        "Backup Generator",
+        "Water Supply",
+        "Shopping Area",
+        "Prayer Area"
+      ],
+      
+      "features": [],
+      
+      "contact": {
+        "phone": [],
+        "email": [],
+        "website": "",
+        "address": ""
+      },
+      
+      "images": [
+        "/Commercial Projects/ABS_Mall_Residency.png"
+      ],
+      
+      "notes": "Review PDF for specific details"
+    },
+    
+    {
+      "id": "abs_mall_payment_plan",
+      "name": "ABS Mall",
+      "type": "commercial",
+      "location": "Lahore, Pakistan",
+      "developer": "ABS Developers",
+      "description": "Commercial mall development with retail spaces",
+      "status": "construction",
+      "brochure_path": "/projectFiles/ABS Mall Payment Plan.pdf",
+      
+      "pricing": {
+        "shops": {
+          "min_price": null,
+          "max_price": null,
+          "price_per_sqft": null
+        }
+      },
+      
+      "payment_plan": {
+        "down_payment_percentage": null,
+        "duration_months": null,
+        "installment_schedule": []
+      },
+      
+      "amenities": [],
+      "images": [],
+      "notes": "Focus on payment plan details"
+    },
+    
+    {
+      "id": "pearl_one_capital_commercial_2025",
+      "name": "Pearl One Capital - Commercial",
+      "type": "commercial",
+      "location": "Lahore, Pakistan",
+      "developer": "ABS Developers",
+      "description": "Premium commercial office spaces",
+      "status": "construction",
+      "offer_type": "Asaan Ghar Offer 2025",
+      "brochure_path": "/projectFiles/PEARL ONE CAPITAL - COMMERCIAL - ASAAN GHAR OFFER 2025.pdf",
+      
+      "pricing": {
+        "min_price": null,
+        "max_price": null,
+        "price_per_sqft": null
+      },
+      
+      "unit_types": [
+        {
+          "type": "Office Space",
+          "area": "",
+          "price": null
+        }
+      ],
+      
+      "payment_plan": {
+        "down_payment_percentage": null,
+        "duration_months": null,
+        "installment_schedule": []
+      },
+      
+      "amenities": [],
+      
+      "images": [
+        "/Commercial Projects/Pearl_One_Capital.png"
+      ],
+      
+      "notes": ""
+    },
+    
+    {
+      "id": "pearl_one_capital_residential_2025",
+      "name": "Pearl One Capital - Residential",
+      "type": "residential",
+      "location": "Lahore, Pakistan",
+      "developer": "ABS Developers",
+      "description": "Luxury residential apartments",
+      "status": "construction",
+      "offer_type": "Asaan Ghar Offer",
+      "brochure_path": "/projectFiles/PEARL ONE CAPITAL - RESIDENTIAL - ASAAN GHAR OFFER.pdf",
+      
+      "pricing": {
+        "min_price": null,
+        "max_price": null
+      },
+      
+      "unit_types": [
+        {
+          "type": "1 Bed",
+          "area": "",
+          "bedrooms": 1,
+          "price": null
+        },
+        {
+          "type": "2 Bed",
+          "area": "",
+          "bedrooms": 2,
+          "price": null
+        },
+        {
+          "type": "3 Bed",
+          "area": "",
+          "bedrooms": 3,
+          "price": null
+        }
+      ],
+      
+      "payment_plan": {
+        "down_payment_percentage": null,
+        "duration_months": null,
+        "installment_schedule": []
+      },
+      
+      "amenities": [
+        "Swimming Pool",
+        "Gym",
+        "Community Center",
+        "Parking",
+        "Security"
+      ],
+      
+      "images": [
+        "/Commercial Projects/Pearl_One_Capital.png"
+      ],
+      
+      "notes": ""
+    },
+    
+    {
+      "id": "pearl_one_courtyard_development_deal",
+      "name": "Pearl One Courtyard",
+      "type": "residential",
+      "location": "Lahore, Pakistan",
+      "developer": "ABS Developers",
+      "description": "Luxury residential project with courtyard design",
+      "status": "construction",
+      "offer_type": "Development Deal",
+      "brochure_path": "/projectFiles/PEARL ONE COURTYARD - DEVELOPMENT DEAL.pdf",
+      
+      "pricing": {
+        "min_price": null,
+        "max_price": null
+      },
+      
+      "unit_types": [],
+      
+      "payment_plan": {
+        "down_payment_percentage": null,
+        "duration_months": null,
+        "installment_schedule": []
+      },
+      
+      "amenities": [],
+      
+      "images": [
+        "/Commercial Projects/Pearl_One_Courtyard_2.png",
+        "/Commercial Projects/Pearl_One_Courtyard_3.png"
+      ],
+      
+      "notes": "Development deal - special terms for early investors"
+    },
+    
+    {
+      "id": "pearl_one_premium_development_deal",
+      "name": "Pearl One Premium",
+      "type": "residential",
+      "location": "Lahore, Pakistan",
+      "developer": "ABS Developers",
+      "description": "Premium residential development",
+      "status": "construction",
+      "offer_type": "Development Deal",
+      "brochure_path": "/projectFiles/PEARL ONE PREMIUM - (DEVELOPMENT DEAL).pdf",
+      
+      "pricing": {
+        "min_price": null,
+        "max_price": null
+      },
+      
+      "unit_types": [],
+      
+      "payment_plan": {
+        "down_payment_percentage": null,
+        "duration_months": null,
+        "installment_schedule": []
+      },
+      
+      "amenities": [],
+      
+      "images": [
+        "/Commercial Projects/Pearl_One_Premium.png"
+      ],
+      
+      "notes": ""
+    },
+    
+    {
+      "id": "poc3_asaan_karobar_deal_2025",
+      "name": "Pearl One Courtyard 3",
+      "type": "commercial",
+      "location": "Lahore, Pakistan",
+      "developer": "ABS Developers",
+      "description": "Commercial development with business-friendly payment plans",
+      "status": "construction",
+      "offer_type": "Asaan Karobar Deal 2025",
+      "brochure_path": "/projectFiles/POC3-ASAAN KAROBAR DEAL 2025.pdf",
+      
+      "pricing": {
+        "min_price": null,
+        "max_price": null
+      },
+      
+      "unit_types": [
+        {
+          "type": "Shop",
+          "area": "",
+          "price": null
+        },
+        {
+          "type": "Office",
+          "area": "",
+          "price": null
+        }
+      ],
+      
+      "payment_plan": {
+        "down_payment_percentage": null,
+        "duration_months": null,
+        "installment_schedule": []
+      },
+      
+      "amenities": [],
+      
+      "images": [
+        "/Commercial Projects/Pearl_One_Courtyard_3.png"
+      ],
+      
+      "notes": "Business-focused payment plan"
+    }
+  ]
+}
+

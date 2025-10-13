@@ -1,0 +1,26 @@
+{
+  "id": "poc3-asaan_karobar_deal_2025",
+  "name": "Pearl One Courtyard",
+  "type": "residential",
+  "location": "At ABS Developers",
+  "developer": "ABS Developers",
+  "description": "Premium residential project in At ABS Developers",
+  "status": "construction",
+  "price_range": {
+    "min": null,
+    "max": null
+  },
+  "unit_types": [],
+  "amenities": [],
+  "payment_plan": {
+    "down_payment": null,
+    "installments": [],
+    "duration_months": null,
+    "monthly_amount": null,
+    "quarterly_amount": null
+  },
+  "images": [],
+  "brochure": "/projectFiles/POC3-ASAAN KAROBAR DEAL 2025.pdf",
+  "raw_text_sample": "TALLEST TOWER OF PUNJABSHARIAH COMPLIANT\nREFUND POLICY\nBEFORE-TIME DELIVERY\n100%\nSAME RATE ON CASH/INSTALMENTS\n100 % SHARILAAHB T ECSTOEDM MAPTELRIIAALNT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding th",
+  "total_tables_extracted": 12
+}

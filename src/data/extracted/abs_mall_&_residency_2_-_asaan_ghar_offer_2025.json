@@ -1,0 +1,28 @@
+{
+  "id": "abs_mall_&_residency_2_-_asaan_ghar_offer_2025",
+  "name": "ABS Mall & Residency",
+  "type": "commercial",
+  "location": "At ABS Developers",
+  "developer": "ABS Developers",
+  "description": "Premium commercial project in At ABS Developers",
+  "status": "construction",
+  "price_range": {
+    "min": null,
+    "max": null
+  },
+  "unit_types": [],
+  "amenities": [
+    "Lift"
+  ],
+  "payment_plan": {
+    "down_payment": null,
+    "installments": [],
+    "duration_months": null,
+    "monthly_amount": null,
+    "quarterly_amount": null
+  },
+  "images": [],
+  "brochure": "/projectFiles/ABS MALL & RESIDENCY 2 - ASAAN GHAR OFFER 2025.pdf",
+  "raw_text_sample": "GARSAANADN EGIHDA URL O AFFDEHRA 2 O02FF5ER100 % SHARIAH COMPLIANT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding these values, we\nprovide a trustworthy and 100% Shariah-compliant real estate\ninvestment ",
+  "total_tables_extracted": 5
+}

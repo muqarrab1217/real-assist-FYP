@@ -1,0 +1,27 @@
+{
+  "filename": "ABS Mall Payment Plan.pdf",
+  "pages": 16,
+  "text_length": 0,
+  "tables_found": 0,
+  "payment_plans": [],
+  "unit_details": [],
+  "pricing_info": {
+    "prices_found": [],
+    "price_ranges": {},
+    "special_offers": []
+  },
+  "project_info": {
+    "name": "ABS Mall Payment Plan",
+    "location": "Lahore, Pakistan",
+    "developer": "ABS Developers",
+    "type": "Mixed-Use"
+  },
+  "contact_info": {
+    "phones": [],
+    "emails": [],
+    "website": "",
+    "address": ""
+  },
+  "key_features": [],
+  "raw_tables": []
+}
