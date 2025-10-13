@@ -87,6 +87,14 @@ export const LandingPage: React.FC = () => {
             </Link>
             
             <div className="hidden md:flex items-center space-x-1">
+              <Link to="/projects">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="px-4 py-2 text-charcoal-700 dark:text-charcoal-300 font-medium hover:bg-gold-50 dark:hover:bg-gold-900/20 hover:text-gold-600 dark:hover:text-gold-400 rounded-xl transition-all duration-300"
+                >
+                  Projects
+                </motion.div>
+              </Link>
               <motion.a 
                 whileHover={{ scale: 1.05 }}
                 href="#features" 
@@ -101,13 +109,14 @@ export const LandingPage: React.FC = () => {
               >
                 Testimonials
               </motion.a>
-              <motion.a 
-                whileHover={{ scale: 1.05 }}
-                href="#pricing" 
-                className="px-4 py-2 text-charcoal-700 dark:text-charcoal-300 font-medium hover:bg-gold-50 dark:hover:bg-gold-900/20 hover:text-gold-600 dark:hover:text-gold-400 rounded-xl transition-all duration-300"
-              >
-                Pricing
-              </motion.a>
+              <Link to="/about">
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  className="px-4 py-2 text-charcoal-700 dark:text-charcoal-300 font-medium hover:bg-gold-50 dark:hover:bg-gold-900/20 hover:text-gold-600 dark:hover:text-gold-400 rounded-xl transition-all duration-300"
+                >
+                  About
+                </motion.div>
+              </Link>
             </div>
             
             <div className="flex items-center space-x-3">
@@ -601,115 +610,6 @@ export const LandingPage: React.FC = () => {
                 <p className="text-gray-300 leading-relaxed">
                   {feature.description}
                 </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Detailed Features Section */}
-      <section 
-        className="relative py-16 md:py-20"
-        style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)' }}
-      >
-        {/* subtle gold dot pattern overlay */}
-        <div
-          aria-hidden="true"
-          className="absolute inset-0 opacity-30 pointer-events-none"
-          style={{
-            backgroundImage:
-              "radial-gradient(rgba(212,175,55,0.1) 1px, transparent 1px)",
-            backgroundSize: '50px 50px',
-          }}
-        />
-        
-        <div className="relative mx-auto max-w-7xl px-4">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                icon: ShieldCheckIcon,
-                title: "100% Shariah Compliant",
-                description: "World's first 100% Shariah compliant real estate company ensuring your investments align with Islamic principles. Every project, transaction, and partnership follows strict Islamic guidelines.",
-                button: "CERTIFIED ISLAMIC"
-              },
-              {
-                icon: BuildingOfficeIcon,
-                title: "Prime Bahria Town Location",
-                description: "Strategic developments in Bahria Town, Lahore - Pakistan's most prestigious planned community. Our projects benefit from excellent connectivity, world-class amenities, and high investment returns.",
-                button: "PREMIUM LOCATION"
-              },
-              {
-                icon: UserGroupIcon,
-                title: "Expert Leadership",
-                description: "Led by Dr. Subbayal and a team of highly seasoned industry executives. Our leadership brings decades of experience in luxury real estate development and Islamic finance.",
-                button: "EXPERIENCED TEAM"
-              },
-              {
-                icon: UserGroupIcon,
-                title: "Trusted Partnerships",
-                description: "Strategic partnerships with industry leaders including DASCON (construction), INTERWOOD (interiors), and BAHRIA TOWN (development). Quality assured through proven collaborations.",
-                button: "QUALITY PARTNERS"
-              },
-              {
-                icon: BuildingOfficeIcon,
-                title: "Innovative Architecture",
-                description: "State-of-the-art technologies and modern amenities in every building. From Pearl One series to Burj Quaid, we create architectural marvels that redefine luxury living.",
-                button: "MODERN DESIGN"
-              },
-              {
-                icon: ShieldCheckIcon,
-                title: "Proven Track Record",
-                description: "16+ successfully delivered projects, 500+ brand outlets, and over 1000 satisfied clients. Our commitment to excellence is reflected in every completed development.",
-                button: "TRUSTED RESULTS"
-              }
-            ].map((feature, index) => (
-              <motion.div
-                key={feature.title}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                viewport={{ once: true }}
-                whileHover={{ 
-                  y: -10,
-                  scale: 1.02,
-                  transition: { duration: 0.3 }
-                }}
-                className="group relative rounded-2xl p-6 md:p-8 border backdrop-blur transition transform hover:-translate-y-2"
-                style={{
-                  background: 'rgba(26,26,26,0.75)',
-                  borderColor: 'rgba(212,175,55,0.25)',
-                  boxShadow: '0 0 0 0 rgba(212,175,55,0)',
-                }}
-              >
-                <motion.div 
-                  className="h-16 w-16 bg-gradient-to-r from-[#d4af37] to-[#f4e68c] rounded-full flex items-center justify-center mb-6 shadow-gold group-hover:shadow-gold-lg transition-all duration-300"
-                  whileHover={{ rotate: 360, scale: 1.1 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <feature.icon className="h-8 w-8 text-white" />
-                </motion.div>
-                <h3 
-                  className="text-2xl font-semibold mb-4"
-                  style={{ 
-                    color: '#d4af37',
-                    fontFamily: 'Playfair Display, serif'
-                  }}
-                >
-                  {feature.title}
-                </h3>
-                <p className="text-gray-300 mb-6 leading-relaxed">
-                  {feature.description}
-                </p>
-                <Button 
-                  className="font-semibold text-sm px-6 py-2 rounded-xl"
-                  style={{
-                    background: 'linear-gradient(135deg, #d4af37, #f4e5a1)',
-                    color: '#0a0a0a',
-                    border: 'none'
-                  }}
-                >
-                  {feature.button}
-                </Button>
               </motion.div>
             ))}
           </div>

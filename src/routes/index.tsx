@@ -5,6 +5,9 @@ import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { PublicRoute } from '@/components/auth/PublicRoute';
 import { LandingPage } from '@/pages/Landing/LandingPage';
+import { ProjectsPage } from '@/pages/Projects/ProjectsPage';
+import { ProjectDetailPage } from '@/pages/Projects/ProjectDetailPage';
+import { AboutPage } from '@/pages/About/AboutPage';
 import { LoginPage } from '@/pages/Auth/LoginPage';
 import { RegisterPage } from '@/pages/Auth/RegisterPage';
 import { ForgotPasswordPage } from '@/pages/Auth/ForgotPasswordPage';
@@ -29,6 +32,18 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: <LandingPage />,
+      },
+      {
+        path: 'projects',
+        element: <ProjectsPage />,
+      },
+      {
+        path: 'projects/:projectId',
+        element: <ProjectDetailPage />,
+      },
+      {
+        path: 'about',
+        element: <AboutPage />,
       },
     ],
   },

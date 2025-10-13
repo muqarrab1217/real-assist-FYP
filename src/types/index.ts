@@ -90,3 +90,16 @@ export interface DashboardStats {
   changeType: 'increase' | 'decrease';
   icon: string;
 }
+
+export interface UnitType {
+  type?: string;
+  bedrooms?: number;
+  area?: string;
+  price?: number;
+}
+
+export interface PaymentPlan {
+  downPaymentPercentage?: number;
+  durationMonths?: number;
+  totalInstallments?: number;
+}
