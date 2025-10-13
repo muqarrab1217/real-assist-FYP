@@ -52,9 +52,9 @@ const mockRoomData: Record<string, RoomData[]> = {
 };
 
 const statusColors = {
-  vacant: '#4ade80',
-  occupied: '#f87171',
-  maintenance: '#facc15',
+  vacant: '#9ca3af', // Gray
+  occupied: '#d4af37', // Gold
+  maintenance: '#facc15', // Yellow
 };
 
 export const BlueprintDisplay: React.FC<BlueprintDisplayProps> = ({ 
@@ -234,7 +234,7 @@ export const BlueprintDisplay: React.FC<BlueprintDisplayProps> = ({
                       </div>
                       <div className="text-right">
                         <p className="font-semibold" style={{ color: statusColors[room.status] }}>
-                          {room.status.toUpperCase()}
+                          {room.status === 'occupied' ? 'SOLD' : room.status === 'vacant' ? 'AVAILABLE' : 'RESERVED'}
                         </p>
                         <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>{room.area}</p>
                       </div>
@@ -256,10 +256,6 @@ export const BlueprintDisplay: React.FC<BlueprintDisplayProps> = ({
             <div className="flex items-center gap-2">
               <div className="w-4 h-4 rounded" style={{ background: statusColors.occupied }}></div>
               <span className="text-sm text-white">Sold</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded" style={{ background: statusColors.maintenance }}></div>
-              <span className="text-sm text-white">Reserved</span>
             </div>
           </div>
         </div>
@@ -284,7 +280,7 @@ export const BlueprintDisplay: React.FC<BlueprintDisplayProps> = ({
           >
             <p className="font-semibold text-white text-sm">Unit {hoveredRoom.id}</p>
             <p className="text-xs" style={{ color: statusColors[hoveredRoom.status] }}>
-              {hoveredRoom.status.toUpperCase()}
+              {hoveredRoom.status === 'occupied' ? 'SOLD' : hoveredRoom.status === 'vacant' ? 'AVAILABLE' : 'RESERVED'}
             </p>
           </motion.div>
         )}
@@ -336,7 +332,7 @@ export const BlueprintDisplay: React.FC<BlueprintDisplayProps> = ({
                       color: statusColors[selectedRoom.status]
                     }}
                   >
-                    {selectedRoom.status}
+                    {selectedRoom.status === 'occupied' ? 'SOLD' : selectedRoom.status === 'vacant' ? 'AVAILABLE' : 'RESERVED'}
                   </span>
                 </div>
 
