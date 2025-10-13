@@ -1,0 +1,393 @@
+{
+  "id": "pearl_one_capital_-_residential_-_asaan_ghar_offer",
+  "name": "Pearl One Capital - Residential",
+  "type": "residential",
+  "location": "At ABS Developers",
+  "developer": "ABS Developers",
+  "description": "Premium residential project in At ABS Developers",
+  "status": "construction",
+  "price_range": {
+    "min": null,
+    "max": null
+  },
+  "unit_types": [
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1700000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1717500
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1794650
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1794650
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1631500
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1801800
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1060000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1070000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1080000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1090000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1100000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1110000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1220000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1250000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 2500000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 2500000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 2400000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 2450000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1370000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 1610000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 3150000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 3330000
+    },
+    {
+      "type": null,
+      "area": null,
+      "bedrooms": null,
+      "price": 3200000
+    }
+  ],
+  "amenities": [
+    "Lift"
+  ],
+  "payment_plan": {
+    "down_payment": null,
+    "installments": [
+      {
+        "number": null,
+        "amount": 1700000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 1717500,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 1794650,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 1794650,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 1631500,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 1801800,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": null,
+        "percentage": 15
+      },
+      {
+        "number": null,
+        "amount": null,
+        "percentage": 10
+      },
+      {
+        "number": null,
+        "amount": 449000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 484750,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 806500,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 842250,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 913750,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 199750,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 271250,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 986250,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 20000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 322000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 106875,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 255000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": null,
+        "percentage": 15
+      },
+      {
+        "number": null,
+        "amount": null,
+        "percentage": 10
+      },
+      {
+        "number": null,
+        "amount": 906250,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 752500,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 2500000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 2500000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 2400000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 2450000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": null,
+        "percentage": 10
+      },
+      {
+        "number": null,
+        "amount": null,
+        "percentage": 10
+      },
+      {
+        "number": null,
+        "amount": 1370000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 1610000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 3150000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 3330000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 164000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 3200000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": null,
+        "percentage": 15
+      },
+      {
+        "number": null,
+        "amount": 120000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 532500,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 200000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 51000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": 500000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": null,
+        "percentage": 10
+      },
+      {
+        "number": null,
+        "amount": 51000,
+        "percentage": null
+      },
+      {
+        "number": null,
+        "amount": null,
+        "percentage": 10
+      }
+    ],
+    "duration_months": null,
+    "monthly_amount": null,
+    "quarterly_amount": null
+  },
+  "images": [],
+  "brochure": "/projectFiles/PEARL ONE CAPITAL - RESIDENTIAL - ASAAN GHAR OFFER.pdf",
+  "raw_text_sample": "100 % SHARIAH COMPLIANT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding these values, we\nprovide a trustworthy and 100% Shariah-compliant real estate\ninvestment for our clients.PEARL ONE COURTYARD PEARL O",
+  "total_tables_extracted": 18
+}

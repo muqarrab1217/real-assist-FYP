@@ -1,0 +1,114 @@
+{
+  "filename": "POC3-ASAAN KAROBAR DEAL 2025.pdf",
+  "pages": 14,
+  "text_length": 16762,
+  "tables_found": 24,
+  "payment_plans": [],
+  "unit_details": [],
+  "pricing_info": {
+    "prices_found": [],
+    "price_ranges": {},
+    "special_offers": [
+      "adhere to Shariah-compliant principles, offering riba-free",
+      "adhere to Shariah-compliant principles, offering riba-free"
+    ]
+  },
+  "project_info": {
+    "name": "Pearl One Courtyard",
+    "location": "ABS Developers",
+    "developer": "ABS Developers",
+    "type": "Mixed-Use"
+  },
+  "contact_info": {
+    "phones": [],
+    "emails": [],
+    "website": "",
+    "address": ""
+  },
+  "key_features": [
+    "courtyard (water & green elements)7 c '-6 a \"l",
+    "community-friendly projects. by upholdi"
+  ],
+  "raw_tables": [
+    {
+      "table_number": 1,
+      "page": 6,
+      "rows": 2,
+      "cols": 1,
+      "data": [
+        [
+          ""
+        ],
+        [
+          "E"
+        ]
+      ]
+    },
+    {
+      "table_number": 2,
+      "page": 6,
+      "rows": 2,
+      "cols": 1,
+      "data": [
+        [
+          ""
+        ],
+        [
+          ""
+        ]
+      ]
+    },
+    {
+      "table_number": 3,
+      "page": 7,
+      "rows": 3,
+      "cols": 4,
+      "data": [
+        [
+          "MULTI-USE SPACE\nRESERGVREODSS F=O29R2 0A SMQE.fNtITIES",
+          "",
+          "",
+          "MULTI-USE SPACE\nRESERVED FOR\nMULTINGARTOIOSSN=2A8L5 3C SOQR.fPtORATE"
+        ],
+        [
+          "",
+          "",
+          "",
+          ""
+        ],
+        [
+          "7'-6L\"IxF6T'-4\" 7'-6L\"IxF6T'-4\" 7'-6L\"IxF6T'-4\" 7'-6L\"IxF6T'-4\" .ND DN.\nSTAIRCASE STAIRCASE",
+          "",
+          "",
+          ""
+        ]
+      ]
+    },
+    {
+      "table_number": 4,
+      "page": 7,
+      "rows": 2,
+      "cols": 1,
+      "data": [
+        [
+          "OFFICE\nGGRROOSSSS==552020 SSQQF.fTt\n64"
+        ],
+        [
+          "OFFICE\nGGRROOSSSS==330105S SQQF.Tft\n65"
+        ]
+      ]
+    },
+    {
+      "table_number": 5,
+      "page": 7,
+      "rows": 1,
+      "cols": 2,
+      "data": [
+        [
+          "OFFICE\nGRROOSSSS==550407S SQQFT.ft",
+          "OFFICE\nGGRROOSSSS==554070 SSQQ\n18"
+        ]
+      ]
+    }
+  ]
+}

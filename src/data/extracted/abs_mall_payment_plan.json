@@ -1,0 +1,26 @@
+{
+  "id": "abs_mall_payment_plan",
+  "name": "ABS Mall",
+  "type": "commercial",
+  "location": "Lahore, Pakistan",
+  "developer": "ABS Developers",
+  "description": "Premium commercial project in Lahore, Pakistan",
+  "status": "construction",
+  "price_range": {
+    "min": null,
+    "max": null
+  },
+  "unit_types": [],
+  "amenities": [],
+  "payment_plan": {
+    "down_payment": null,
+    "installments": [],
+    "duration_months": null,
+    "monthly_amount": null,
+    "quarterly_amount": null
+  },
+  "images": [],
+  "brochure": "/projectFiles/ABS Mall Payment Plan.pdf",
+  "raw_text_sample": "",
+  "total_tables_extracted": 0
+}

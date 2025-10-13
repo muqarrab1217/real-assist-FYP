@@ -1,0 +1,31 @@
+{
+  "id": "pearl_one_courtyard_-_development_deal",
+  "name": "Pearl One Courtyard",
+  "type": "residential",
+  "location": "At ABS Developers",
+  "developer": "ABS Developers",
+  "description": "Premium residential project in At ABS Developers",
+  "status": "construction",
+  "price_range": {
+    "min": null,
+    "max": null
+  },
+  "unit_types": [],
+  "amenities": [
+    "Park",
+    "Parking",
+    "Fitness Center",
+    "Lobby"
+  ],
+  "payment_plan": {
+    "down_payment": null,
+    "installments": [],
+    "duration_months": null,
+    "monthly_amount": null,
+    "quarterly_amount": null
+  },
+  "images": [],
+  "brochure": "/projectFiles/PEARL ONE COURTYARD - DEVELOPMENT DEAL.pdf",
+  "raw_text_sample": "100 % SHARIAH COMPLIANT\nAt ABS Developers, we ensure that all our real estate projects\nadhere to Shariah-compliant principles, offering riba-free\ntransactions, transparent agreements, and ethical business\npractices. Our developments promote halal investments, fair\npricing, and social responsibility, ensuring sustainable and\ncommunity-friendly projects. By upholding these values, we\nprovide a trustworthy and 100% Shariah-compliant real estate\ninvestment for our clients.PEARL ONE COURTYARD PEARL O",
+  "total_tables_extracted": 3
+}
