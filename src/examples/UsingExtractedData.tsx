@@ -5,7 +5,7 @@
  * from the PDF files in your React components.
  */
 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { 
   extractedProperties, 
   detailedProjects,
@@ -238,17 +238,17 @@ export const PaymentPlansExample = () => {
           <div key={plan.projectId} className="border rounded-lg p-4 bg-gray-50">
             <h3 className="text-xl font-semibold mb-3">{plan.projectName}</h3>
             
-            {plan.downPayment && (
+            {'downPayment' in plan && plan.downPayment ? (
               <div className="mb-2">
-                <span className="font-semibold">Down Payment:</span> {plan.downPayment}%
+                <span className="font-semibold">Down Payment:</span> {(plan as any).downPayment}%
               </div>
-            )}
+            ) : null}
             
-            {plan.durationMonths && (
+            {'durationMonths' in plan && plan.durationMonths ? (
               <div className="mb-2">
-                <span className="font-semibold">Duration:</span> {plan.durationMonths} months
+                <span className="font-semibold">Duration:</span> {(plan as any).durationMonths} months
               </div>
-            )}
+            ) : null}
             
             {plan.installments && plan.installments.length > 0 && (
               <div className="mt-4">
@@ -265,11 +265,11 @@ export const PaymentPlansExample = () => {
                     <tbody>
                       {plan.installments.slice(0, 10).map((inst, index) => (
                         <tr key={index} className="border-b">
-                          <td className="py-1">{inst.number || index + 1}</td>
+                          <td className="py-1">{'number' in inst ? (inst as any).number : index + 1}</td>
                           <td className="py-1">
-                            {inst.amount ? `PKR ${inst.amount.toLocaleString()}` : '-'}
+                            {'amount' in inst && (inst as any).amount ? `PKR ${(inst as any).amount.toLocaleString()}` : '-'}
                           </td>
-                          <td className="py-1">{inst.percentage ? `${inst.percentage}%` : '-'}</td>
+                          <td className="py-1">{'percentage' in inst && (inst as any).percentage ? `${(inst as any).percentage}%` : '-'}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -339,7 +339,6 @@ export const ProjectStatsDashboard = () => {
   const totalProjects = detailedProjects.length;
   const residentialCount = detailedProjects.filter(p => p.type === 'residential').length;
   const commercialCount = detailedProjects.filter(p => p.type === 'commercial').length;
-  const mixedUseCount = detailedProjects.filter(p => p.type === 'mixed-use').length;
   
   const avgAmenities = Math.round(
     detailedProjects.reduce((sum, p) => sum + p.amenities.length, 0) / totalProjects
