@@ -40,6 +40,9 @@ export default defineConfig({
   preview: {
     host: true,
     port: 3000,
-    allowedHosts: ['real-assist-fyp.onrender.com'],
+    allowedHosts: [
+      'real-assist-fyp.onrender.com',
+      'real-assist-rag.onrender.com',
+    ],
   },
 })
