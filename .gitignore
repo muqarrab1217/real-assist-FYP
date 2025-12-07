@@ -30,6 +30,10 @@ dist-ssr
 .env.test.local
 .env.production.local
 
+# Gemini RAG config and uploads
+gemini-rag/config/
+gemini-rag/uploads/
+
 # OS generated files
 Thumbs.db
 ehthumbs.db

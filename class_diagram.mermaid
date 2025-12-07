@@ -1,0 +1,500 @@
+classDiagram
+    direction TB
+
+    %% User Management Module - Light Blue
+    class User {
+        +String id
+        +String email
+        +String name
+        +String role
+        +Date createdAt
+        +String status
+        +String avatar
+        +String phone
+        +String address
+        +login()
+        +logout()
+        +updateProfile()
+        +changePassword()
+    }
+
+    class Client {
+        +String clientId
+        +String userId
+        +String cnic
+        +String phone
+        +String address
+        +Number totalInvestment
+        +String status
+        +Date registrationDate
+        +String preferredContact
+        +String emergencyContact
+        +viewPortfolio()
+        +makePayment()
+        +viewLedger()
+    }
+
+    class Admin {
+        +String adminId
+        +String userId
+        +String permissions
+        +String department
+        +String accessLevel
+        +Date lastLogin
+        +String role
+        +Boolean isActive
+        +manageLeads()
+        +viewAnalytics()
+        +processPayments()
+        +generateReports()
+    }
+
+    %% Lead Management Module - Light Red
+    class Lead {
+        +String leadId
+        +String name
+        +String email
+        +String phone
+        +String source
+        +String status
+        +Number score
+        +String assignedTo
+        +Date createdAt
+        +Date lastContact
+        +String notes
+        +String priority
+        +Number budget
+        +updateStatus()
+        +assignTo()
+        +addNote()
+        +calculateScore()
+    }
+
+    class LeadSource {
+        +String sourceId
+        +String name
+        +String type
+        +Number conversionRate
+        +String description
+        +Date createdDate
+        +Boolean isActive
+        +String category
+        +trackConversion()
+        +updateRate()
+    }
+
+    class LeadAssignment {
+        +String assignmentId
+        +String leadId
+        +String assignedTo
+        +Date assignedDate
+        +String priority
+        +String status
+        +String notes
+        +Date dueDate
+        +assignLead()
+        +updatePriority()
+        +markComplete()
+    }
+
+    %% Project Management Module - Light Green
+    class Project {
+        +String projectId
+        +String name
+        +String location
+        +String developer
+        +String status
+        +Date startDate
+        +Date completionDate
+        +Number totalUnits
+        +Number soldUnits
+        +String description
+        +String[] amenities
+        +Number progress
+        +addProperty()
+        +updateProgress()
+        +addUpdate()
+        +getAvailableUnits()
+    }
+
+    class Property {
+        +String propertyId
+        +String projectId
+        +String unitNumber
+        +String type
+        +Number bedrooms
+        +Number area
+        +String view
+        +Number price
+        +String status
+        +String amenities
+        +String floor
+        +String building
+        +reserve()
+        +sell()
+        +updateStatus()
+    }
+
+    class ProjectUpdate {
+        +String updateId
+        +String projectId
+        +String title
+        +String description
+        +String milestone
+        +Number progress
+        +String[] images
+        +Date createdAt
+        +String category
+        +String priority
+        +String status
+        +addImages()
+        +updateProgress()
+        +publish()
+    }
+
+    %% Investment Management Module - Light Cyan
+    class Investment {
+        +String investmentId
+        +String clientId
+        +String propertyId
+        +Number amount
+        +Number downPayment
+        +Number remainingAmount
+        +String status
+        +Date investmentDate
+        +Number expectedROI
+        +String investmentType
+        +String currency
+        +Date maturityDate
+        +calculateROI()
+        +updateStatus()
+        +makePayment()
+    }
+
+    class Portfolio {
+        +String portfolioId
+        +String clientId
+        +Number totalValue
+        +Number totalReturns
+        +String riskLevel
+        +Date lastUpdated
+        +Number numberOfInvestments
+        +String performance
+        +String strategy
+        +calculateValue()
+        +updatePerformance()
+        +addInvestment()
+    }
+
+    %% Payment Management Module - Light Yellow
+    class Payment {
+        +String paymentId
+        +String investmentId
+        +Number amount
+        +String type
+        +String method
+        +String status
+        +Date dueDate
+        +Date paidDate
+        +String transactionId
+        +String receiptNumber
+        +String bankReference
+        +String currency
+        +processPayment()
+        +generateReceipt()
+        +refund()
+    }
+
+    class PaymentPlan {
+        +String planId
+        +String propertyId
+        +Number downPaymentPercentage
+        +Number totalInstallments
+        +Number monthlyAmount
+        +Number quarterlyAmount
+        +String status
+        +Date startDate
+        +Date endDate
+        +String planType
+        +Number interestRate
+        +createInstallments()
+        +calculateAmount()
+        +updatePlan()
+    }
+
+    class Installment {
+        +String installmentId
+        +String paymentPlanId
+        +Number installmentNumber
+        +Number amount
+        +Date dueDate
+        +String status
+        +Number lateFee
+        +String paymentMethod
+        +Date paidDate
+        +String transactionId
+        +payInstallment()
+        +calculateLateFee()
+        +updateStatus()
+    }
+
+    %% Ledger Management Module - Light Purple
+    class LedgerEntry {
+        +String entryId
+        +String clientId
+        +String paymentId
+        +String type
+        +Number amount
+        +Number balanceAfter
+        +Date date
+        +String description
+        +String reference
+        +String status
+        +createEntry()
+        +updateBalance()
+        +reconcile()
+    }
+
+    class Ledger {
+        +String ledgerId
+        +String clientId
+        +Number currentBalance
+        +Date lastUpdated
+        +Number totalCredits
+        +Number totalDebits
+        +String status
+        +Date startDate
+        +String currency
+        +addEntry()
+        +calculateBalance()
+        +generateStatement()
+    }
+
+    %% Feedback Management Module - Light Pink
+    class Feedback {
+        +String feedbackId
+        +String clientId
+        +String type
+        +String subject
+        +String message
+        +String status
+        +String priority
+        +String assignedTo
+        +Date createdAt
+        +Date resolvedAt
+        +String resolution
+        +String category
+        +submitFeedback()
+        +assignTo()
+        +resolve()
+    }
+
+    class SupportTicket {
+        +String ticketId
+        +String feedbackId
+        +String category
+        +String severity
+        +String[] attachments
+        +String resolution
+        +Date resolvedAt
+        +String resolvedBy
+        +String status
+        +String priority
+        +createTicket()
+        +addAttachment()
+        +escalate()
+    }
+
+    %% Analytics Module - Light Orange
+    class Analytics {
+        +String analyticsId
+        +Number totalLeads
+        +Number activeClients
+        +Number totalRevenue
+        +Number monthlyRevenue
+        +Number conversionRate
+        +Number averageDealSize
+        +Date calculatedAt
+        +String period
+        +Number[] trends
+        +String reportType
+        +calculateMetrics()
+        +generateTrends()
+        +exportData()
+    }
+
+    class Report {
+        +String reportId
+        +String type
+        +String title
+        +String[] data
+        +String format
+        +Date generatedAt
+        +String generatedBy
+        +String status
+        +String[] filters
+        +String description
+        +generateReport()
+        +exportToPDF()
+        +scheduleReport()
+    }
+
+    class DashboardStats {
+        +String statId
+        +String title
+        +String value
+        +Number change
+        +String changeType
+        +String icon
+        +Date lastUpdated
+        +String category
+        +String unit
+        +updateStats()
+        +calculateChange()
+        +formatValue()
+    }
+
+    %% PDF Processing Module - Light Teal
+    class PDFProcessor {
+        +String processorId
+        +String fileName
+        +String filePath
+        +String status
+        +Date processedAt
+        +String[] extractedData
+        +Number totalTables
+        +String projectType
+        +extractText()
+        +parseTables()
+        +generateJSON()
+    }
+
+    class ExtractedProject {
+        +String id
+        +String name
+        +String type
+        +String location
+        +String developer
+        +Number minPrice
+        +Number maxPrice
+        +String[] unitTypes
+        +String[] amenities
+        +String paymentPlan
+        +String brochure
+        +String rawText
+        +Number totalTables
+        +validateData()
+        +convertToTypeScript()
+    }
+
+    %% Value Objects - Light Gray
+    class Address {
+        +String street
+        +String city
+        +String province
+        +String postalCode
+        +String country
+        +String landmark
+        +String coordinates
+        +validateAddress()
+        +formatAddress()
+    }
+
+    class ContactInfo {
+        +String email
+        +String phone
+        +String alternatePhone
+        +String emergencyContact
+        +String preferredContact
+        +String whatsapp
+        +String skype
+        +validateContact()
+        +updateContact()
+    }
+
+    class FinancialDetails {
+        +Number totalAmount
+        +Number paidAmount
+        +Number remainingAmount
+        +Number interestRate
+        +String currency
+        +Date lastUpdated
+        +String paymentMethod
+        +String bankAccount
+        +calculateRemaining()
+        +updateAmount()
+    }
+
+    %% Relationships
+    User --> Client : "1:1"
+    User --> Admin : "1:1"
+    User --> Lead : "1:*"
+    Client --> Investment : "1:*"
+    Client --> Payment : "1:*"
+    Client --> Feedback : "1:*"
+    Client --> Portfolio : "1:1"
+    Client --> Ledger : "1:1"
+    Project --> Property : "1:*"
+    Project --> ProjectUpdate : "1:*"
+    Project --> PaymentPlan : "1:*"
+    Property --> Investment : "1:*"
+    Property --> PaymentPlan : "1:1"
+    Investment --> Payment : "1:*"
+    Investment --> Portfolio : "*:1"
+    PaymentPlan --> Installment : "1:*"
+    Payment --> LedgerEntry : "1:1"
+    Ledger --> LedgerEntry : "1:*"
+    Lead --> LeadSource : "*:1"
+    Lead --> LeadAssignment : "1:*"
+    Lead --> Client : "1:1"
+    Feedback --> SupportTicket : "1:1"
+    Analytics --> Report : "1:*"
+    Analytics --> DashboardStats : "1:*"
+    PDFProcessor --> ExtractedProject : "1:*"
+
+    %% Value Object Relationships
+    Client --> Address : "1:1"
+    Client --> ContactInfo : "1:1"
+    Investment --> FinancialDetails : "1:1"
+    Payment --> FinancialDetails : "1:1"
+
+    %% Styling for different modules
+    classDef userModule fill:#e3f2fd,stroke:#1976d2,stroke-width:3px,color:#000
+    classDef leadModule fill:#ffebee,stroke:#d32f2f,stroke-width:3px,color:#000
+    classDef projectModule fill:#e8f5e8,stroke:#388e3c,stroke-width:3px,color:#000
+    classDef investmentModule fill:#e0f7fa,stroke:#00acc1,stroke-width:3px,color:#000
+    classDef paymentModule fill:#fff9c4,stroke:#f57c00,stroke-width:3px,color:#000
+    classDef ledgerModule fill:#f3e5f5,stroke:#7b1fa2,stroke-width:3px,color:#000
+    classDef feedbackModule fill:#fce4ec,stroke:#c2185b,stroke-width:3px,color:#000
+    classDef analyticsModule fill:#fff3e0,stroke:#f57c00,stroke-width:3px,color:#000
+    classDef pdfModule fill:#e0f2f1,stroke:#00695c,stroke-width:3px,color:#000
+    classDef valueObject fill:#f5f5f5,stroke:#424242,stroke-width:2px,color:#000
+
+    %% Apply styles to classes
+    User:::userModule
+    Client:::userModule
+    Admin:::userModule
+    Lead:::leadModule
+    LeadSource:::leadModule
+    LeadAssignment:::leadModule
+    Project:::projectModule
+    Property:::projectModule
+    ProjectUpdate:::projectModule
+    Investment:::investmentModule
+    Portfolio:::investmentModule
+    Payment:::paymentModule
+    PaymentPlan:::paymentModule
+    Installment:::paymentModule
+    Ledger:::ledgerModule
+    LedgerEntry:::ledgerModule
+    Feedback:::feedbackModule
+    SupportTicket:::feedbackModule
+    Analytics:::analyticsModule
+    Report:::analyticsModule
+    DashboardStats:::analyticsModule
+    PDFProcessor:::pdfModule
+    ExtractedProject:::pdfModule
+    Address:::valueObject
+    ContactInfo:::valueObject
+    FinancialDetails:::valueObject
+

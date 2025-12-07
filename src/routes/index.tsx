@@ -21,6 +21,7 @@ import { CustomerManagementPage } from '@/pages/Admin/CustomerManagementPage';
 import { PaymentsManagementPage } from '@/pages/Admin/PaymentsManagementPage';
 import { AnalyticsPage } from '@/pages/Admin/AnalyticsPage';
 import { SettingsPage } from '@/pages/Admin/SettingsPage';
+import { RagUploadPage } from '@/pages/Admin/RagUploadPage';
 import { SubmitResponse } from '@/pages/SubmitResponse';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -158,6 +159,10 @@ export const router = createBrowserRouter([
       {
         path: 'settings',
         element: <SettingsPage />,
+      },
+      {
+        path: 'rag-upload',
+        element: <RagUploadPage />,
       },
       {
         path: 'submit-feedback',

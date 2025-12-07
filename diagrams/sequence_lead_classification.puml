@@ -1,0 +1,25 @@
+@startuml
+actor Visitor
+participant LeadForm as "LeadForm (Landing)"
+participant FrontAPI as "frontend API (src/services/api.ts)"
+participant Backend as "Backend (API)"
+participant DB as "Database (MongoDB)"
+participant ML as "ML Classifier / RAG"
+
+Visitor -> LeadForm: submit lead data
+LeadForm -> FrontAPI: POST /leads
+FrontAPI -> Backend: POST /leads
+Backend -> DB: insert lead (status: pending)
+Backend -> ML: classify(lead) [async job]
+ML --> Backend: returns score & status
+Backend -> DB: update lead with score & status
+Backend --> FrontAPI: return created lead
+FrontAPI --> LeadForm: show success to user
+
+note right
+Frontend mapping: landing CTA or form (src/pages/Landing/LandingPage.tsx and components)
+APIs: extend src/services/api.ts to call real backend endpoints
+ML: not implemented in frontend repo; implement in backend or separate microservice
+end note
+
+@enduml
