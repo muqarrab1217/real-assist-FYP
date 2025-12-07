@@ -10,7 +10,8 @@ import {
   Cog6ToothIcon,
   UserGroupIcon,
   CurrencyDollarIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  CloudArrowUpIcon
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 
@@ -33,6 +34,7 @@ const adminNavigation = [
   { name: 'Customer Management', href: '/admin/customers', icon: UserGroupIcon },
   { name: 'Payments & Ledger', href: '/admin/payments', icon: CurrencyDollarIcon },
   { name: 'Analytics', href: '/admin/analytics', icon: ChartBarIcon },
+  { name: 'RAG Upload', href: '/admin/rag-upload', icon: CloudArrowUpIcon },
   { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
 ];
 

@@ -1,0 +1,78 @@
+@startuml
+' Frontend domain model (from src/types/index.ts)
+class User {
+  +id: string
+  +email: string
+  +name: string
+  +role: 'client'|'admin'
+  +avatar?: string
+  +createdAt: Date
+}
+
+class Client {
+  +id: string
+  +userId: string
+  +propertyId: string
+  +investmentAmount: number
+  +currentInstallment: number
+  +totalInstallments: number
+  +status: string
+  +createdAt: Date
+}
+
+class Property {
+  +id: string
+  +name: string
+  +location: string
+  +developer: string
+  +price: number
+  +completionDate: Date
+  +images: string[]
+  +status: string
+}
+
+class Payment {
+  +id: string
+  +clientId: string
+  +amount: number
+  +installmentNumber: number
+  +dueDate: Date
+  +paidDate?: Date
+  +status: 'pending'|'paid'|'overdue'
+  +method?: string
+}
+
+class ProjectUpdate {
+  +id: string
+  +propertyId: string
+  +title: string
+  +description: string
+  +milestone: string
+  +progress: number
+  +images: string[]
+  +createdAt: Date
+}
+
+class Lead {
+  +id: string
+  +name: string
+  +email: string
+  +phone: string
+  +source: string
+  +status: 'hot'|'warm'|'cold'|'dead'
+  +score: number
+  +lastContact: Date
+  +notes: string
+  +assignedTo?: string
+}
+
+class Analytics {}
+class DashboardStats {}
+
+User "1" -- "0..1" Client : owns >
+Client --> Property : investsIn >
+Client "1" o-- "*" Payment : has >
+Property "1" o-- "*" ProjectUpdate : updates >
+Lead --> User : assignedTo >
+
+@enduml
