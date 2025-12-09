@@ -65,7 +65,7 @@ Once deployed, your backend will be available at:
 
 ### CORS errors
 - The backend already has CORS enabled with `app.use(cors())`
-- If issues persist, check the CORS configuration in `gemini-rag/server/index.js`
+- If issues persist, check the CORS configuration in `ragBot/server/index.js`
 
 ### Timeout errors
 - Render free tier has request timeouts

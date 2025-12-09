@@ -213,7 +213,7 @@ export const RagUploadPage: React.FC = () => {
           color: 'transparent',
         }}>RAG Document Upload</h1>
         <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
-          Upload real estate documents (PDF, DOCX, TXT) to the Gemini RAG corpus. 
+          Upload real estate documents (PDF, DOCX, TXT) to the RAG document store.
           These documents will be used by the chatbot to answer questions.
         </p>
       </motion.div>
@@ -268,10 +268,10 @@ export const RagUploadPage: React.FC = () => {
               >
                 <div className="text-center">
                   <DocumentTextIcon className="mx-auto h-12 w-12" style={{ color: 'rgba(212,175,55,0.6)' }} />
-                  <div className="mt-4 flex text-sm leading-6" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
+                  <div className="mt-4 flex flex-col items-center text-sm leading-6 space-y-1" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
                     <label
                       htmlFor="file-upload"
-                      className="relative cursor-pointer rounded-md font-semibold focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 hover:opacity-80 transition-opacity"
+                      className="relative cursor-pointer rounded-md font-semibold focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 hover:opacity-80 transition-opacity text-center"
                       style={{
                         color: '#d4af37',
                         '--tw-ring-color': 'rgba(212,175,55,0.3)'
@@ -289,7 +289,7 @@ export const RagUploadPage: React.FC = () => {
                         multiple
                       />
                     </label>
-                    <p className="pl-1">or drag and drop</p>
+                    <p className="text-center">or drag and drop</p>
                   </div>
                   <p className="text-xs leading-5 mt-2" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
                     PDF, DOCX, or TXT files (up to 500MB each, multiple files supported)
@@ -455,7 +455,7 @@ export const RagUploadPage: React.FC = () => {
               <li className="flex items-start">
                 <span className="mr-3 font-semibold" style={{ color: '#d4af37' }}>•</span>
                 <span style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
-                  Files are processed and added to the Gemini RAG corpus
+                  Files are processed and added to the RAG document store used by the chatbot
                 </span>
               </li>
               <li className="flex items-start">
