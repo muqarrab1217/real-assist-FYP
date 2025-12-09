@@ -32,6 +32,8 @@ dist-ssr
 
 # ABS AudioBot local app (contains local API key config)
 models/ABS AudioBot/streamlit_app.py
+# ABS AudioBot model artifact
+models/ABS AudioBot/Best_model.pkl
 
 # Gemini RAG config and uploads
 ragBot/config/
