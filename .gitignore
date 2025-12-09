@@ -30,9 +30,12 @@ dist-ssr
 .env.test.local
 .env.production.local
 
+# ABS AudioBot local app (contains local API key config)
+models/ABS AudioBot/streamlit_app.py
+
 # Gemini RAG config and uploads
-gemini-rag/config/
-gemini-rag/uploads/
+ragBot/config/
+ragBot/uploads/
 
 # OS generated files
 Thumbs.db
