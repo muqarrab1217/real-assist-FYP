@@ -6,6 +6,7 @@ import {
   PaperAirplaneIcon 
 } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 interface Message {
   id: string;
@@ -13,6 +14,22 @@ interface Message {
   isUser: boolean;
   timestamp: Date;
 }
+
+interface ChatSession {
+  id: string;
+  title: string;
+  messages: Message[];
+  updatedAt: string;
+}
+
+const STORAGE_KEY = 'rag-chat-sessions';
+
+const INITIAL_MESSAGE: Message = {
+  id: 'welcome',
+  text: "Hello! I'm your AI assistant. How can I help you with your real estate investment today?",
+  isUser: false,
+  timestamp: new Date(),
+};
 
 // Get API base URL from environment or use default
 // In development, Vite proxy will handle /api routes, so we can use empty string or relative path
@@ -32,15 +49,11 @@ const getApiBaseUrl = () => {
 const API_BASE_URL = getApiBaseUrl();
 
 export const RagChatbot: React.FC = () => {
+  const { isAuthenticated } = useAuthContext();
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      text: 'Hello! I\'m your AI assistant. How can I help you with your real estate investment today?',
-      isUser: false,
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([INITIAL_MESSAGE]);
+  const [sessions, setSessions] = useState<ChatSession[]>([]);
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -53,8 +66,86 @@ export const RagChatbot: React.FC = () => {
     scrollToBottom();
   }, [messages]);
 
+  // Load sessions from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed: ChatSession[] = JSON.parse(raw);
+        setSessions(parsed);
+        if (parsed.length > 0) {
+          setActiveSessionId(parsed[0].id);
+          setMessages(parsed[0].messages.map(m => ({ ...m, timestamp: new Date(m.timestamp) })));
+          return;
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load chat sessions', err);
+    }
+    // ensure a default session exists
+    createNewSession();
+  }, []);
+
+  const persistSessions = (nextSessions: ChatSession[]) => {
+    setSessions(nextSessions);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(nextSessions));
+    } catch (err) {
+      console.error('Failed to persist sessions', err);
+    }
+  };
+
+  const createNewSession = () => {
+    // Allow seeding the first session for all users; additional sessions only if authenticated
+    if (!isAuthenticated && sessions.length > 0) {
+      return null;
+    }
+    const newSession: ChatSession = {
+      id: Date.now().toString(),
+      title: 'New chat',
+      messages: [INITIAL_MESSAGE],
+      updatedAt: new Date().toISOString(),
+    };
+    const nextSessions = [newSession, ...sessions];
+    persistSessions(nextSessions);
+    setActiveSessionId(newSession.id);
+    setMessages(newSession.messages);
+    return newSession.id;
+  };
+
+  const updateActiveSession = (updatedMessages: Message[]) => {
+    if (!activeSessionId) return;
+    const nextSessions = sessions.map(session =>
+      session.id === activeSessionId
+        ? {
+            ...session,
+            messages: updatedMessages,
+            title:
+              session.title === 'New chat' && updatedMessages.length > 1
+                ? updatedMessages.find(m => m.isUser)?.text.slice(0, 40) || 'New chat'
+                : session.title,
+            updatedAt: new Date().toISOString(),
+          }
+        : session
+    );
+    persistSessions(nextSessions);
+    setMessages(updatedMessages);
+  };
+
+  const handleSelectSession = (sessionId: string) => {
+    const session = sessions.find(s => s.id === sessionId);
+    if (!session) return;
+    setActiveSessionId(sessionId);
+    setMessages(session.messages.map(m => ({ ...m, timestamp: new Date(m.timestamp) })));
+  };
+
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
+    const ensuredSessionId = activeSessionId || createNewSession();
+    if (!ensuredSessionId) return;
+    if (activeSessionId !== ensuredSessionId) {
+      setActiveSessionId(ensuredSessionId);
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -63,7 +154,8 @@ export const RagChatbot: React.FC = () => {
       timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const newMessages = [...messages, userMessage];
+    updateActiveSession(newMessages);
     const currentInput = inputValue;
     setInputValue('');
     setIsLoading(true);
@@ -112,7 +204,7 @@ export const RagChatbot: React.FC = () => {
         timestamp: new Date(),
       };
       
-      setMessages(prev => [...prev, aiResponse]);
+      updateActiveSession([...newMessages, aiResponse]);
     } catch (error) {
       console.error('Error sending message:', error);
       let errorText = 'Sorry, there was an error processing your request.';
@@ -129,7 +221,7 @@ export const RagChatbot: React.FC = () => {
         isUser: false,
         timestamp: new Date(),
       };
-      setMessages(prev => [...prev, errorMessage]);
+      updateActiveSession([...newMessages, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -199,14 +291,26 @@ export const RagChatbot: React.FC = () => {
                   <p className="text-xs" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Online</p>
                 </div>
               </div>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setIsOpen(false)}
-                className="h-8 w-8"
-              >
-                <XMarkIcon className="h-4 w-4" />
-              </Button>
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={createNewSession}
+                  className="h-8 text-xs"
+                  disabled={!isAuthenticated}
+                  title={isAuthenticated ? 'Start a new chat' : 'Login to start a new chat'}
+                >
+                  New chat
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => setIsOpen(false)}
+                  className="h-8 w-8"
+                >
+                  <XMarkIcon className="h-4 w-4" />
+                </Button>
+              </div>
             </div>
 
             {/* Messages */}
