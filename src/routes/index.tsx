@@ -22,6 +22,7 @@ import { PaymentsManagementPage } from '@/pages/Admin/PaymentsManagementPage';
 import { AnalyticsPage } from '@/pages/Admin/AnalyticsPage';
 import { SettingsPage } from '@/pages/Admin/SettingsPage';
 import { RagUploadPage } from '@/pages/Admin/RagUploadPage';
+import { RagChatHistoryPage } from '@/pages/Admin/RagChatHistoryPage';
 import { SubmitResponse } from '@/pages/SubmitResponse';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -37,6 +38,10 @@ export const router = createBrowserRouter([
       {
         path: 'projects',
         element: <ProjectsPage />,
+      },
+      {
+        path: 'rag-history',
+        element: <RagChatHistoryPage />,
       },
       {
         path: 'projects/:projectId',
@@ -163,6 +168,10 @@ export const router = createBrowserRouter([
       {
         path: 'rag-upload',
         element: <RagUploadPage />,
+      },
+      {
+        path: 'rag-history',
+        element: <RagChatHistoryPage />,
       },
       {
         path: 'submit-feedback',

@@ -11,7 +11,8 @@ import {
   UserGroupIcon,
   CurrencyDollarIcon,
   ArrowRightOnRectangleIcon,
-  CloudArrowUpIcon
+  CloudArrowUpIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +27,7 @@ const clientNavigation = [
   { name: 'Payments', href: '/client/payments', icon: CreditCardIcon },
   { name: 'Ledger', href: '/client/ledger', icon: DocumentTextIcon },
   { name: 'Project Updates', href: '/client/updates', icon: NewspaperIcon },
+  { name: 'Chat History', href: '/rag-history', icon: ChatBubbleLeftRightIcon },
 ];
 
 const adminNavigation = [
@@ -35,6 +37,7 @@ const adminNavigation = [
   { name: 'Payments & Ledger', href: '/admin/payments', icon: CurrencyDollarIcon },
   { name: 'Analytics', href: '/admin/analytics', icon: ChartBarIcon },
   { name: 'RAG Upload', href: '/admin/rag-upload', icon: CloudArrowUpIcon },
+  { name: 'Chat History', href: '/admin/rag-history', icon: ChatBubbleLeftRightIcon },
   { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
 ];
 
