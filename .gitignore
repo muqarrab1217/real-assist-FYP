@@ -44,6 +44,9 @@ $RECYCLE.BIN/
 *.tmp
 *.temp
 
+# Large local documents
+RagDocuments/
+
 # Coverage directory used by tools like istanbul
 coverage
 *.lcov

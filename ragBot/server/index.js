@@ -16,7 +16,7 @@ app.use(express.urlencoded({ limit: '500mb', extended: true }));
 
 // Configure multer for file uploads
 const upload = multer({
-  dest: 'gemini-rag/uploads/',
+  dest: 'ragBot/uploads/',
   limits: {
     fileSize: 500 * 1024 * 1024, // 500MB limit per file
   },
@@ -33,7 +33,7 @@ const upload = multer({
 // Ensure uploads directory exists
 const ensureUploadsDir = async () => {
   try {
-    await fs.mkdir('gemini-rag/uploads', { recursive: true });
+    await fs.mkdir('ragBot/uploads', { recursive: true });
   } catch (error) {
     console.error('Error creating uploads directory:', error);
   }
@@ -56,12 +56,12 @@ try {
 }
 
 // Config file path for corpus ID
-const CONFIG_FILE = 'gemini-rag/config/corpus-config.json';
+const CONFIG_FILE = 'ragBot/config/corpus-config.json';
 
 // Ensure config directory exists and load config
 const loadConfig = async () => {
   try {
-    await fs.mkdir('gemini-rag/config', { recursive: true });
+    await fs.mkdir('ragBot/config', { recursive: true });
     try {
       const data = await fs.readFile(CONFIG_FILE, 'utf8');
       return JSON.parse(data);
@@ -131,7 +131,7 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
     }
 
     const corpusId = await getOrCreateCorpus();
-    const fileRegistryPath = 'gemini-rag/config/files-registry.json';
+    const fileRegistryPath = 'ragBot/config/files-registry.json';
     let fileRegistry = [];
     
     try {
@@ -247,7 +247,7 @@ app.post('/api/gemini/query', async (req, res) => {
     }
 
     // Load file registry to get document context
-    const fileRegistryPath = 'gemini-rag/config/files-registry.json';
+    const fileRegistryPath = 'ragBot/config/files-registry.json';
     let fileRegistry = [];
     
     try {
@@ -435,7 +435,7 @@ Now provide your response in plain text without any formatting:`;
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', service: 'gemini-rag-api' });
+  res.json({ status: 'ok', service: 'ragBot-api' });
 });
 
 // Initialize directories on startup
@@ -443,7 +443,7 @@ ensureUploadsDir();
 
 // Start server
 app.listen(PORT, () => {
-  console.log(`Gemini RAG API server running on port ${PORT}`);
+  console.log(`ragBot API server running on port ${PORT}`);
   console.log(`Make sure to set GEMINI_API_KEY environment variable`);
 });
 
