@@ -3,6 +3,8 @@ import { User, Client, Property, Payment, ProjectUpdate, Lead, Analytics, Dashbo
 export const mockUser: User = {
   id: '1',
   email: 'john.doe@example.com',
+  firstName: 'John',
+  lastName: 'Doe',
   name: 'John Doe',
   role: 'client',
   avatar: '',
@@ -12,6 +14,8 @@ export const mockUser: User = {
 export const mockAdminUser: User = {
   id: '2',
   email: 'admin@realassist.com',
+  firstName: 'Admin',
+  lastName: 'User',
   name: 'Admin User',
   role: 'admin',
   avatar: '',
@@ -22,9 +26,11 @@ export const mockProperties: Property[] = [
   {
     id: '1',
     name: 'Sunset Towers',
+    type: 'residential',
     location: 'Miami, FL',
     developer: 'Miami Developers LLC',
     price: 450000,
+    priceRange: { min: 400000, max: 600000 },
     completionDate: new Date('2024-12-31'),
     images: ['/images/files-apartment-1_800x.jpg'],
     status: 'construction',
@@ -32,9 +38,11 @@ export const mockProperties: Property[] = [
   {
     id: '2',
     name: 'Ocean View Residences',
+    type: 'residential',
     location: 'San Diego, CA',
     developer: 'Pacific Coast Properties',
     price: 675000,
+    priceRange: { min: 600000, max: 900000 },
     completionDate: new Date('2025-06-30'),
     images: ['/images/files-apartment-1_800x.jpg'],
     status: 'planning',

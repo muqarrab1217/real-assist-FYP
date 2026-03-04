@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ChatBubbleLeftRightIcon, 
-  XMarkIcon, 
-  PaperAirplaneIcon 
+import {
+  ChatBubbleLeftRightIcon,
+  XMarkIcon,
+  PaperAirplaneIcon
 } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { useAuthContext } from '@/contexts/AuthContext';
@@ -118,26 +118,28 @@ export const RagChatbot: React.FC = () => {
     const nextSessions = sessions.map(session =>
       session.id === activeSessionId
         ? {
-            ...session,
-            messages: updatedMessages,
-            title:
-              session.title === 'New chat' && updatedMessages.length > 1
-                ? updatedMessages.find(m => m.isUser)?.text.slice(0, 40) || 'New chat'
-                : session.title,
-            updatedAt: new Date().toISOString(),
-          }
+          ...session,
+          messages: updatedMessages,
+          title:
+            session.title === 'New chat' && updatedMessages.length > 1
+              ? updatedMessages.find(m => m.isUser)?.text.slice(0, 40) || 'New chat'
+              : session.title,
+          updatedAt: new Date().toISOString(),
+        }
         : session
     );
     persistSessions(nextSessions);
     setMessages(updatedMessages);
   };
 
+  /* Commented out as it's currently unused and causing build issues
   const handleSelectSession = (sessionId: string) => {
     const session = sessions.find(s => s.id === sessionId);
     if (!session) return;
     setActiveSessionId(sessionId);
     setMessages(session.messages.map(m => ({ ...m, timestamp: new Date(m.timestamp) })));
   };
+  */
 
   const handleSendMessage = async () => {
     if (!inputValue.trim() || isLoading) return;
@@ -164,7 +166,7 @@ export const RagChatbot: React.FC = () => {
       // Construct the full URL
       const url = API_BASE_URL ? `${API_BASE_URL}/api/gemini/query` : '/api/gemini/query';
       console.log('Sending request to:', url, 'API_BASE_URL:', API_BASE_URL || '(using proxy)'); // Debug log
-      
+
       const response = await fetch(url, {
         method: 'POST',
         headers: {
@@ -196,25 +198,25 @@ export const RagChatbot: React.FC = () => {
       }
 
       const data = await response.json();
-      
+
       const aiResponse: Message = {
         id: (Date.now() + 1).toString(),
         text: data.response || 'Thank you for your message! I\'m here to help with any questions about your investment, payments, or project updates. What would you like to know more about?',
         isUser: false,
         timestamp: new Date(),
       };
-      
+
       updateActiveSession([...newMessages, aiResponse]);
     } catch (error) {
       console.error('Error sending message:', error);
       let errorText = 'Sorry, there was an error processing your request.';
-      
+
       if (error instanceof TypeError && error.message === 'Failed to fetch') {
         errorText = 'Unable to connect to the server. Please make sure the backend server is running on ' + API_BASE_URL + '. Start it with: npm run dev:backend';
       } else if (error instanceof Error) {
         errorText = `I apologize, but I encountered an issue: ${error.message}. Please ensure the backend server is running.`;
       }
-      
+
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         text: errorText,
@@ -244,7 +246,7 @@ export const RagChatbot: React.FC = () => {
         onClick={() => setIsOpen(true)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        animate={{ 
+        animate={{
           boxShadow: [
             "0 0 0 0 rgba(212, 175, 55, 0.4)",
             "0 0 0 10px rgba(212, 175, 55, 0)",
@@ -284,7 +286,7 @@ export const RagChatbot: React.FC = () => {
                   <span className="text-xs font-bold" style={{ color: '#000000' }}>AI</span>
                 </div>
                 <div>
-                  <h3 className="font-semibold" style={{ 
+                  <h3 className="font-semibold" style={{
                     fontFamily: 'Playfair Display, serif',
                     color: '#d4af37'
                   }}>AI Assistant</h3>

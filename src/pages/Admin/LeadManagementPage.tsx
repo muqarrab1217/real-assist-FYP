@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
+import {
   MagnifyingGlassIcon,
   FunnelIcon,
   PlusIcon,
@@ -49,9 +49,9 @@ export const LeadManagementPage: React.FC = () => {
 
     if (searchTerm) {
       filtered = filtered.filter(lead =>
-        lead.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lead.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        lead.phone.includes(searchTerm)
+        (lead.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (lead.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (lead.phone || '').includes(searchTerm)
       );
     }
 
@@ -134,7 +134,7 @@ export const LeadManagementPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2" style={{ 
+            <h1 className="text-3xl font-bold mb-2" style={{
               fontFamily: 'Playfair Display, serif',
               backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
               WebkitBackgroundClip: 'text',
@@ -143,7 +143,7 @@ export const LeadManagementPage: React.FC = () => {
             }}>Lead Management</h1>
             <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Manage and track your sales leads with AI-powered insights</p>
           </div>
-          <Button className="text-black font-semibold" style={{ 
+          <Button className="text-black font-semibold" style={{
             backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
           }}>
             <PlusIcon className="h-4 w-4 mr-2" />
@@ -242,8 +242,8 @@ export const LeadManagementPage: React.FC = () => {
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                   className="px-3 py-2 rounded-lg"
-                  style={{ 
-                    background: '#000000', 
+                  style={{
+                    background: '#000000',
                     border: '1px solid rgba(212,175,55,0.25)',
                     color: '#ffffff'
                   }}
@@ -272,7 +272,7 @@ export const LeadManagementPage: React.FC = () => {
       >
         <Card className="abs-card">
           <CardHeader>
-            <CardTitle style={{ 
+            <CardTitle style={{
               fontFamily: 'Playfair Display, serif',
               color: '#d4af37'
             }}>Leads ({filteredLeads.length})</CardTitle>
@@ -310,11 +310,11 @@ export const LeadManagementPage: React.FC = () => {
                       <TableCell className="dark:text-white">{lead.source}</TableCell>
                       <TableCell>{getStatusBadge(lead.status)}</TableCell>
                       <TableCell>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getScoreColor(lead.score)}`}>
-                          {lead.score}
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${getScoreColor(lead.score || 0)}`}>
+                          {lead.score ?? 0}
                         </span>
                       </TableCell>
-                      <TableCell>{formatDate(lead.lastContact)}</TableCell>
+                      <TableCell>{lead.lastContact ? formatDate(lead.lastContact) : 'Never'}</TableCell>
                       <TableCell>
                         <div className="flex space-x-2">
                           <Dialog>
@@ -358,8 +358,8 @@ export const LeadManagementPage: React.FC = () => {
                                   </div>
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Score</label>
-                                    <span className={`px-2 py-1 rounded-full text-sm font-medium ${getScoreColor(lead.score)}`}>
-                                      {lead.score}
+                                    <span className={`px-2 py-1 rounded-full text-sm font-medium ${getScoreColor(lead.score || 0)}`}>
+                                      {lead.score ?? 0}
                                     </span>
                                   </div>
                                 </div>

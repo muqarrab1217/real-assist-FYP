@@ -3,6 +3,7 @@ export interface User {
     email: string;
     firstName: string;
     lastName: string;
+    name?: string; // Added for compatibility with existing mock data
     role: 'admin' | 'client' | 'employee';
     avatar?: string;
     createdAt?: Date;
@@ -19,20 +20,41 @@ export interface Client {
     createdAt?: Date;
 }
 
+export interface UnitType {
+    type?: string;
+    bedrooms?: string;
+    area?: string;
+    price?: number;
+}
+
+export interface PaymentPlan {
+    downPaymentPercentage?: number;
+    durationMonths?: number;
+    totalInstallments?: number;
+}
+
 export interface Property {
     id: string;
     name: string;
     type: string;
     location: string;
+    developer?: string; // Added field
     price?: number;
     priceMin?: number;
     priceMax?: number;
+    priceRange?: { // Added field
+        min: number;
+        max: number;
+    };
     description?: string;
     amenities?: string[];
     images?: string[];
     brochureUrl?: string;
+    brochure?: string; // Added field
     completionDate?: Date;
     status?: string;
+    unitTypes?: UnitType[]; // Added field
+    paymentPlan?: PaymentPlan; // Added field
 }
 
 export interface Payment {
