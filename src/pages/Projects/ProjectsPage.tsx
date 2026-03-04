@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { 
-  BuildingOffice2Icon, 
-  MapPinIcon, 
+import {
+  BuildingOffice2Icon,
+  MapPinIcon,
   CurrencyDollarIcon,
   ArrowRightIcon
 } from '@heroicons/react/24/outline';
 import { detailedProjects } from '@/data/extractedMockData';
 import { Button } from '@/components/ui/button';
+
+import { ProjectSlider } from '@/components/Projects/ProjectSlider';
+import { EnrollmentModal } from '@/components/Projects/EnrollmentModal';
 
 // Filter to only include the 5 specific projects
 const FEATURED_PROJECT_IDS = [
@@ -21,6 +24,13 @@ const FEATURED_PROJECT_IDS = [
 
 export const ProjectsPage: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'residential' | 'commercial' | 'mixed-use'>('all');
+  const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
+  const [selectedProject, setSelectedProject] = useState<any>(null);
+
+  const handleEnrollClick = (project: any) => {
+    setSelectedProject(project);
+    setIsEnrollModalOpen(true);
+  };
 
   // Filter projects based on IDs and type
   const filteredProjects = detailedProjects
@@ -30,7 +40,7 @@ export const ProjectsPage: React.FC = () => {
   return (
     <div className="min-h-screen" style={{ background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)' }}>
       {/* Navigation */}
-      <motion.nav 
+      <motion.nav
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.6, ease: "easeOut" }}
@@ -39,14 +49,14 @@ export const ProjectsPage: React.FC = () => {
         <div className="max-w-7xl mx-auto px-6 sm:px-8 lg:px-10">
           <div className="flex justify-between items-center h-18">
             <Link to="/" className="flex items-center group">
-              <motion.img 
+              <motion.img
                 src="/images/logo.png"
                 alt="ABS Developers"
                 whileHover={{ scale: 1.05 }}
                 className="h-14 w-auto transition-all duration-300"
               />
             </Link>
-            
+
             <div className="hidden md:flex items-center space-x-1">
               <Link to="/">
                 <motion.div
@@ -76,7 +86,7 @@ export const ProjectsPage: React.FC = () => {
                 </motion.div>
               </Link>
             </div>
-            
+
             <div className="flex items-center space-x-3">
               <Link to="/login">
                 <Button variant="ghost" className="font-semibold hover:bg-gold-900/20 hover:text-gold-400 border-0 transition-all duration-300" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
@@ -85,7 +95,7 @@ export const ProjectsPage: React.FC = () => {
               </Link>
               <Link to="/register">
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button 
+                  <Button
                     className="group"
                     style={{
                       background: 'linear-gradient(135deg, #d4af37, #f4e5a1)',
@@ -111,7 +121,7 @@ export const ProjectsPage: React.FC = () => {
             backgroundSize: '50px 50px',
           }}
         />
-        
+
         <div className="max-w-7xl mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -119,7 +129,7 @@ export const ProjectsPage: React.FC = () => {
             transition={{ duration: 0.8 }}
             className="text-center mb-12"
           >
-            <h1 
+            <h1
               className="text-5xl md:text-6xl font-bold mb-6"
               style={{
                 backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e5a1)',
@@ -153,15 +163,15 @@ export const ProjectsPage: React.FC = () => {
                 style={
                   filter === type
                     ? {
-                        background: 'linear-gradient(135deg, #d4af37, #f4e5a1)',
-                        color: '#0a0a0a',
-                        boxShadow: '0 10px 25px rgba(212,175,55,0.4)'
-                      }
+                      background: 'linear-gradient(135deg, #d4af37, #f4e5a1)',
+                      color: '#0a0a0a',
+                      boxShadow: '0 10px 25px rgba(212,175,55,0.4)'
+                    }
                     : {
-                        background: 'rgba(26,26,26,0.75)',
-                        color: 'rgba(156, 163, 175, 0.9)',
-                        border: '1px solid rgba(212,175,55,0.25)'
-                      }
+                      background: 'rgba(26,26,26,0.75)',
+                      color: 'rgba(156, 163, 175, 0.9)',
+                      border: '1px solid rgba(212,175,55,0.25)'
+                    }
                 }
               >
                 {type === 'all' ? 'All Projects' : type.charAt(0).toUpperCase() + type.slice(1)}
@@ -180,7 +190,7 @@ export const ProjectsPage: React.FC = () => {
                 whileHover={{ y: -10, scale: 1.02 }}
               >
                 <Link to={`/projects/${project.id}`}>
-                  <div 
+                  <div
                     className="rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 border backdrop-blur group"
                     style={{
                       background: 'rgba(26,26,26,0.75)',
@@ -200,10 +210,10 @@ export const ProjectsPage: React.FC = () => {
                           <BuildingOffice2Icon className="h-24 w-24 text-gray-600" />
                         </div>
                       )}
-                      
+
                       {/* Type Badge */}
                       <div className="absolute top-4 right-4">
-                        <span 
+                        <span
                           className="px-4 py-2 backdrop-blur-sm rounded-full text-xs font-semibold shadow-lg"
                           style={{
                             background: 'rgba(212,175,55,0.9)',
@@ -217,13 +227,13 @@ export const ProjectsPage: React.FC = () => {
 
                     {/* Project Details */}
                     <div className="p-6">
-                      <h3 
-                        className="text-2xl font-bold mb-3 text-white" 
+                      <h3
+                        className="text-2xl font-bold mb-3 text-white"
                         style={{ fontFamily: 'Playfair Display, serif' }}
                       >
                         {project.name}
                       </h3>
-                      
+
                       <div className="flex items-center mb-3" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
                         <MapPinIcon className="h-5 w-5 mr-2" style={{ color: '#d4af37' }} />
                         <span className="text-sm">{project.location}</span>
@@ -240,35 +250,6 @@ export const ProjectsPage: React.FC = () => {
                           <span className="font-semibold">
                             PKR {(project.priceRange.min / 1000000).toFixed(1)}M - {(project.priceRange.max / 1000000).toFixed(1)}M
                           </span>
-                        </div>
-                      )}
-
-                      {/* Amenities Preview */}
-                      {project.amenities.length > 0 && (
-                        <div className="flex flex-wrap gap-2 mb-4">
-                          {project.amenities.slice(0, 3).map((amenity, idx) => (
-                            <span
-                              key={idx}
-                              className="px-3 py-1 text-xs rounded-full"
-                              style={{
-                                background: 'rgba(212,175,55,0.15)',
-                                color: '#d4af37'
-                              }}
-                            >
-                              {amenity}
-                            </span>
-                          ))}
-                          {project.amenities.length > 3 && (
-                            <span 
-                              className="px-3 py-1 text-xs rounded-full"
-                              style={{
-                                background: 'rgba(156, 163, 175, 0.1)',
-                                color: 'rgba(156, 163, 175, 0.9)'
-                              }}
-                            >
-                              +{project.amenities.length - 3} more
-                            </span>
-                          )}
                         </div>
                       )}
 
@@ -306,10 +287,20 @@ export const ProjectsPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Projects Slider Section */}
+      <ProjectSlider onEnroll={handleEnrollClick} />
+
+      {/* Enrollment Modal */}
+      <EnrollmentModal
+        isOpen={isEnrollModalOpen}
+        onClose={() => setIsEnrollModalOpen(false)}
+        project={selectedProject}
+      />
+
       {/* Footer */}
-      <footer 
+      <footer
         className="relative py-12 mt-20"
-        style={{ 
+        style={{
           background: 'linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%)',
           borderTop: '1px solid rgba(212,175,55,0.2)'
         }}

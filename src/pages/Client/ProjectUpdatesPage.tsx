@@ -1,55 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { 
+import { motion, AnimatePresence } from 'framer-motion';
+import {
   CalendarIcon,
   MapPinIcon,
   BuildingOfficeIcon,
-  PhotoIcon,
-  ArrowRightIcon
+  ArrowRightIcon,
+  ChevronRightIcon,
+  InformationCircleIcon,
+  CreditCardIcon,
+  DocumentArrowDownIcon,
+  CheckCircleIcon,
+  StarIcon,
+  ClockIcon,
+  MagnifyingGlassIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { clientAPI } from '@/services/api';
-import { ProjectUpdate } from '@/types';
+import { enrollmentAPI, clientAPI } from '@/services/api';
+import { ProjectUpdate, Property, Payment } from '@/types';
 import { formatDate } from '@/lib/utils';
+import { Link } from 'react-router-dom';
+import { PaymentCalendar } from '@/components/Client/PaymentCalendar';
+import { useAuthContext } from '@/contexts/AuthContext';
+
+type TabType = 'journal' | 'timeline' | 'dossier';
 
 export const ProjectUpdatesPage: React.FC = () => {
+  const { user } = useAuthContext();
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [selectedEnrollment, setSelectedEnrollment] = useState<any>(null);
   const [updates, setUpdates] = useState<ProjectUpdate[]>([]);
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [activeTab, setActiveTab] = useState<TabType>('journal');
   const [loading, setLoading] = useState(true);
+  const [updatesLoading, setUpdatesLoading] = useState(false);
+  const [paymentsLoading, setPaymentsLoading] = useState(true);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    const fetchUpdates = async () => {
+    const initPage = async () => {
+      setLoading(true);
       try {
-        const data = await clientAPI.getProjectUpdates();
-        setUpdates(data);
+        const data = await enrollmentAPI.getUserEnrollments();
+        setEnrollments(data);
+        if (data.length > 0) {
+          setSelectedEnrollment(data[0]);
+        }
       } catch (error) {
-        console.error('Failed to fetch project updates:', error);
+        console.error('Failed to fetch enrollments:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUpdates();
+    initPage();
   }, []);
 
-  const getProgressColor = (progress: number) => {
-    if (progress >= 80) return '#d4af37';
-    if (progress >= 50) return '#d4af37';
-    if (progress >= 25) return 'rgba(212,175,55,0.7)';
-    return '#ef4444';
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!selectedEnrollment) return;
 
-  const getMilestoneBadge = (milestone: string) => {
-    const variants = {
+      setUpdatesLoading(true);
+      setPaymentsLoading(true);
+      try {
+        const [allUpdates, projectPayments] = await Promise.all([
+          clientAPI.getProjectUpdates(),
+          clientAPI.getProjectPayments(selectedEnrollment.projectId)
+        ]);
+
+        const filteredUpdates = allUpdates.filter(u => u.propertyId === selectedEnrollment.projectId);
+        setUpdates(filteredUpdates);
+        setPayments(projectPayments);
+      } catch (error) {
+        console.error('Failed to fetch project data:', error);
+      } finally {
+        setUpdatesLoading(false);
+        setPaymentsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedEnrollment]);
+
+  const getMilestoneBadge = (milestone: string | undefined) => {
+    if (!milestone) return null;
+    const variants: Record<string, string> = {
       'Foundation': 'gold',
       'Structural Framework': 'secondary',
       'MEP Systems': 'gold',
       'General Progress': 'gold',
     };
-    
     return (
-      <Badge variant={variants[milestone as keyof typeof variants] as any || 'secondary'}>
+      <Badge variant={variants[milestone] as any || 'secondary'}>
         {milestone}
       </Badge>
     );
@@ -57,251 +102,525 @@ export const ProjectUpdatesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex flex-col items-center justify-center h-96 gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
+        <p className="text-gold-400 animate-pulse">Synchronizing Portfolios...</p>
       </div>
     );
   }
 
+  if (enrollments.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <div className="w-24 h-24 mb-6 rounded-full bg-gold-500/10 flex items-center justify-center border border-gold-500/20">
+          <BuildingOfficeIcon className="h-12 w-12 text-gold-500" />
+        </div>
+        <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>No Active Enrollments</h2>
+        <p className="text-gray-400 max-w-md mb-8">
+          You haven't enrolled in any projects yet. Reach out to our consultants to find your next flagship investment.
+        </p>
+        <Link to="/client/projects">
+          <Button className="bg-gold-500 text-black hover:bg-gold-400 font-bold px-8 py-6 rounded-2xl flex items-center gap-2">
+            Explore Projects
+            <ArrowRightIcon className="h-5 w-5" />
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const project = selectedEnrollment?.project as Property;
+
+  // Derived financial data
+  const totalPaid = payments
+    .filter(p => p.status === 'paid')
+    .reduce((sum, p) => sum + p.amount, 0);
+
+  const totalPrice = selectedEnrollment?.totalPrice || 0;
+  const remainingBalance = totalPrice - totalPaid;
+
+  const handleSettlePayment = async (paymentId: string) => {
+    try {
+      setIsProcessingPayment(true);
+      const paymentToPay = payments.find(p => p.id === paymentId);
+      if (!paymentToPay) throw new Error('Payment not found');
+
+      await clientAPI.makePayment(paymentId, paymentToPay.amount, 'Portal');
+
+      // Update local state immediately
+      setPayments(prev => prev.map(p =>
+        p.id === paymentId
+          ? { ...p, status: 'paid' as const, paidDate: new Date() }
+          : p
+      ));
+
+      console.log('Payment successful');
+    } catch (error) {
+      console.error('Payment failed:', error);
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+
+  const filteredPayments = payments.filter(p => {
+    if (!searchQuery) return true;
+    const searchLower = searchQuery.toLowerCase();
+
+    // Search by installment number, status, or amount
+    return (
+      p.installmentNumber.toString().includes(searchLower) ||
+      p.status.toLowerCase().includes(searchLower) ||
+      p.amount.toString().includes(searchLower) ||
+      (p.method && p.method.toLowerCase().includes(searchLower))
+    );
+  });
+
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h1 className="text-3xl font-bold mb-2" style={{ 
-          fontFamily: 'Playfair Display, serif',
-          backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
-          WebkitBackgroundClip: 'text',
-          backgroundClip: 'text',
-          color: 'transparent',
-        }}>Project Updates</h1>
-        <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Stay informed about your investment progress</p>
-      </motion.div>
+    <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Header & Project Selector */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <InformationCircleIcon className="h-4 w-4 text-gold-500" />
+            <span className="text-xs uppercase tracking-[0.2em] font-bold text-gold-500">Investment Insights</span>
+          </div>
+          <h1 className="text-4xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
+            Flagship <span className="text-gold-400 italic">Portfolios</span>
+          </h1>
+        </motion.div>
 
-      {/* Project Overview */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        <Card className="abs-card-premium">
-          <CardContent className="p-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h3 className="text-lg font-semibold mb-2" style={{ color: '#ffffff' }}>Sunset Towers</h3>
-                <div className="space-y-2">
-                  <div className="flex items-center text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
-                    <MapPinIcon className="h-4 w-4 mr-2" style={{ color: '#d4af37' }} />
-                    Miami, FL
-                  </div>
-                  <div className="flex items-center text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
-                    <BuildingOfficeIcon className="h-4 w-4 mr-2" style={{ color: '#d4af37' }} />
-                    Miami Developers LLC
-                  </div>
-                  <div className="flex items-center text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
-                    <CalendarIcon className="h-4 w-4 mr-2" style={{ color: '#d4af37' }} />
-                    Expected Completion: December 2024
-                  </div>
-                </div>
-              </div>
-              <div>
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Overall Progress</span>
-                  <span className="text-sm font-medium" style={{ color: '#ffffff' }}>35%</span>
-                </div>
-                <div className="w-full rounded-full h-3" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                  <div className="h-3 rounded-full w-1/3" style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }}></div>
-                </div>
-                <p className="text-xs mt-1" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>On track for completion</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+        {/* Project Horizontal Scroll/Selector */}
+        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide md:max-w-md lg:max-w-xl no-scrollbar">
+          {enrollments.map((env) => (
+            <button
+              key={env.id}
+              onClick={() => setSelectedEnrollment(env)}
+              className={`flex-shrink-0 px-5 py-2.5 rounded-xl border transition-all whitespace-nowrap font-bold text-sm ${selectedEnrollment?.id === env.id
+                ? 'bg-gold-500 text-black border-transparent shadow-lg shadow-gold-500/20'
+                : 'bg-[#1a1a1a] text-gray-400 border-gold-500/10 hover:border-gold-500/30'
+                }`}
+            >
+              {env.project?.name || 'Untitled Project'}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {/* Updates Timeline */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        <Card className="abs-card">
-          <CardHeader>
-            <CardTitle style={{ 
-              fontFamily: 'Playfair Display, serif',
-              color: '#d4af37'
-            }}>Recent Updates</CardTitle>
-            <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Latest progress reports and milestones</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
-              {updates.map((update, index) => (
-                <motion.div
-                  key={update.id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="border-l-4 pl-6 pb-6 relative"
-                  style={{ borderColor: 'rgba(212,175,55,0.3)' }}
-                >
-                  <div className="absolute -left-2 top-0 h-4 w-4 rounded-full" style={{ backgroundColor: '#d4af37' }}></div>
-                  
-                  <div className="rounded-lg p-6 shadow-sm" style={{
-                    background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.05) 0%, rgba(0, 0, 0, 0.8) 100%)',
-                    border: '1px solid rgba(212,175,55,0.2)'
-                  }}>
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="text-lg font-semibold" style={{ color: '#ffffff' }}>{update.title}</h3>
-                          {getMilestoneBadge(update.milestone)}
-                        </div>
-                        <p className="text-sm mb-4" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>{update.description}</p>
-                        
-                        <div className="flex items-center justify-between mb-4">
-                          <div className="flex items-center text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>
-                            <CalendarIcon className="h-4 w-4 mr-1" style={{ color: '#d4af37' }} />
-                            {formatDate(update.createdAt)}
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <span className="text-sm font-medium" style={{ color: 'rgba(212,175,55,0.9)' }}>Progress:</span>
-                            <span className="text-sm font-medium" style={{ color: '#ffffff' }}>{update.progress}%</span>
-                          </div>
-                        </div>
-                        
-                        <div className="w-full rounded-full h-2 mb-4" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                          <div 
-                            className="h-2 rounded-full"
-                            style={{ width: `${update.progress}%`, backgroundColor: getProgressColor(update.progress) }}
-                          ></div>
-                        </div>
-                        
-                        <div className="flex items-center space-x-4">
-                          <Button variant="outline" size="sm">
-                            <PhotoIcon className="h-4 w-4 mr-2" />
-                            View Photos
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <ArrowRightIcon className="h-4 w-4 mr-2" />
-                            Read More
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    {/* Real Property Images */}
-                    <div className="grid grid-cols-3 gap-2 mt-4">
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <img 
-                          src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=400&h=300&fit=crop" 
-                          alt="Modern Building Exterior"
-                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <img 
-                          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=400&h=300&fit=crop" 
-                          alt="High-rise Construction"
-                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                        />
-                      </div>
-                      <div className="aspect-video rounded-lg overflow-hidden">
-                        <img 
-                          src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=300&fit=crop" 
-                          alt="Luxury Property"
-                          className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
-
-      {/* Milestone Progress */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
-      >
-        <Card className="abs-card">
-          <CardHeader>
-            <CardTitle style={{ 
-              fontFamily: 'Playfair Display, serif',
-              color: '#d4af37'
-            }}>Milestone Progress</CardTitle>
-            <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Track completion of major project milestones</p>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[
-                { name: 'Foundation', progress: 100, status: 'completed' },
-                { name: 'Structural Framework', progress: 75, status: 'in-progress' },
-                { name: 'MEP Systems', progress: 40, status: 'in-progress' },
-                { name: 'Interior Work', progress: 0, status: 'pending' },
-                { name: 'Final Inspection', progress: 0, status: 'pending' },
-              ].map((milestone, index) => (
-                <div key={index} className="flex items-center space-x-4">
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium" style={{ color: '#ffffff' }}>{milestone.name}</span>
-                      <span className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>{milestone.progress}%</span>
-                    </div>
-                    <div className="w-full rounded-full h-2" style={{ background: 'rgba(0,0,0,0.5)' }}>
-                      <div 
-                        className="h-2 rounded-full"
-                        style={{ width: `${milestone.progress}%`, backgroundColor: getProgressColor(milestone.progress) }}
-                      ></div>
-                    </div>
-                  </div>
-                  <Badge variant={milestone.status === 'completed' ? 'success' : milestone.status === 'in-progress' ? 'info' : 'secondary'}>
-                    {milestone.status}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Sidebar: Detailed Project View */}
+        <div className="lg:col-span-4 space-y-6">
+          <motion.div
+            key={project?.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+          >
+            <Card className="overflow-hidden border-gold-500/20 bg-[#0a0a0a] rounded-[2rem] h-full border shadow-2xl">
+              <div className="relative h-56">
+                <img
+                  src={project?.images?.[0] || 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&fit=crop'}
+                  alt={project?.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-transparent"></div>
+                <div className="absolute bottom-6 left-8">
+                  <Badge className="bg-gold-500 text-black font-extrabold uppercase tracking-widest text-[10px] px-3 py-1">
+                    {project?.status || 'In Progress'}
                   </Badge>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+              </div>
+              <CardContent className="p-8">
+                <h3 className="text-3xl font-bold text-white mb-6 leading-tight" style={{ fontFamily: 'Playfair Display, serif' }}>
+                  {project?.name}
+                </h3>
 
-      {/* Contact Information */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-      >
-        <Card className="abs-card">
-          <CardHeader>
-            <CardTitle style={{ 
-              fontFamily: 'Playfair Display, serif',
-              color: '#d4af37'
-            }}>Need More Information?</CardTitle>
-            <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.7)' }}>Contact our project team for detailed updates</p>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h4 className="font-semibold mb-2" style={{ color: '#ffffff' }}>Project Manager</h4>
-                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Sarah Johnson</p>
-                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>sarah.johnson@miamidevelopers.com</p>
-                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>+1 (555) 123-4567</p>
-              </div>
-              <div>
-                <h4 className="font-semibold mb-2" style={{ color: '#ffffff' }}>Customer Support</h4>
-                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>RealAssist Support Team</p>
-                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>support@realassist.com</p>
-                <p className="text-sm" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>+1 (555) 987-6543</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </motion.div>
+                <div className="space-y-5 mb-8">
+                  <div className="flex items-center text-sm group">
+                    <div className="p-2 rounded-lg bg-gold-500/5 border border-gold-500/10 mr-4 group-hover:bg-gold-500/10 group-hover:border-gold-500/20 transition-all">
+                      <MapPinIcon className="h-5 w-5 text-gold-500/80" />
+                    </div>
+                    <span className="text-gray-400 group-hover:text-white transition-colors">{project?.location}</span>
+                  </div>
+                  <div className="flex items-center text-sm group">
+                    <div className="p-2 rounded-lg bg-gold-500/5 border border-gold-500/10 mr-4 group-hover:bg-gold-500/10 group-hover:border-gold-500/20 transition-all">
+                      <BuildingOfficeIcon className="h-5 w-5 text-gold-500/80" />
+                    </div>
+                    <span className="text-gray-400 group-hover:text-white transition-colors">{project?.type || 'Premium Development'}</span>
+                  </div>
+                  <div className="flex items-center text-sm group">
+                    <div className="p-2 rounded-lg bg-gold-500/5 border border-gold-500/10 mr-4 group-hover:bg-gold-500/10 group-hover:border-gold-500/20 transition-all">
+                      <CalendarIcon className="h-5 w-5 text-gold-500/80" />
+                    </div>
+                    <span className="text-gray-400 group-hover:text-white transition-colors">
+                      Completion: {project?.completionDate ? formatDate(project.completionDate) : 'Dec 2025'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="pt-8 border-t border-gold-500/10">
+                  <div className="flex justify-between items-center mb-6">
+                    <span className="text-xs uppercase tracking-widest text-gold-500 font-extrabold">Portfolio Value</span>
+                    <Badge variant="outline" className="border-gold-500/30 text-gold-400 py-1 font-bold">
+                      {selectedEnrollment?.status || 'Active'}
+                    </Badge>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-end">
+                      <span className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Total Valuation</span>
+                      <span className="text-xl font-bold text-white font-serif tracking-tight">PKR {(selectedEnrollment?.totalPrice || 0).toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center py-3 border-y border-gold-500/5">
+                      <span className="text-gray-500 text-xs">Total Settled</span>
+                      <span className="text-green-500 font-bold">PKR {totalPaid.toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-500 text-xs">Outstanding</span>
+                      <span className="text-gold-400 font-bold">PKR {remainingBalance.toLocaleString()}</span>
+                    </div>
+
+                    <div className="flex justify-between text-[11px] pt-2">
+                      <span className="text-gray-500">Duration</span>
+                      <span className="text-white font-bold">{selectedEnrollment?.installmentDurationYears} Years</span>
+                    </div>
+                  </div>
+
+                  {project?.brochureUrl && (
+                    <Button
+                      variant="outline"
+                      className="w-full mt-8 border-gold-500/20 text-gold-400 hover:bg-gold-500/10 hover:border-gold-500/40 rounded-xl flex items-center gap-2 font-bold py-6"
+                      onClick={() => window.open(project.brochureUrl, '_blank')}
+                    >
+                      <DocumentArrowDownIcon className="h-5 w-5" />
+                      View Project Brochure
+                    </Button>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </div>
+
+        {/* Main Content Area: Tabs & Timeline */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Tab Navigation */}
+          <div className="flex p-1.5 bg-[#0f0f0f] border border-gold-500/10 rounded-[1.25rem] w-fit">
+            {[
+              { id: 'journal', label: 'Journal', icon: CalendarIcon },
+              { id: 'timeline', label: 'Payments', icon: CreditCardIcon },
+              { id: 'dossier', label: 'Dossier', icon: InformationCircleIcon }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as TabType)}
+                className={`flex items-center gap-2 px-6 py-2.5 rounded-xl transition-all font-bold text-sm ${activeTab === tab.id
+                  ? 'bg-gold-500 text-black shadow-lg shadow-gold-500/20'
+                  : 'text-gray-500 hover:text-gray-300'
+                  }`}
+              >
+                <tab.icon className="h-4 w-4" />
+                {tab.label}
+              </button>
+            ))}
+          </div>
+
+          <AnimatePresence mode="wait">
+            {activeTab === 'journal' && (
+              <motion.div
+                key="journal"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <Card className="bg-[#0a0a0a]/60 border-gold-500/10 rounded-[2rem] backdrop-blur-md border min-h-[500px] overflow-hidden">
+                  <CardHeader className="p-10 border-b border-gold-500/10">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <CardTitle className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                          Development Journal
+                        </CardTitle>
+                        <p className="text-sm text-gray-500 italic">Capturing the evolution of {project?.name}</p>
+                      </div>
+                      <Badge className="bg-gold-500/10 text-gold-400 border-gold-500/20 py-2 px-6 rounded-full font-bold">
+                        {updates.length} Logs
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-10">
+                    {updatesLoading ? (
+                      <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <div className="h-10 w-10 border-2 border-gold-500/20 border-t-gold-500 rounded-full animate-spin"></div>
+                        <p className="text-xs text-gold-500 font-bold tracking-widest uppercase">Fetching Records...</p>
+                      </div>
+                    ) : updates.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <CalendarIcon className="h-16 w-16 text-gold-500/20 mb-6" />
+                        <h4 className="text-white font-bold text-lg mb-2">No Entries Found</h4>
+                        <p className="text-gray-500 text-sm max-w-sm">
+                          Our architectural and engineering site reviews are in progress. Check back soon for the latest snapshots.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-16 relative before:absolute before:inset-0 before:left-5 md:before:left-1/2 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-gold-500/40 before:via-gold-500/10 before:to-transparent">
+                        {updates.map((update, idx) => (
+                          <div key={update.id} className="relative group">
+                            {/* Marker */}
+                            <div className="absolute left-5 md:left-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-[#0a0a0a] border-2 border-gold-500 z-10 group-hover:scale-125 transition-transform"></div>
+
+                            <div className={`flex flex-col md:flex-row gap-8 ${idx % 2 === 0 ? 'md:flex-row-reverse' : ''}`}>
+                              <div className="w-full md:w-[45%]">
+                                <Card className="bg-[#141414] border-gold-500/10 group-hover:border-gold-500/30 transition-all rounded-3xl overflow-hidden shadow-xl">
+                                  {update.images && update.images.length > 0 && (
+                                    <img src={update.images[0]} alt="" className="w-full h-40 object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                                  )}
+                                  <CardContent className="p-6">
+                                    <div className="flex justify-between items-center mb-4">
+                                      <time className="text-[10px] font-extrabold text-gold-500 uppercase tracking-widest">
+                                        {formatDate(update.createdAt)}
+                                      </time>
+                                      {getMilestoneBadge(update.milestone)}
+                                    </div>
+                                    <h4 className="text-xl font-bold text-white mb-3 tracking-tight">{update.title}</h4>
+                                    <p className="text-sm text-gray-400 mb-6 leading-relaxed line-clamp-3 font-medium">
+                                      {update.description}
+                                    </p>
+                                    <div className="flex items-center justify-between pt-4 border-t border-gold-500/5">
+                                      <span className="text-xs font-bold text-gray-500 italic">{update.progress}% Completion</span>
+                                      <Button variant="ghost" className="text-gold-500 h-8 p-0 hover:bg-transparent font-bold text-xs uppercase tracking-widest flex items-center gap-1 group/btn">
+                                        View Details <ChevronRightIcon className="h-4 w-4 group-hover/btn:translate-x-1 transition-transform" />
+                                      </Button>
+                                    </div>
+                                  </CardContent>
+                                </Card>
+                              </div>
+                              <div className="hidden md:block w-4 mt-8" />
+                              <div className="w-full md:w-[45%] hidden md:block" />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {activeTab === 'timeline' && (
+              <motion.div
+                key="timeline"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <Card className="bg-[#0a0a0a]/60 border-gold-500/10 rounded-[2rem] backdrop-blur-md border min-h-[500px] overflow-hidden">
+                  <CardHeader className="p-10 border-b border-gold-500/10">
+                    <CardTitle className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                      Payment Timeline
+                    </CardTitle>
+                    <p className="text-sm text-gray-500">Track your investment milestones and transaction history</p>
+                  </CardHeader>
+                  <CardContent className="p-10">
+                    {paymentsLoading ? (
+                      <div className="flex flex-col items-center justify-center py-20 gap-4">
+                        <div className="h-10 w-10 border-2 border-gold-500/20 border-t-gold-500 rounded-full animate-spin"></div>
+                        <p className="text-xs text-gold-500 font-bold uppercase tracking-widest">Loading Ledger...</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-10">
+                        {/* Next Payment Summary Card */}
+                        {payments.length > 0 && payments.some(p => ['pending', 'overdue'].includes(p.status)) && (
+                          <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-gold-500/10 to-transparent border border-gold-500/20 p-8 mb-8">
+                            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+                              <div>
+                                <div className="flex items-center gap-2 mb-2">
+                                  <ClockIcon className="h-4 w-4 text-gold-500" />
+                                  <span className="text-[10px] font-extrabold text-gold-500 uppercase tracking-[0.2em]">Next Obligation</span>
+                                </div>
+                                <h4 className="text-3xl font-bold text-white font-serif">
+                                  PKR {payments.find(p => ['pending', 'overdue'].includes(p.status))?.amount.toLocaleString()}
+                                </h4>
+                                <p className="text-sm text-gray-500 mt-1 font-medium italic">
+                                  Due Date: {formatDate(payments.find(p => ['pending', 'overdue'].includes(p.status))?.dueDate || new Date())}
+                                </p>
+                              </div>
+                              <div className="flex gap-4 w-full md:w-auto">
+                                <Button
+                                  onClick={() => {
+                                    const nextPayment = payments.find(p => ['pending', 'overdue'].includes(p.status));
+                                    if (nextPayment) handleSettlePayment(nextPayment.id);
+                                  }}
+                                  disabled={isProcessingPayment}
+                                  className="flex-1 md:flex-none bg-gold-500 text-black hover:bg-gold-400 font-extrabold px-8 py-6 rounded-xl text-xs uppercase tracking-widest transition-all shadow-xl shadow-gold-500/20"
+                                >
+                                  {isProcessingPayment ? 'Processing...' : 'Settle Now'}
+                                </Button>
+                              </div>
+                            </div>
+                            {/* Background Decorative Element */}
+                            <CreditCardIcon className="absolute -bottom-10 -right-10 h-40 w-40 text-gold-500/5 rotate-12" />
+                          </div>
+                        )}
+
+                        {/* Interactive Payment Calendar - Always Visible */}
+                        <div className="mb-4">
+                          <PaymentCalendar
+                            payments={payments}
+                            dueDay={user?.createdAt ? new Date(user.createdAt).getDate() : undefined}
+                          />
+                        </div>
+
+                        {/* Search Bar for Ledger */}
+                        <div className="relative w-full md:w-1/2">
+                          <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-gold-500" />
+                          <Input
+                            placeholder="Search Installment #, Status, Amount..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="bg-[#141414] border-gold-500/10 pl-10 h-10 rounded-xl text-sm focus:border-gold-500/30 text-white"
+                          />
+                        </div>
+
+                        <div className="space-y-6">
+                          {filteredPayments.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-12 text-center border border-gold-500/5 rounded-3xl bg-[#141414]/20">
+                              <CreditCardIcon className="h-12 w-12 text-gold-500/20 mb-4" />
+                              <h4 className="text-white font-bold text-sm mb-1">No Transactions Reported</h4>
+                              <p className="text-gray-500 text-[10px] max-w-xs">Detailed transaction history will appear here once processed.</p>
+                            </div>
+                          ) : (
+                            filteredPayments.map((payment, idx) => (
+                              <div key={payment.id} className="relative flex items-center gap-6 group">
+                                {/* Vertical Line Segment */}
+                                {idx !== filteredPayments.length - 1 && (
+                                  <div className="absolute top-10 bottom-0 left-6 w-0.5 bg-gold-500/10 translate-y-2"></div>
+                                )}
+
+                                {/* Status Icon Marker */}
+                                <div className={`relative z-10 w-12 h-12 rounded-2xl flex items-center justify-center border transition-all duration-500 ${payment.status === 'paid'
+                                  ? 'bg-gold-500/10 border-gold-500/30'
+                                  : payment.status === 'overdue'
+                                    ? 'bg-red-500/10 border-red-500/30'
+                                    : 'bg-[#141414] border-gold-500/10'
+                                  }`}>
+                                  {payment.status === 'paid' ? (
+                                    <CheckCircleIcon className="h-6 w-6 text-gold-500" />
+                                  ) : payment.status === 'overdue' ? (
+                                    <ClockIcon className="h-6 w-6 text-red-500" />
+                                  ) : (
+                                    <CreditCardIcon className="h-6 w-6 text-gray-600" />
+                                  )}
+                                </div>
+
+                                {/* Payment Row */}
+                                <div className="flex-1 p-6 rounded-2xl bg-[#141414]/40 border border-gold-500/5 hover:border-gold-500/20 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                  <div className="space-y-1">
+                                    <div className="flex items-center gap-3">
+                                      <span className="text-white font-bold">Installment #{payment.installmentNumber}</span>
+                                      <Badge className={payment.status === 'paid' ? 'bg-green-500/10 text-green-500 border-green-500/20' : 'bg-gold-500/10 text-gold-500 border-gold-500/20'}>
+                                        {payment.status}
+                                      </Badge>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                                      <CalendarIcon className="h-3 w-3" />
+                                      <span>Due: {formatDate(payment.dueDate)}</span>
+                                      {payment.paidDate && (
+                                        <>
+                                          <span className="mx-1">•</span>
+                                          <span className="text-green-500/80">Paid on {formatDate(payment.paidDate)}</span>
+                                        </>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="text-right">
+                                    <div className="text-lg font-bold text-white font-serif">PKR {payment.amount.toLocaleString()}</div>
+                                    <div className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
+                                      {payment.method || 'SCHEDULED'}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+
+            {activeTab === 'dossier' && (
+              <motion.div
+                key="dossier"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <Card className="bg-[#0a0a0a]/60 border-gold-500/10 rounded-[2rem] backdrop-blur-md border min-h-[500px] overflow-hidden">
+                  <CardHeader className="p-10 border-b border-gold-500/10">
+                    <CardTitle className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+                      Project <span className="text-gold-400">Dossier</span>
+                    </CardTitle>
+                    <p className="text-sm text-gray-500">Deep insights into the architectural vision and amenities</p>
+                  </CardHeader>
+                  <CardContent className="p-10 space-y-12">
+                    {/* Description */}
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2 mb-4">
+                        <InformationCircleIcon className="h-5 w-5 text-gold-500" />
+                        <h4 className="text-sm font-extrabold text-gold-500 uppercase tracking-widest">Architectural Vision</h4>
+                      </div>
+                      <p className="text-gray-400 leading-relaxed font-medium text-lg">
+                        {project?.description || "This flagship development represents a paradigm shift in luxury commercial and residential spaces. Situated at a prime focal point of the city, it seamlessly integrates modern architectural aesthetics with sustainable engineering solutions to create a future-ready landmark."}
+                      </p>
+                    </div>
+
+                    {/* Amenities Grid */}
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-2 mb-4">
+                        <StarIcon className="h-5 w-5 text-gold-500" />
+                        <h4 className="text-sm font-extrabold text-gold-500 uppercase tracking-widest">Signature Amenities</h4>
+                      </div>
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                        {(project?.amenities && project.amenities.length > 0 ? project.amenities : ['24/7 Security', 'Fitness Center', 'Rooftop Lounge', 'Concierge Service', 'Smart Automation', 'High-Speed Elevators']).map((amenity, idx) => (
+                          <div key={idx} className="flex items-center gap-3 p-4 bg-[#141414] border border-gold-500/5 rounded-2xl group hover:border-gold-500/20 transition-all">
+                            <div className="h-2 w-2 rounded-full bg-gold-500/40 group-hover:scale-150 transition-all"></div>
+                            <span className="text-sm text-gray-400 font-bold group-hover:text-white transition-colors">{amenity}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Technical Specs */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-gold-500/10">
+                      <div className="p-6 rounded-[2rem] bg-gradient-to-br from-[#141414] to-transparent border border-gold-500/10">
+                        <h5 className="text-xs uppercase tracking-widest text-gold-500 font-bold mb-4">Project Scope</h5>
+                        <ul className="space-y-2 text-sm text-gray-400">
+                          <li className="flex justify-between"><span>Development Type</span> <span className="text-white font-bold">{project?.type || 'Commercial'}</span></li>
+                          <li className="flex justify-between"><span>Status</span> <span className="text-gold-400 font-bold">{project?.status || 'Active'}</span></li>
+                          <li className="flex justify-between"><span>Lead Architect</span> <span className="text-white font-bold">Studio ABS</span></li>
+                        </ul>
+                      </div>
+                      <div className="p-6 rounded-[2rem] bg-gradient-to-br from-[#141414] to-transparent border border-gold-500/10">
+                        <h5 className="text-xs uppercase tracking-widest text-gold-500 font-bold mb-4">Investment Highlights</h5>
+                        <ul className="space-y-2 text-sm text-gray-400">
+                          <li className="flex justify-between"><span>Location Grade</span> <span className="text-white font-bold">A+ Prime</span></li>
+                          <li className="flex justify-between"><span>Yield Potential</span> <span className="text-white font-bold">High Growth</span></li>
+                          <li className="flex justify-between"><span>Ownership</span> <span className="text-white font-bold">Pre-Launch Early Access</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
   );
 };

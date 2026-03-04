@@ -20,9 +20,11 @@ import { LeadManagementPage } from '@/pages/Admin/LeadManagementPage';
 import { CustomerManagementPage } from '@/pages/Admin/CustomerManagementPage';
 import { PaymentsManagementPage } from '@/pages/Admin/PaymentsManagementPage';
 import { AnalyticsPage } from '@/pages/Admin/AnalyticsPage';
-import { SettingsPage } from '@/pages/Admin/SettingsPage';
+import { SettingsPage } from '@/pages/Settings/SettingsPage';
 import { RagUploadPage } from '@/pages/Admin/RagUploadPage';
 import { RagChatHistoryPage } from '@/pages/Admin/RagChatHistoryPage';
+import { TeamManagementPage } from '@/pages/Admin/TeamManagementPage';
+import { DashboardProjectsPage } from '@/pages/Dashboard/Projects/DashboardProjectsPage';
 import { SubmitResponse } from '@/pages/SubmitResponse';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
@@ -39,10 +41,7 @@ export const router = createBrowserRouter([
         path: 'projects',
         element: <ProjectsPage />,
       },
-      {
-        path: 'rag-history',
-        element: <RagChatHistoryPage />,
-      },
+
       {
         path: 'projects/:projectId',
         element: <ProjectDetailPage />,
@@ -127,7 +126,51 @@ export const router = createBrowserRouter([
         path: 'submit-feedback',
         element: <SubmitResponse />,
       },
+      {
+        path: 'projects',
+        element: <DashboardProjectsPage />,
+      },
+      {
+        path: 'settings',
+        element: <SettingsPage />,
+      },
+      {
+        path: 'chat-history',
+        element: <RagChatHistoryPage />,
+      },
     ],
+
+  },
+  {
+    path: '/employee',
+    element: (
+      <ProtectedRoute requiredRole="employee">
+        <DashboardLayout role="employee" title="Staff Dashboard" />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/employee/dashboard" replace />,
+      },
+      {
+        path: 'dashboard',
+        element: <div className="text-white p-6">Staff Dashboard Content Incoming...</div>,
+      },
+      {
+        path: 'settings',
+        element: <SettingsPage />,
+      },
+      {
+        path: 'submit-feedback',
+        element: <SubmitResponse />,
+      },
+      {
+        path: 'chat-history',
+        element: <RagChatHistoryPage />,
+      },
+    ],
+
   },
   {
     path: '/admin',
@@ -146,6 +189,10 @@ export const router = createBrowserRouter([
         element: <AdminDashboard />,
       },
       {
+        path: 'teams',
+        element: <TeamManagementPage />,
+      },
+      {
         path: 'leads',
         element: <LeadManagementPage />,
       },
@@ -162,6 +209,10 @@ export const router = createBrowserRouter([
         element: <AnalyticsPage />,
       },
       {
+        path: 'projects',
+        element: <DashboardProjectsPage />,
+      },
+      {
         path: 'settings',
         element: <SettingsPage />,
       },
@@ -170,9 +221,10 @@ export const router = createBrowserRouter([
         element: <RagUploadPage />,
       },
       {
-        path: 'rag-history',
+        path: 'chat-history',
         element: <RagChatHistoryPage />,
       },
+
       {
         path: 'submit-feedback',
         element: <SubmitResponse />,

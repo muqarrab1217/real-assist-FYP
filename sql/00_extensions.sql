@@ -1,0 +1,3 @@
+-- Place any PostgreSQL extensions here.
+-- Example: CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- (Supabase PG13+ includes gen_random_uuid() natively)

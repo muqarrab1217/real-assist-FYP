@@ -1,5 +1,6 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 interface PublicRouteProps {
   children: React.ReactNode;
@@ -10,22 +11,21 @@ export const PublicRoute: React.FC<PublicRouteProps> = ({
   children,
   redirectPath
 }) => {
+  const { isAuthenticated, role, loading } = useAuthContext();
   const location = useLocation();
-  
-  // Check if user is authenticated
-  const isAuthenticated = () => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    return !!(token && user);
-  };
 
-  // If authenticated, redirect to appropriate dashboard
-  if (isAuthenticated()) {
-    const userRole = localStorage.getItem('role');
-    const defaultRedirect = userRole === 'admin' ? '/admin/dashboard' : '/client/dashboard';
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated) {
+    const defaultRedirect = role === 'admin' ? '/admin/dashboard' : '/client/dashboard';
     const targetPath = redirectPath || defaultRedirect;
-    
-    // Get the intended destination from state, or use the default
+
     const from = location.state?.from?.pathname || targetPath;
     return <Navigate to={from} replace />;
   }

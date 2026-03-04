@@ -5,50 +5,47 @@ import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthContext } from '@/contexts/AuthContext';
+import { authAPI } from '@/services/api';
 
 export const LoginPage: React.FC = () => {
-  const { login } = useAuth();
+  const { login } = useAuthContext();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    role: 'client' as 'client' | 'admin',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
+
+    // Role is ignored by the login service as it's fetched from the DB, but signature expects it.
+    // Passing 'client' as a default that will be overwritten by reality.
+    const loginPromise = authAPI.login(formData.email, formData.password, 'client');
+
+    // Timeout protective logic - increased to 30s for better tolerance
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Login timed out. This may be due to a slow connection. Please try again or refresh the page.')), 30000)
+    );
 
     try {
-      // Mock authentication - replace with actual API call
-      if (formData.email && formData.password) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Mock user data
-        const mockUser = {
-          id: '1',
-          email: formData.email,
-          firstName: 'John',
-          lastName: 'Doe',
-          role: formData.role,
-        };
-        
-        const mockToken = 'mock-jwt-token-' + Date.now();
-        
-        // Login user
-        login(mockUser, mockToken);
-        
-        // Navigate to appropriate dashboard
-        const redirectPath = formData.role === 'admin' ? '/admin/dashboard' : '/client/dashboard';
-        navigate(redirectPath, { replace: true });
-      }
-    } catch (error) {
-      console.error('Login failed:', error);
-      // Handle login error
+      const user = (await Promise.race([loginPromise, timeoutPromise])) as any;
+
+      // Update local auth state (login function updates state and session is handled by listener)
+      login(user);
+
+      // Navigate to appropriate dashboard
+      const isAdmin = user.email.toLowerCase() === 'realassist@admin.com' || user.role === 'admin';
+      const redirectPath = isAdmin ? '/admin/dashboard' : '/client/dashboard';
+      navigate(redirectPath, { replace: true });
+    } catch (err: any) {
+      console.error('Login error:', err);
+      setError(err.message || 'Invalid email or password');
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +76,7 @@ export const LoginPage: React.FC = () => {
           <div className="flex justify-center">
             <img src="/images/logo.png" alt="ABS Developers" className="h-16 w-auto" />
           </div>
-          <CardTitle className="text-2xl font-bold" style={{ 
+          <CardTitle className="text-2xl font-bold" style={{
             fontFamily: 'Playfair Display, serif',
             backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
             WebkitBackgroundClip: 'text',
@@ -92,27 +89,6 @@ export const LoginPage: React.FC = () => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label htmlFor="role" className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>
-                Account Type
-              </label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={(e) => setFormData(prev => ({ ...prev, role: e.target.value as 'client' | 'admin' }))}
-                className="w-full px-4 py-3 rounded-xl transition-all duration-300"
-                style={{
-                  background: '#000000',
-                  border: '1px solid rgba(212,175,55,0.25)',
-                  color: 'white',
-                  fontSize: '14px',
-                }}
-              >
-                <option value="client" style={{ background: '#1a1a1a' }}>Client (Investor/Buyer)</option>
-                <option value="admin" style={{ background: '#1a1a1a' }}>Admin (Developer/Sales)</option>
-              </select>
-            </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>
@@ -185,6 +161,12 @@ export const LoginPage: React.FC = () => {
               </Link>
             </div>
 
+            {error && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center">
+                {error}
+              </div>
+            )}
+
             <Button
               type="submit"
               disabled={isLoading}
@@ -205,7 +187,7 @@ export const LoginPage: React.FC = () => {
                 <div className="w-full" style={{ borderTop: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2" style={{ 
+                <span className="px-2" style={{
                   background: 'rgba(26,26,26,0.75)',
                   backdropFilter: 'blur(100px)',
                   color: 'rgba(156, 163, 175, 0.9)'
@@ -245,7 +227,7 @@ export const LoginPage: React.FC = () => {
                 color: 'white',
               }}>
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
                 Facebook
               </Button>

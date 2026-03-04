@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface Message {
   id: string;
@@ -122,7 +124,6 @@ export const RagChatHistoryPage: React.FC = () => {
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        // includeFiles flag hints backend to include Gemini file search context
         body: JSON.stringify({ message: userMessage.text, includeFiles: true }),
       });
 
@@ -161,119 +162,138 @@ export const RagChatHistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">RAG Chatbot History</h1>
-          <p className="text-sm text-muted-foreground">
+          <h1 className="text-3xl font-bold mb-2" style={{
+            fontFamily: 'Playfair Display, serif',
+            backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+            WebkitBackgroundClip: 'text',
+            backgroundClip: 'text',
+            color: 'transparent',
+          }}>
+            RAG Chatbot History
+          </h1>
+          <p style={{ color: 'rgba(156, 163, 175, 0.9)' }} className="text-sm">
             View stored conversations from the chatbot widget. Data is persisted locally in the browser.
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-10 gap-4">
-        <Card className="md:col-span-2 h-[80vh] flex flex-col">
-          <CardHeader>
-            <CardTitle>Conversations</CardTitle>
+      <div className="grid grid-cols-1 md:grid-cols-10 gap-6">
+        <Card className="md:col-span-3 h-[75vh] flex flex-col abs-card overflow-hidden">
+          <CardHeader className="p-4 border-b border-gold-500/10">
+            <CardTitle className="text-lg font-bold text-white" style={{ fontFamily: 'Playfair Display, serif', color: '#d4af37' }}>
+              Conversations
+            </CardTitle>
           </CardHeader>
-          <CardContent className="flex-1 p-0">
-            <div className="h-full overflow-y-auto">
-              <div className="divide-y">
-                {sessions.length === 0 && (
-                  <p className="p-4 text-sm text-muted-foreground">No conversations yet.</p>
-                )}
-                {sessions.map((session) => (
-                  <button
-                    key={session.id}
-                    onClick={() => setActiveSessionId(session.id)}
-                    className={`w-full text-left p-4 hover:bg-muted transition ${
-                      session.id === activeSessionId ? 'bg-muted' : ''
+          <CardContent className="flex-1 overflow-y-auto p-0 custom-scrollbar">
+            <div className="divide-y divide-gold-500/10">
+              {sessions.length === 0 && (
+                <p className="p-6 text-sm text-gray-500 text-center italic">No conversations yet.</p>
+              )}
+              {sessions.map((session) => (
+                <button
+                  key={session.id}
+                  onClick={() => setActiveSessionId(session.id)}
+                  className={`w-full text-left p-4 hover:bg-gold-500/10 transition-all group ${session.id === activeSessionId ? 'bg-gold-500/20 border-l-4 border-gold-400' : ''
                     }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="font-medium">
-                        {session.title.length > 40 ? `${session.title.slice(0, 40)}...` : session.title}
-                      </div>
-                      <span className="text-xs text-muted-foreground">
-                        {formatTime(session.updatedAt)}
-                      </span>
+                >
+                  <div className="flex items-center justify-between mb-1">
+                    <div className={cn(
+                      "font-bold truncate group-hover:text-gold-400 transition-colors",
+                      session.id === activeSessionId ? "text-gold-400" : "text-white"
+                    )}>
+                      {session.title.length > 30 ? `${session.title.slice(0, 30)}...` : session.title}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {session.messages.find((m) => m.isUser)?.text?.slice(0, 60) || 'No messages yet'}
-                    </p>
-                  </button>
-                ))}
-              </div>
+                    <span className="text-[10px] text-gray-500 shrink-0">
+                      {formatTime(session.updatedAt)}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 line-clamp-1">
+                    {session.messages.find((m) => m.isUser)?.text || 'No messages yet'}
+                  </p>
+                </button>
+              ))}
             </div>
           </CardContent>
         </Card>
 
-        <Card className="md:col-span-8 h-[80vh] flex flex-col overflow-hidden">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>{activeSession?.title || 'Select a conversation'}</CardTitle>
+        <Card className="md:col-span-7 h-[75vh] flex flex-col abs-card overflow-hidden">
+          <CardHeader className="p-4 border-b border-gold-500/10 flex items-center justify-between">
+            <CardTitle className="text-lg font-bold text-white truncate max-w-[70%]" style={{ fontFamily: 'Playfair Display, serif', color: '#d4af37' }}>
+              {activeSession?.title || 'Select session'}
+            </CardTitle>
             <Button
               variant="outline"
+              size="sm"
               onClick={() => setActiveSessionId(activeSession?.id || null)}
               disabled={!activeSession}
+              className="border-gold-500/30 text-gold-400 hover:bg-gold-500/10 h-8 font-semibold"
             >
               Refresh
             </Button>
           </CardHeader>
-          <CardContent className="flex-1 p-0 flex flex-col overflow-hidden">
-            <div className="flex-1 overflow-y-auto p-4 space-y-4">
-              {!activeSession && <p className="text-sm text-muted-foreground">Choose a conversation to view history.</p>}
-              {activeSession?.messages.map((message) => (
-                <div
-                  key={message.id}
-                  className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
-                >
-                  <div
-                    className="max-w-xl rounded-lg px-4 py-3 shadow-sm text-sm"
-                    style={
-                      message.isUser
-                        ? {
-                            backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
-                            color: '#000000',
-                          }
-                        : {
-                            background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.85) 100%)',
-                            border: '1px solid rgba(212, 175, 55, 0.25)',
-                            color: '#ffffff',
-                          }
-                    }
-                  >
-                    <div className="text-xs opacity-70 mb-1">{formatTime(message.timestamp.toString())}</div>
-                    <div>{message.text}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
 
-            {/* Continue conversation inside right panel */}
-            <div className="border-t border-muted-foreground/20 p-4 space-y-3 sticky bottom-0 bg-background">
-              <div className="flex flex-col md:flex-row md:items-center md:space-x-3 space-y-3 md:space-y-0">
-                <input
-                  type="text"
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSend();
-                  }}
-                  placeholder="Ask a question or continue the chat..."
-                  className="flex-1 px-3 py-2 rounded-md border border-muted-foreground/30 bg-background text-foreground"
-                  disabled={isLoading}
-                />
-                <Button onClick={handleSend} disabled={isLoading || !inputValue.trim()}>
-                  {isLoading ? 'Sending...' : 'Send'}
-                </Button>
+          <CardContent className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+            {!activeSession && (
+              <div className="h-full flex flex-col items-center justify-center text-center space-y-4">
+                <div className="p-4 rounded-full bg-gold-500/5 border border-gold-500/10">
+                  <ChatBubbleLeftRightIcon className="h-12 w-12 text-gold-500/30" />
+                </div>
+                <p className="text-gray-500 max-w-xs">Choose a conversation from the sidebar or start a new chat below.</p>
               </div>
-              {!activeSession && <p className="text-xs text-muted-foreground">Select a conversation or send a message to create one.</p>}
-            </div>
+            )}
+
+            {activeSession?.messages.map((message) => (
+              <div
+                key={message.id}
+                className={`flex ${message.isUser ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={cn(
+                    "max-w-[85%] rounded-2xl px-5 py-4 shadow-xl text-sm leading-relaxed",
+                    message.isUser
+                      ? "bg-gradient-to-br from-gold-500 to-gold-400 text-black font-semibold rounded-tr-none"
+                      : "bg-[#0a0a0a] border border-gold-500/20 text-white rounded-tl-none backdrop-blur-sm"
+                  )}
+                >
+                  <div className={cn(
+                    "text-[10px] mb-2 font-bold uppercase tracking-wider",
+                    message.isUser ? "text-black/50" : "text-gold-400/70"
+                  )}>
+                    {formatTime(message.timestamp.toString())}
+                  </div>
+                  <div className="whitespace-pre-wrap">{message.text}</div>
+                </div>
+              </div>
+            ))}
           </CardContent>
+
+          <div className="p-4 bg-black/40 border-t border-gold-500/10">
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleSend();
+                }}
+                placeholder="Ask a question or continue the chat..."
+                className="w-full bg-black/50 border border-gold-500/20 text-white pl-4 pr-24 py-3 rounded-xl focus:outline-none focus:border-gold-500/50 transition-all placeholder:text-gray-600"
+                disabled={isLoading}
+              />
+              <button
+                onClick={handleSend}
+                disabled={isLoading || !inputValue.trim()}
+                className="absolute right-2 px-4 py-1.5 bg-gradient-to-r from-gold-500 to-gold-400 text-black font-bold rounded-lg text-xs hover:shadow-lg hover:shadow-gold-500/20 transition-all disabled:opacity-50"
+              >
+                {isLoading ? 'Sending...' : 'Send'}
+              </button>
+            </div>
+          </div>
         </Card>
       </div>
     </div>
   );
 };
-
-

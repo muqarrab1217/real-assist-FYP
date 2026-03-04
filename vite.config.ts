@@ -45,4 +45,15 @@ export default defineConfig({
       'real-assist-rag.onrender.com',
     ],
   },
+  test: {
+    environment: 'jsdom',
+    setupFiles: './testing/setupTests.ts',
+    globals: true,
+    css: false,
+    coverage: {
+      reporter: ['text', 'html'],
+      provider: 'v8',
+      reportsDirectory: './coverage'
+    }
+  },
 })

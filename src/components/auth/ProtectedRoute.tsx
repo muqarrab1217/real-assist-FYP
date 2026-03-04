@@ -1,9 +1,10 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'client' | 'admin';
+  requiredRole?: 'client' | 'admin' | 'employee';
   fallbackPath?: string;
 }
 
@@ -12,31 +13,23 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   fallbackPath = '/auth/login'
 }) => {
+  const { isAuthenticated, role, loading } = useAuthContext();
   const location = useLocation();
-  
-  // Check if user is authenticated
-  const isAuthenticated = () => {
-    const token = localStorage.getItem('token');
-    const user = localStorage.getItem('user');
-    return !!(token && user);
-  };
 
-  // Check if user has the required role
-  const hasRequiredRole = () => {
-    if (!requiredRole) return true;
-    const userRole = localStorage.getItem('role');
-    return userRole === requiredRole;
-  };
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-500"></div>
+      </div>
+    );
+  }
 
-  // If not authenticated, redirect to login
-  if (!isAuthenticated()) {
+  if (!isAuthenticated) {
     return <Navigate to={fallbackPath} state={{ from: location }} replace />;
   }
 
-  // If authenticated but doesn't have required role, redirect to appropriate dashboard
-  if (!hasRequiredRole()) {
-    const userRole = localStorage.getItem('role');
-    const redirectPath = userRole === 'admin' ? '/admin/dashboard' : '/client/dashboard';
+  if (requiredRole && role !== requiredRole) {
+    const redirectPath = role === 'admin' ? '/admin/dashboard' : (role === 'employee' ? '/employee/dashboard' : '/client/dashboard');
     return <Navigate to={redirectPath} replace />;
   }
 

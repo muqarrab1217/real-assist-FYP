@@ -4,13 +4,12 @@ import { useAuth } from '@/hooks/useAuth';
 interface AuthContextType {
   isAuthenticated: boolean;
   user: any;
-  token: string | null;
-  role: 'client' | 'admin' | null;
-  login: (user: any, token: string) => void;
+  loading: boolean;
+  role: 'client' | 'admin' | 'employee' | null;
+  login: (user: any) => void;
   logout: () => void;
-  clearAuth: () => void;
-  hasRole: (role: 'client' | 'admin') => boolean;
-  hasAnyRole: (roles: ('client' | 'admin')[]) => boolean;
+  hasRole: (role: 'client' | 'admin' | 'employee') => boolean;
+  hasAnyRole: (roles: ('client' | 'admin' | 'employee')[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
