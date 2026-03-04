@@ -6,11 +6,11 @@
  */
 
 import { useState } from 'react';
-import { 
-  extractedProperties, 
+import {
+  extractedProperties,
   detailedProjects,
   projectOffers,
-  extractedPaymentPlans 
+  extractedPaymentPlans
 } from '@/data/extractedMockData';
 
 // ============================================================================
@@ -22,9 +22,9 @@ export const AllProjectsExample = () => {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {extractedProperties.map((property) => (
         <div key={property.id} className="border rounded-lg p-4 shadow-md">
-          {property.images[0] && (
-            <img 
-              src={property.images[0]} 
+          {property.images && property.images[0] && (
+            <img
+              src={property.images[0]}
               alt={property.name}
               className="w-full h-48 object-cover rounded mb-4"
             />
@@ -32,7 +32,7 @@ export const AllProjectsExample = () => {
           <h3 className="text-xl font-bold mb-2">{property.name}</h3>
           <p className="text-gray-600 mb-2">{property.location}</p>
           <p className="text-lg font-semibold text-green-600">
-            PKR {property.price.toLocaleString()}
+            PKR {property.price ? property.price.toLocaleString() : 'TBA'}
           </p>
           <p className="text-sm text-gray-500 mt-2">
             Status: {property.status}
@@ -49,11 +49,11 @@ export const AllProjectsExample = () => {
 
 export const FilteredProjectsExample = () => {
   const [filter, setFilter] = useState<'all' | 'residential' | 'commercial' | 'mixed-use'>('all');
-  
-  const filteredProjects = detailedProjects.filter(project => 
+
+  const filteredProjects = detailedProjects.filter(project =>
     filter === 'all' || project.type === filter
   );
-  
+
   return (
     <div>
       <div className="mb-6 flex gap-2">
@@ -82,7 +82,7 @@ export const FilteredProjectsExample = () => {
           Mixed-Use
         </button>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredProjects.map(project => (
           <div key={project.id} className="border rounded-lg p-4">
@@ -104,11 +104,11 @@ export const FilteredProjectsExample = () => {
 
 export const DetailedProjectExample = ({ projectId }: { projectId: string }) => {
   const project = detailedProjects.find(p => p.id === projectId);
-  
+
   if (!project) {
     return <div>Project not found</div>;
   }
-  
+
   return (
     <div className="max-w-4xl mx-auto p-6">
       {/* Header */}
@@ -119,20 +119,20 @@ export const DetailedProjectExample = ({ projectId }: { projectId: string }) => 
           {project.status}
         </span>
       </div>
-      
+
       {/* Description */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold mb-2">About</h2>
         <p className="text-gray-700">{project.description}</p>
       </div>
-      
+
       {/* Price Range */}
       <div className="mb-6 bg-blue-50 p-4 rounded-lg">
         <h2 className="text-xl font-semibold mb-2">Price Range</h2>
         <p className="text-2xl font-bold text-blue-600">
           {project.priceRange.min && project.priceRange.max ? (
             <>
-              PKR {project.priceRange.min.toLocaleString()} - 
+              PKR {project.priceRange.min.toLocaleString()} -
               PKR {project.priceRange.max.toLocaleString()}
             </>
           ) : (
@@ -140,7 +140,7 @@ export const DetailedProjectExample = ({ projectId }: { projectId: string }) => 
           )}
         </p>
       </div>
-      
+
       {/* Amenities */}
       {project.amenities.length > 0 && (
         <div className="mb-6">
@@ -155,7 +155,7 @@ export const DetailedProjectExample = ({ projectId }: { projectId: string }) => 
           </div>
         </div>
       )}
-      
+
       {/* Payment Plan */}
       {project.paymentPlan && project.paymentPlan.totalInstallments && (
         <div className="mb-6 bg-yellow-50 p-4 rounded-lg">
@@ -169,7 +169,7 @@ export const DetailedProjectExample = ({ projectId }: { projectId: string }) => 
           )}
         </div>
       )}
-      
+
       {/* Brochure Download */}
       <div className="mb-6">
         <a
@@ -181,7 +181,7 @@ export const DetailedProjectExample = ({ projectId }: { projectId: string }) => 
           📄 Download Brochure
         </a>
       </div>
-      
+
       {/* Developer Info */}
       <div className="border-t pt-4 text-gray-600">
         <p>Developed by: <strong>{project.developer}</strong></p>
@@ -237,19 +237,19 @@ export const PaymentPlansExample = () => {
         {extractedPaymentPlans.map((plan) => (
           <div key={plan.projectId} className="border rounded-lg p-4 bg-gray-50">
             <h3 className="text-xl font-semibold mb-3">{plan.projectName}</h3>
-            
+
             {'downPayment' in plan && plan.downPayment ? (
               <div className="mb-2">
                 <span className="font-semibold">Down Payment:</span> {(plan as any).downPayment}%
               </div>
             ) : null}
-            
+
             {'durationMonths' in plan && plan.durationMonths ? (
               <div className="mb-2">
                 <span className="font-semibold">Duration:</span> {(plan as any).durationMonths} months
               </div>
             ) : null}
-            
+
             {plan.installments && plan.installments.length > 0 && (
               <div className="mt-4">
                 <h4 className="font-semibold mb-2">Installment Schedule:</h4>
@@ -295,13 +295,13 @@ export const PaymentPlansExample = () => {
 
 export const SearchProjectsExample = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  
+
   const searchResults = detailedProjects.filter(project =>
     project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
     project.location.toLowerCase().includes(searchTerm.toLowerCase())
   );
-  
+
   return (
     <div>
       <div className="mb-4">
@@ -313,11 +313,11 @@ export const SearchProjectsExample = () => {
           className="w-full px-4 py-2 border rounded-lg"
         />
       </div>
-      
+
       <p className="text-gray-600 mb-4">
         Found {searchResults.length} project(s)
       </p>
-      
+
       <div className="space-y-4">
         {searchResults.map(project => (
           <div key={project.id} className="border rounded-lg p-4 hover:shadow-lg transition">
@@ -339,28 +339,28 @@ export const ProjectStatsDashboard = () => {
   const totalProjects = detailedProjects.length;
   const residentialCount = detailedProjects.filter(p => p.type === 'residential').length;
   const commercialCount = detailedProjects.filter(p => p.type === 'commercial').length;
-  
+
   const avgAmenities = Math.round(
     detailedProjects.reduce((sum, p) => sum + p.amenities.length, 0) / totalProjects
   );
-  
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div className="bg-blue-100 p-4 rounded-lg text-center">
         <div className="text-3xl font-bold text-blue-600">{totalProjects}</div>
         <div className="text-sm text-gray-600 mt-1">Total Projects</div>
       </div>
-      
+
       <div className="bg-green-100 p-4 rounded-lg text-center">
         <div className="text-3xl font-bold text-green-600">{residentialCount}</div>
         <div className="text-sm text-gray-600 mt-1">Residential</div>
       </div>
-      
+
       <div className="bg-yellow-100 p-4 rounded-lg text-center">
         <div className="text-3xl font-bold text-yellow-600">{commercialCount}</div>
         <div className="text-sm text-gray-600 mt-1">Commercial</div>
       </div>
-      
+
       <div className="bg-purple-100 p-4 rounded-lg text-center">
         <div className="text-3xl font-bold text-purple-600">{avgAmenities}</div>
         <div className="text-sm text-gray-600 mt-1">Avg. Amenities</div>

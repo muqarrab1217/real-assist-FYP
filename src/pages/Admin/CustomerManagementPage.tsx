@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { 
+import {
   UserGroupIcon,
   MagnifyingGlassIcon,
   EyeIcon,
@@ -75,7 +75,7 @@ export const CustomerManagementPage: React.FC = () => {
       >
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold mb-2" style={{ 
+            <h1 className="text-3xl font-bold mb-2" style={{
               fontFamily: 'Playfair Display, serif',
               backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
               WebkitBackgroundClip: 'text',
@@ -84,7 +84,7 @@ export const CustomerManagementPage: React.FC = () => {
             }}>Customer Management</h1>
             <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Manage and track your client relationships</p>
           </div>
-          <Button className="text-black font-semibold" style={{ 
+          <Button className="text-black font-semibold" style={{
             backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
           }}>
             <UserGroupIcon className="h-4 w-4 mr-2" />
@@ -204,7 +204,7 @@ export const CustomerManagementPage: React.FC = () => {
       >
         <Card className="abs-card">
           <CardHeader>
-            <CardTitle style={{ 
+            <CardTitle style={{
               fontFamily: 'Playfair Display, serif',
               color: '#d4af37'
             }}>Customer List ({filteredClients.length})</CardTitle>
@@ -227,7 +227,7 @@ export const CustomerManagementPage: React.FC = () => {
                     <TableRow key={client.id}>
                       <TableCell className="font-medium">
                         <div className="flex items-center space-x-3">
-                          <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{ 
+                          <div className="h-8 w-8 rounded-full flex items-center justify-center" style={{
                             backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
                           }}>
                             <span className="text-black text-xs font-bold">
@@ -240,9 +240,9 @@ export const CustomerManagementPage: React.FC = () => {
                       <TableCell>
                         <div className="flex items-center space-x-2">
                           <div className="w-20 rounded-full h-2" style={{ background: 'rgba(91, 85, 85, 0.5)' }}>
-                            <div 
+                            <div
                               className="h-2 rounded-full"
-                              style={{ 
+                              style={{
                                 width: `${(client.currentInstallment / client.totalInstallments) * 100}%`,
                                 backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
                               }}
@@ -254,7 +254,7 @@ export const CustomerManagementPage: React.FC = () => {
                         </div>
                       </TableCell>
                       <TableCell>{getStatusBadge(client.status)}</TableCell>
-                      <TableCell>{formatDate(client.createdAt)}</TableCell>
+                      <TableCell>{client.createdAt ? formatDate(client.createdAt) : 'N/A'}</TableCell>
                       <TableCell>
                         <Dialog>
                           <DialogTrigger asChild>
@@ -307,7 +307,7 @@ export const CustomerManagementPage: React.FC = () => {
 
                               <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-                                <p className="text-gray-900">{formatDate(client.createdAt)}</p>
+                                <p className="text-gray-900">{client.createdAt ? formatDate(client.createdAt) : 'N/A'}</p>
                               </div>
 
                               <div className="pt-4 border-t">
