@@ -1,0 +1,65 @@
+dead lead:
+
+
+Hello! I'm your AI assistant. How can I help you with your real estate investment today?
+i want to talk to Dr. subayial ikram regarding some oppertunities
+I am here to assist you with all queries related to ABS Developers.
+is it possible that if i can get any job in the ABS corporation
+I am here to assist you with all queries related to ABS Developers.
+
+
+
+
+
+cold lead:
+
+
+Hello! I'm your AI assistant. How can I help you with your real estate investment today?
+hi
+Hi there! How can I assist you with ABS Developers today? Are you interested in learning more about our properties, projects, pricing, or payment plans? Im here to help with any real estate related questions you may have.
+tell me the details of 2 bedrom apartments
+I do not have the specific details of 2-bedroom apartments from the provided documents. To assist you better, could you please specify which ABS Developers project you are interested in? This will help me find the relevant information.
+tell me current projects
+We have several ongoing projects including ABS Mall & Residency, Pearl One Capital (both commercial and residential), Pearl One Courtyard, and Pearl One Premium. We also have the Asaan Ghar Offer 2025 and Asaan Karobar Offer 2025 available for some projects.
+tell me about how many bedrooms are there in apartments
+Please specify which ABS Developers property or project you are interested in so I can provide you with information about the number of bedrooms in the apartments.
+tell me about the residential asaan ghar scheme
+We offer an Asaan Ghar scheme for residential properties. Please refer to the PEARL ONE CAPITAL - RESIDENTIAL - ASAAN GHAR OFFER document for detailed information.
+hi
+Hi there! How can I help you with your real estate needs related to ABS Developers today?
+tell me about the recent projects for abs developers
+ABS Developers has several recent projects including ABS Mall & Residency and Pearl One Capital which features both commercial and residential options under the Asaan Ghar Offer 2025. Other projects include Pearl One Courtyard and Pearl One Premium, with development deals and Asaan Karobar Offer 2025 available for Pearl One Premium. Please note that details may vary.
+tell me about the schemes currently going on
+We have several schemes available. These include the ASAAN GHAR OFFER 2025 for Pearl One Capital Residential, the ASAAN KAROBAR OFFER 2025 for Pearl One Premium, and the ASAAN KAROBAR DEAL 2025 for POC3. Please contact us for more details on each offer.
+i have 1 crore budget and i wna tot buy a penthouse
+With a budget of 1 crore, we can explore options at our Pearl One properties. The Pearl One Capital, Pearl One Courtyard, and Pearl One Premium may have suitable commercial or residential options. Please contact us to discuss available penthouses and payment plans that fit your budget. I do not have access to live pricing information.Hello! I'm your AI assistant. How can I help you with your real estate investment today?
+hi
+Hi there! How can I assist you with ABS Developers today? Are you interested in learning more about our properties, projects, pricing, or payment plans? Im here to help with any real estate related questions you may have.
+tell me the details of 2 bedrom apartments
+I do not have the specific details of 2-bedroom apartments from the provided documents. To assist you better, could you please specify which ABS Developers project you are interested in? This will help me find the relevant information.
+tell me current projects
+We have several ongoing projects including ABS Mall & Residency, Pearl One Capital (both commercial and residential), Pearl One Courtyard, and Pearl One Premium. We also have the Asaan Ghar Offer 2025 and Asaan Karobar Offer 2025 available for some projects.
+tell me about how many bedrooms are there in apartments
+Please specify which ABS Developers property or project you are interested in so I can provide you with information about the number of bedrooms in the apartments.
+tell me about the residential asaan ghar scheme
+We offer an Asaan Ghar scheme for residential properties. Please refer to the PEARL ONE CAPITAL - RESIDENTIAL - ASAAN GHAR OFFER document for detailed information.
+hi
+Hi there! How can I help you with your real estate needs related to ABS Developers today?
+tell me about the recent projects for abs developers
+ABS Developers has several recent projects including ABS Mall & Residency and Pearl One Capital which features both commercial and residential options under the Asaan Ghar Offer 2025. Other projects include Pearl One Courtyard and Pearl One Premium, with development deals and Asaan Karobar Offer 2025 available for Pearl One Premium. Please note that details may vary.
+tell me about the schemes currently going on
+We have several schemes available. These include the ASAAN GHAR OFFER 2025 for Pearl One Capital Residential, the ASAAN KAROBAR OFFER 2025 for Pearl One Premium, and the ASAAN KAROBAR DEAL 2025 for POC3. Please contact us for more details on each offer.
+
+
+
+
+Hot Lead:
+
+Agent: Thank you for contacting ABS Developers. How can I help you today?
+Customer: I’m interested in buying a 10 Marla house in Bahria Town Lahore. Do you have anything available right now?
+Agent: Yes, we have a few premium options available. Do you have a specific budget in mind?
+Customer: Yes, my budget is around PKR 2.5 to 3 crore. I’m specifically looking for a corner plot facing the park.
+Agent: That’s great. Would you like to arrange a site visit?
+Customer: Yes, I want to visit tomorrow if possible. If I like it, I’m ready to pay the booking amount immediately.
+Agent: Perfect. Please bring your CNIC for the booking process.
+Customer: Sure, I’ll bring my CNIC and let’s proceed with the booking if everything looks good.

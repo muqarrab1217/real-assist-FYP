@@ -5,9 +5,15 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
+
+// Initialize Supabase
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseKey = process.env.VITE_SUPABASE_ANON_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Middleware
 app.use(cors());
@@ -87,7 +93,7 @@ const saveConfig = async (config) => {
 // Create or get corpus using Gemini File API
 const getOrCreateCorpus = async () => {
   const config = await loadConfig();
-  
+
   if (config.corpusId) {
     console.log(`Using existing corpus: ${config.corpusId}`);
     return config.corpusId;
@@ -96,18 +102,18 @@ const getOrCreateCorpus = async () => {
   // Create new corpus using Gemini File API
   const corpusName = config.corpusName || `real-estate-corpus-${Date.now()}`;
   console.log(`Creating new corpus: ${corpusName}`);
-  
+
   try {
     // Note: Gemini File Search uses file-based retrieval
     // We'll create a corpus name that can be referenced
     // In the actual Gemini API, files are uploaded and then referenced by corpus
-    
+
     const newConfig = {
       corpusId: corpusName,
       corpusName: corpusName,
       createdAt: new Date().toISOString(),
     };
-    
+
     await saveConfig(newConfig);
     console.log(`Corpus created: ${corpusName}`);
     return corpusName;
@@ -121,7 +127,7 @@ const getOrCreateCorpus = async () => {
 app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
   try {
     const files = req.files || (req.file ? [req.file] : []);
-    
+
     if (!files || files.length === 0) {
       return res.status(400).json({ error: 'No files uploaded' });
     }
@@ -133,7 +139,7 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
     const corpusId = await getOrCreateCorpus();
     const fileRegistryPath = 'ragBot/config/files-registry.json';
     let fileRegistry = [];
-    
+
     try {
       const registryData = await fs.readFile(fileRegistryPath, 'utf8');
       fileRegistry = JSON.parse(registryData);
@@ -154,7 +160,7 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
         // Store file metadata (DO NOT store base64 - files are too large for JSON)
         // Files are stored on disk and can be read when needed for Gemini API
         const fileId = Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9);
-        
+
         // Create file entry without base64 to avoid JSON string length limits
         const fileEntry = {
           id: fileId,
@@ -165,7 +171,7 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
           corpusId: corpusId,
           size: file.size,
         };
-        
+
         fileRegistry.push(fileEntry);
 
         uploadedFiles.push({
@@ -184,7 +190,7 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
         // Clean up uploaded file on error
         try {
           await fs.unlink(file.path);
-        } catch {}
+        } catch { }
       }
     }
 
@@ -202,15 +208,15 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
     }
 
     if (uploadedFiles.length === 0) {
-      return res.status(500).json({ 
+      return res.status(500).json({
         error: 'Failed to upload any files',
-        errors: errors 
+        errors: errors
       });
     }
 
     res.json({
       success: true,
-      message: uploadedFiles.length === 1 
+      message: uploadedFiles.length === 1
         ? 'File uploaded successfully'
         : `${uploadedFiles.length} files uploaded successfully`,
       corpusId: corpusId,
@@ -241,15 +247,15 @@ app.post('/api/gemini/query', async (req, res) => {
 
     const config = await loadConfig();
     if (!config.corpusId) {
-      return res.status(400).json({ 
-        error: 'No corpus found. Please upload documents first using /api/gemini/upload' 
+      return res.status(400).json({
+        error: 'No corpus found. Please upload documents first using /api/gemini/upload'
       });
     }
 
     // Load file registry to get document context
     const fileRegistryPath = 'ragBot/config/files-registry.json';
     let fileRegistry = [];
-    
+
     try {
       const registryData = await fs.readFile(fileRegistryPath, 'utf8');
       fileRegistry = JSON.parse(registryData);
@@ -294,28 +300,28 @@ Now provide your response in plain text without any formatting:`;
     // Helper function to clean markdown and formatting from text
     const cleanText = (text) => {
       let cleaned = text;
-      
+
       // Remove markdown bold (**text** or *text*)
       cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, '$1');
       cleaned = cleaned.replace(/\*([^*]+)\*/g, '$1');
-      
+
       // Remove bullet points with asterisks (* item or - item)
       cleaned = cleaned.replace(/^\s*[\*\-\+]\s+/gm, '');
-      
+
       // Remove quotes (both single and double)
       cleaned = cleaned.replace(/[""]/g, '');
       cleaned = cleaned.replace(/['']/g, '');
-      
+
       // Remove markdown headers (# Header)
       cleaned = cleaned.replace(/^#+\s+/gm, '');
-      
+
       // Remove markdown links [text](url)
       cleaned = cleaned.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
-      
+
       // Remove extra whitespace and newlines
       cleaned = cleaned.replace(/\n\s*\n/g, ' ');
       cleaned = cleaned.replace(/\s+/g, ' ');
-      
+
       // Remove AI-related phrases
       const aiPhrases = [
         /i am an ai/gi,
@@ -328,46 +334,46 @@ Now provide your response in plain text without any formatting:`;
         /i cannot tell you/gi,
         /i cannot provide/gi
       ];
-      
+
       aiPhrases.forEach(phrase => {
         cleaned = cleaned.replace(phrase, '');
       });
-      
+
       return cleaned.trim();
     };
 
     // Helper function to process and validate response
     const processResponse = (text, userMessage) => {
       const offTopicMessage = "I am here to assist you with all queries related to ABS Developers.";
-      
+
       // Clean markdown and formatting first
       let cleanedText = cleanText(text);
-      
+
       // If response is already the off-topic message, return it
       if (cleanedText.trim().toLowerCase().includes(offTopicMessage.toLowerCase())) {
         return offTopicMessage;
       }
-      
+
       // Check if user's question is clearly off-topic
       const lowerUserMessage = userMessage.toLowerCase();
       const lowerCleanedText = cleanedText.toLowerCase();
-      
+
       // Off-topic indicators in user's question (including date/time questions)
       const offTopicQuestionKeywords = [
-        'poem', 'joke', 'story', 'recipe', 'weather', 'sports', 'movie', 'music', 'game', 
+        'poem', 'joke', 'story', 'recipe', 'weather', 'sports', 'movie', 'music', 'game',
         'funny', 'tell me a poem', 'write a poem', 'tell me a joke', 'tell me a story',
-        'what is the date', 'what date', 'what time', 'current date', 'today date', 
+        'what is the date', 'what date', 'what time', 'current date', 'today date',
         'what day', 'current time', 'what is today', 'date today', 'time now'
       ];
-      
+
       // Check if question is off-topic
       const isQuestionOffTopic = offTopicQuestionKeywords.some(keyword => lowerUserMessage.includes(keyword));
-      
+
       // If question is clearly off-topic, redirect
       if (isQuestionOffTopic) {
         return offTopicMessage;
       }
-      
+
       // Check if response mentions AI behavior (using word boundaries to avoid false positives)
       // Check for whole words/phrases, not substrings
       const aiPhrases = [
@@ -382,33 +388,33 @@ Now provide your response in plain text without any formatting:`;
         /\bi cannot provide\b/i,
         /\bi don't have\b/i
       ];
-      
+
       const containsAIPhrase = aiPhrases.some(phrase => phrase.test(cleanedText));
-      
+
       // Only redirect if response actually mentions AI behavior AND doesn't mention real estate
       if (containsAIPhrase) {
-        const mentionsRealEstate = /\babs\b/i.test(cleanedText) || 
-                                    /\bdeveloper\b/i.test(cleanedText) || 
-                                    /\bproperty\b/i.test(cleanedText) || 
-                                    /\breal estate\b/i.test(cleanedText) || 
-                                    /\bproject\b/i.test(cleanedText) || 
-                                    /\bapartment\b/i.test(cleanedText) ||
-                                    /\bflat\b/i.test(cleanedText) || 
-                                    /\bpayment\b/i.test(cleanedText);
-        
+        const mentionsRealEstate = /\babs\b/i.test(cleanedText) ||
+          /\bdeveloper\b/i.test(cleanedText) ||
+          /\bproperty\b/i.test(cleanedText) ||
+          /\breal estate\b/i.test(cleanedText) ||
+          /\bproject\b/i.test(cleanedText) ||
+          /\bapartment\b/i.test(cleanedText) ||
+          /\bflat\b/i.test(cleanedText) ||
+          /\bpayment\b/i.test(cleanedText);
+
         // Only redirect if it mentions AI but NOT real estate
         if (!mentionsRealEstate) {
           return offTopicMessage;
         }
       }
-      
+
       // Enforce 80-word limit
       const words = cleanedText.trim().split(/\s+/);
       if (words.length > 80) {
         // Truncate to 80 words and add ellipsis if needed
         return words.slice(0, 80).join(' ') + '...';
       }
-      
+
       return cleanedText.trim();
     };
 
@@ -417,12 +423,27 @@ Now provide your response in plain text without any formatting:`;
     const result = await model.generateContent(systemPrompt);
     const response = await result.response;
     const text = response.text();
-    
+
     // Process and validate the response
     const processedText = processResponse(text, message);
-    
+
+    // Persist to Supabase AI Logs
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('ai_logs').insert([
+        {
+          input_data: { message },
+          output_data: { response: processedText, model: modelName },
+          status: 'success',
+          user_id: user?.id,
+        }
+      ]);
+    } catch (logError) {
+      console.error('Failed to log AI run:', logError);
+    }
+
     console.log(`✅ Using model: ${modelName}`);
-    
+
     res.json({
       success: true,
       response: processedText,

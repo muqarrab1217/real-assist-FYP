@@ -169,6 +169,11 @@ The floating AI assistant provides:
 npm run build
 ```
 
+### run command for classifier
+```bash
+cd "D:\FYP"; $env:STREAMLIT_BROWSER_GATHER_USAGE_STATS="false"; $env:STREAMLIT_SERVER_HEADLESS="true"; python -m streamlit run streamlit_app.py --server.port 8501
+```
+
 ### Deploy to Vercel/Netlify
 The project is configured for easy deployment to modern hosting platforms:
 

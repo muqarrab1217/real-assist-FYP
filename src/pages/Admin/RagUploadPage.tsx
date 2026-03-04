@@ -162,7 +162,7 @@ export const RagUploadPage: React.FC = () => {
         type: failCount > 0 ? 'error' : 'success',
         message: failCount > 0
           ? `Uploaded ${successCount} file(s) successfully. ${failCount} file(s) failed.`
-          : `Successfully uploaded ${successCount} file(s)! Corpus ID: ${data.corpusId}`,
+          : `Successfully uploaded ${successCount} file(s)! Storage ID: ${data.corpusId}`,
       });
       
       // Clear successfully uploaded files after a delay
@@ -213,7 +213,7 @@ export const RagUploadPage: React.FC = () => {
           color: 'transparent',
         }}>RAG Document Upload</h1>
         <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
-          Upload real estate documents (PDF, DOCX, TXT) to the Gemini RAG corpus. 
+          Upload real estate documents (PDF, DOCX, TXT) to the Rag Chatbot. 
           These documents will be used by the chatbot to answer questions.
         </p>
       </motion.div>
@@ -268,7 +268,7 @@ export const RagUploadPage: React.FC = () => {
               >
                 <div className="text-center">
                   <DocumentTextIcon className="mx-auto h-12 w-12" style={{ color: 'rgba(212,175,55,0.6)' }} />
-                  <div className="mt-4 flex text-sm leading-6" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
+                  <div className="mt-4 flex justify-center text-sm leading-6" style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
                     <label
                       htmlFor="file-upload"
                       className="relative cursor-pointer rounded-md font-semibold focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 hover:opacity-80 transition-opacity"
@@ -419,7 +419,7 @@ export const RagUploadPage: React.FC = () => {
                 ) : (
                   <>
                     <CloudArrowUpIcon className="h-5 w-5 mr-2" />
-                    Upload {selectedFiles.length > 0 ? `${selectedFiles.length} file(s)` : 'to Corpus'}
+                    Upload {selectedFiles.length > 0 ? `${selectedFiles.length} file(s)` : 'to Storage'}
                   </>
                 )}
               </Button>
@@ -455,7 +455,7 @@ export const RagUploadPage: React.FC = () => {
               <li className="flex items-start">
                 <span className="mr-3 font-semibold" style={{ color: '#d4af37' }}>•</span>
                 <span style={{ color: 'rgba(156, 163, 175, 0.9)' }}>
-                  Files are processed and added to the Gemini RAG corpus
+                  Files are processed and added to the Rag Chatbot
                 </span>
               </li>
               <li className="flex items-start">

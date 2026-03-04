@@ -5,11 +5,16 @@ import { EyeIcon, EyeSlashIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { authAPI } from '@/services/api';
+import { useAuthContext } from '@/contexts/AuthContext';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuthContext();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -18,20 +23,47 @@ export const RegisterPage: React.FC = () => {
     password: '',
     confirmPassword: '',
     agreeToTerms: false,
+    role: 'client' as 'client' | 'admin',
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
     if (formData.password !== formData.confirmPassword) {
-      alert('Passwords do not match');
+      setError('Passwords do not match');
       return;
     }
     if (!formData.agreeToTerms) {
-      alert('Please agree to the terms and conditions');
+      setError('Please agree to the terms and conditions');
       return;
     }
-    // Mock registration
-    navigate('/client/dashboard');
+
+    setIsLoading(true);
+
+    const registerPromise = authAPI.register({
+      email: formData.email,
+      password: formData.password,
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      role: formData.role,
+    });
+
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Registration timed out. This may be due to a slow connection. Please try again or refresh the page.')), 30000)
+    );
+
+    try {
+      const user = (await Promise.race([registerPromise, timeoutPromise])) as any;
+
+      login(user);
+      navigate(user.role === 'admin' ? '/admin/dashboard' : '/client/dashboard');
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Registration failed. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,7 +99,7 @@ export const RegisterPage: React.FC = () => {
           <div className="flex justify-center">
             <img src="/images/logo.png" alt="ABS Developers" className="h-16 w-auto" />
           </div>
-          <CardTitle className="text-2xl font-bold" style={{ 
+          <CardTitle className="text-2xl font-bold" style={{
             fontFamily: 'Playfair Display, serif',
             backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
             WebkitBackgroundClip: 'text',
@@ -176,7 +208,7 @@ export const RegisterPage: React.FC = () => {
                   )}
                 </button>
               </div>
-              
+
               {formData.password && (
                 <div className="mt-2 space-y-1">
                   {passwordRequirements.map((req, index) => (
@@ -253,8 +285,15 @@ export const RegisterPage: React.FC = () => {
               </label>
             </div>
 
+            {error && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm text-center">
+                {error}
+              </div>
+            )}
+
             <Button
               type="submit"
+              disabled={isLoading}
               className="w-full text-black font-semibold"
               style={{
                 backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
@@ -262,7 +301,7 @@ export const RegisterPage: React.FC = () => {
                 padding: '14px',
               }}
             >
-              Create Account
+              {isLoading ? 'Creating Account...' : 'Create Account'}
             </Button>
           </form>
 
@@ -272,7 +311,7 @@ export const RegisterPage: React.FC = () => {
                 <div className="w-full" style={{ borderTop: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2" style={{ 
+                <span className="px-2" style={{
                   background: 'rgba(26,26,26,0.75)',
                   color: 'rgba(156, 163, 175, 0.9)'
                 }}>Or continue with</span>
@@ -311,7 +350,7 @@ export const RegisterPage: React.FC = () => {
                 color: 'white',
               }}>
                 <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
                 </svg>
                 Facebook
               </Button>
