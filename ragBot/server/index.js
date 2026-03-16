@@ -1,11 +1,14 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs').promises;
-const { GoogleGenerativeAI } = require('@google/generative-ai');
-const { createClient } = require('@supabase/supabase-js');
+import "dotenv/config";
+import express from "express";
+import cors from "cors";
+import multer from "multer";
+import path from "path";
+import fs from "fs/promises";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { createClient } from "@supabase/supabase-js";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -17,21 +20,27 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: '500mb' }));
-app.use(express.urlencoded({ limit: '500mb', extended: true }));
+app.use(express.json({ limit: "500mb" }));
+app.use(express.urlencoded({ limit: "500mb", extended: true }));
+
+// Request Logger
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  next();
+});
 
 // Configure multer for file uploads
 const upload = multer({
-  dest: 'ragBot/uploads/',
+  dest: "ragBot/uploads/",
   limits: {
     fileSize: 500 * 1024 * 1024, // 500MB limit per file
   },
   fileFilter: (req, file, cb) => {
-    const allowedTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+    const allowedTypes = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"];
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only PDF, DOCX, and TXT files are allowed'));
+      cb(new Error("Only PDF, DOCX, and TXT files are allowed"));
     }
   },
 });
@@ -39,9 +48,9 @@ const upload = multer({
 // Ensure uploads directory exists
 const ensureUploadsDir = async () => {
   try {
-    await fs.mkdir('ragBot/uploads', { recursive: true });
+    await fs.mkdir("ragBot/uploads", { recursive: true });
   } catch (error) {
-    console.error('Error creating uploads directory:', error);
+    console.error("Error creating uploads directory:", error);
   }
 };
 
@@ -49,7 +58,7 @@ const ensureUploadsDir = async () => {
 const initializeGemini = () => {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
-    throw new Error('GEMINI_API_KEY environment variable is required');
+    throw new Error("GEMINI_API_KEY environment variable is required");
   }
   return new GoogleGenerativeAI(apiKey);
 };
@@ -58,25 +67,25 @@ let genAI;
 try {
   genAI = initializeGemini();
 } catch (error) {
-  console.error('Error initializing Gemini:', error.message);
+  console.error("Error initializing Gemini:", error.message);
 }
 
 // Config file path for corpus ID
-const CONFIG_FILE = 'ragBot/config/corpus-config.json';
+const CONFIG_FILE = "ragBot/config/corpus-config.json";
 
 // Ensure config directory exists and load config
 const loadConfig = async () => {
   try {
-    await fs.mkdir('ragBot/config', { recursive: true });
+    await fs.mkdir("ragBot/config", { recursive: true });
     try {
-      const data = await fs.readFile(CONFIG_FILE, 'utf8');
+      const data = await fs.readFile(CONFIG_FILE, "utf8");
       return JSON.parse(data);
     } catch {
       // Config doesn't exist yet, return default
       return { corpusId: null, corpusName: null };
     }
   } catch (error) {
-    console.error('Error loading config:', error);
+    console.error("Error loading config:", error);
     return { corpusId: null, corpusName: null };
   }
 };
@@ -85,7 +94,7 @@ const saveConfig = async (config) => {
   try {
     await fs.writeFile(CONFIG_FILE, JSON.stringify(config, null, 2));
   } catch (error) {
-    console.error('Error saving config:', error);
+    console.error("Error saving config:", error);
     throw error;
   }
 };
@@ -118,30 +127,30 @@ const getOrCreateCorpus = async () => {
     console.log(`Corpus created: ${corpusName}`);
     return corpusName;
   } catch (error) {
-    console.error('Error creating corpus:', error);
+    console.error("Error creating corpus:", error);
     throw error;
   }
 };
 
 // Upload endpoint - supports both single and multiple files
-app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
+app.post("/api/gemini/upload", upload.array("files", 50), async (req, res) => {
   try {
     const files = req.files || (req.file ? [req.file] : []);
 
     if (!files || files.length === 0) {
-      return res.status(400).json({ error: 'No files uploaded' });
+      return res.status(400).json({ error: "No files uploaded" });
     }
 
     if (!genAI) {
-      return res.status(500).json({ error: 'Gemini API not initialized. Check GEMINI_API_KEY.' });
+      return res.status(500).json({ error: "Gemini API not initialized. Check GEMINI_API_KEY." });
     }
 
     const corpusId = await getOrCreateCorpus();
-    const fileRegistryPath = 'ragBot/config/files-registry.json';
+    const fileRegistryPath = "ragBot/config/files-registry.json";
     let fileRegistry = [];
 
     try {
-      const registryData = await fs.readFile(fileRegistryPath, 'utf8');
+      const registryData = await fs.readFile(fileRegistryPath, "utf8");
       fileRegistry = JSON.parse(registryData);
     } catch {
       // Registry doesn't exist yet
@@ -159,7 +168,7 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
 
         // Store file metadata (DO NOT store base64 - files are too large for JSON)
         // Files are stored on disk and can be read when needed for Gemini API
-        const fileId = Date.now().toString() + '-' + Math.random().toString(36).substr(2, 9);
+        const fileId = Date.now().toString() + "-" + Math.random().toString(36).substr(2, 9);
 
         // Create file entry without base64 to avoid JSON string length limits
         const fileEntry = {
@@ -190,7 +199,7 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
         // Clean up uploaded file on error
         try {
           await fs.unlink(file.path);
-        } catch { }
+        } catch {}
       }
     }
 
@@ -198,8 +207,8 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
     try {
       await fs.writeFile(fileRegistryPath, JSON.stringify(fileRegistry, null, 2));
     } catch (error) {
-      if (error.message.includes('Invalid string length') || error.message.includes('string too long')) {
-        console.error('Registry too large to save. Consider splitting into multiple registries.');
+      if (error.message.includes("Invalid string length") || error.message.includes("string too long")) {
+        console.error("Registry too large to save. Consider splitting into multiple registries.");
         // For now, save without pretty printing to reduce size
         await fs.writeFile(fileRegistryPath, JSON.stringify(fileRegistry));
       } else {
@@ -209,16 +218,14 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
 
     if (uploadedFiles.length === 0) {
       return res.status(500).json({
-        error: 'Failed to upload any files',
-        errors: errors
+        error: "Failed to upload any files",
+        errors: errors,
       });
     }
 
     res.json({
       success: true,
-      message: uploadedFiles.length === 1
-        ? 'File uploaded successfully'
-        : `${uploadedFiles.length} files uploaded successfully`,
+      message: uploadedFiles.length === 1 ? "File uploaded successfully" : `${uploadedFiles.length} files uploaded successfully`,
       corpusId: corpusId,
       files: uploadedFiles,
       errors: errors.length > 0 ? errors : undefined,
@@ -227,45 +234,45 @@ app.post('/api/gemini/upload', upload.array('files', 50), async (req, res) => {
       failed: errors.length,
     });
   } catch (error) {
-    console.error('Upload error:', error);
+    console.error("Upload error:", error);
     res.status(500).json({ error: error.message });
   }
 });
 
 // Query endpoint
-app.post('/api/gemini/query', async (req, res) => {
+app.post("/api/gemini/query", async (req, res) => {
   try {
     const { message } = req.body;
 
-    if (!message || typeof message !== 'string') {
-      return res.status(400).json({ error: 'Message is required' });
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "Message is required" });
     }
 
     if (!genAI) {
-      return res.status(500).json({ error: 'Gemini API not initialized. Check GEMINI_API_KEY.' });
+      return res.status(500).json({ error: "Gemini API not initialized. Check GEMINI_API_KEY." });
     }
 
     const config = await loadConfig();
     if (!config.corpusId) {
       return res.status(400).json({
-        error: 'No corpus found. Please upload documents first using /api/gemini/upload'
+        error: "No corpus found. Please upload documents first using /api/gemini/upload",
       });
     }
 
     // Load file registry to get document context
-    const fileRegistryPath = 'ragBot/config/files-registry.json';
+    const fileRegistryPath = "ragBot/config/files-registry.json";
     let fileRegistry = [];
 
     try {
-      const registryData = await fs.readFile(fileRegistryPath, 'utf8');
+      const registryData = await fs.readFile(fileRegistryPath, "utf8");
       fileRegistry = JSON.parse(registryData);
     } catch (error) {
-      console.error('Error loading file registry:', error);
+      console.error("Error loading file registry:", error);
       // Continue without file registry - model will answer from general knowledge
     }
 
     // Build context from uploaded files (for reference in prompt)
-    let fileContext = '';
+    let fileContext = "";
     if (fileRegistry.length > 0) {
       fileContext = `\n\nAvailable documents in corpus "${config.corpusId}":\n`;
       fileRegistry.forEach((file, index) => {
@@ -275,7 +282,7 @@ app.post('/api/gemini/query', async (req, res) => {
     }
 
     // Use Gemini 2.0 Flash - fastest and most efficient model
-    const modelName = 'gemini-2.0-flash';
+    const modelName = "gemini-2.0-flash";
 
     // Create a comprehensive prompt with context
     const systemPrompt = `You are a professional real estate customer service representative for ABS Developers. You assist customers with queries about ABS Developers' properties, projects, pricing, features, payment plans, and real estate offerings. You are a helpful human assistant, not an AI.
@@ -302,41 +309,31 @@ Now provide your response in plain text without any formatting:`;
       let cleaned = text;
 
       // Remove markdown bold (**text** or *text*)
-      cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, '$1');
-      cleaned = cleaned.replace(/\*([^*]+)\*/g, '$1');
+      cleaned = cleaned.replace(/\*\*([^*]+)\*\*/g, "$1");
+      cleaned = cleaned.replace(/\*([^*]+)\*/g, "$1");
 
       // Remove bullet points with asterisks (* item or - item)
-      cleaned = cleaned.replace(/^\s*[\*\-\+]\s+/gm, '');
+      cleaned = cleaned.replace(/^\s*[\*\-\+]\s+/gm, "");
 
       // Remove quotes (both single and double)
-      cleaned = cleaned.replace(/[""]/g, '');
-      cleaned = cleaned.replace(/['']/g, '');
+      cleaned = cleaned.replace(/[""]/g, "");
+      cleaned = cleaned.replace(/['']/g, "");
 
       // Remove markdown headers (# Header)
-      cleaned = cleaned.replace(/^#+\s+/gm, '');
+      cleaned = cleaned.replace(/^#+\s+/gm, "");
 
       // Remove markdown links [text](url)
-      cleaned = cleaned.replace(/\[([^\]]+)\]\([^\)]+\)/g, '$1');
+      cleaned = cleaned.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1");
 
       // Remove extra whitespace and newlines
-      cleaned = cleaned.replace(/\n\s*\n/g, ' ');
-      cleaned = cleaned.replace(/\s+/g, ' ');
+      cleaned = cleaned.replace(/\n\s*\n/g, " ");
+      cleaned = cleaned.replace(/\s+/g, " ");
 
       // Remove AI-related phrases
-      const aiPhrases = [
-        /i am an ai/gi,
-        /i'm an ai/gi,
-        /as an ai/gi,
-        /i am a chatbot/gi,
-        /i'm a chatbot/gi,
-        /as a chatbot/gi,
-        /i don't have access to/gi,
-        /i cannot tell you/gi,
-        /i cannot provide/gi
-      ];
+      const aiPhrases = [/i am an ai/gi, /i'm an ai/gi, /as an ai/gi, /i am a chatbot/gi, /i'm a chatbot/gi, /as a chatbot/gi, /i don't have access to/gi, /i cannot tell you/gi, /i cannot provide/gi];
 
-      aiPhrases.forEach(phrase => {
-        cleaned = cleaned.replace(phrase, '');
+      aiPhrases.forEach((phrase) => {
+        cleaned = cleaned.replace(phrase, "");
       });
 
       return cleaned.trim();
@@ -359,15 +356,10 @@ Now provide your response in plain text without any formatting:`;
       const lowerCleanedText = cleanedText.toLowerCase();
 
       // Off-topic indicators in user's question (including date/time questions)
-      const offTopicQuestionKeywords = [
-        'poem', 'joke', 'story', 'recipe', 'weather', 'sports', 'movie', 'music', 'game',
-        'funny', 'tell me a poem', 'write a poem', 'tell me a joke', 'tell me a story',
-        'what is the date', 'what date', 'what time', 'current date', 'today date',
-        'what day', 'current time', 'what is today', 'date today', 'time now'
-      ];
+      const offTopicQuestionKeywords = ["poem", "joke", "story", "recipe", "weather", "sports", "movie", "music", "game", "funny", "tell me a poem", "write a poem", "tell me a joke", "tell me a story", "what is the date", "what date", "what time", "current date", "today date", "what day", "current time", "what is today", "date today", "time now"];
 
       // Check if question is off-topic
-      const isQuestionOffTopic = offTopicQuestionKeywords.some(keyword => lowerUserMessage.includes(keyword));
+      const isQuestionOffTopic = offTopicQuestionKeywords.some((keyword) => lowerUserMessage.includes(keyword));
 
       // If question is clearly off-topic, redirect
       if (isQuestionOffTopic) {
@@ -377,7 +369,7 @@ Now provide your response in plain text without any formatting:`;
       // Check if response mentions AI behavior (using word boundaries to avoid false positives)
       // Check for whole words/phrases, not substrings
       const aiPhrases = [
-        /\bai\b/i,  // "ai" as a whole word
+        /\bai\b/i, // "ai" as a whole word
         /\bartificial intelligence\b/i,
         /\bchatbot\b/i,
         /\bi am an ai\b/i,
@@ -386,21 +378,14 @@ Now provide your response in plain text without any formatting:`;
         /\bi don't have access\b/i,
         /\bi cannot tell you\b/i,
         /\bi cannot provide\b/i,
-        /\bi don't have\b/i
+        /\bi don't have\b/i,
       ];
 
-      const containsAIPhrase = aiPhrases.some(phrase => phrase.test(cleanedText));
+      const containsAIPhrase = aiPhrases.some((phrase) => phrase.test(cleanedText));
 
       // Only redirect if response actually mentions AI behavior AND doesn't mention real estate
       if (containsAIPhrase) {
-        const mentionsRealEstate = /\babs\b/i.test(cleanedText) ||
-          /\bdeveloper\b/i.test(cleanedText) ||
-          /\bproperty\b/i.test(cleanedText) ||
-          /\breal estate\b/i.test(cleanedText) ||
-          /\bproject\b/i.test(cleanedText) ||
-          /\bapartment\b/i.test(cleanedText) ||
-          /\bflat\b/i.test(cleanedText) ||
-          /\bpayment\b/i.test(cleanedText);
+        const mentionsRealEstate = /\babs\b/i.test(cleanedText) || /\bdeveloper\b/i.test(cleanedText) || /\bproperty\b/i.test(cleanedText) || /\breal estate\b/i.test(cleanedText) || /\bproject\b/i.test(cleanedText) || /\bapartment\b/i.test(cleanedText) || /\bflat\b/i.test(cleanedText) || /\bpayment\b/i.test(cleanedText);
 
         // Only redirect if it mentions AI but NOT real estate
         if (!mentionsRealEstate) {
@@ -412,7 +397,7 @@ Now provide your response in plain text without any formatting:`;
       const words = cleanedText.trim().split(/\s+/);
       if (words.length > 80) {
         // Truncate to 80 words and add ellipsis if needed
-        return words.slice(0, 80).join(' ') + '...';
+        return words.slice(0, 80).join(" ") + "...";
       }
 
       return cleanedText.trim();
@@ -429,17 +414,19 @@ Now provide your response in plain text without any formatting:`;
 
     // Persist to Supabase AI Logs
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      await supabase.from('ai_logs').insert([
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      await supabase.from("ai_logs").insert([
         {
           input_data: { message },
           output_data: { response: processedText, model: modelName },
-          status: 'success',
+          status: "success",
           user_id: user?.id,
-        }
+        },
       ]);
     } catch (logError) {
-      console.error('Failed to log AI run:', logError);
+      console.error("Failed to log AI run:", logError);
     }
 
     console.log(`✅ Using model: ${modelName}`);
@@ -449,14 +436,48 @@ Now provide your response in plain text without any formatting:`;
       response: processedText,
     });
   } catch (error) {
-    console.error('Query error:', error);
-    res.status(500).json({ error: 'Error processing query: ' + error.message });
+    console.error("Query error:", error);
+    res.status(500).json({ error: "Error processing query: " + error.message });
+  }
+});
+
+// Stripe Payment Intent endpoint
+app.post("/api/payments/create-intent", async (req, res) => {
+  try {
+    const { amount, paymentId, customerEmail } = req.body;
+
+    if (!amount || !paymentId) {
+      return res.status(400).json({ error: "Amount and Payment ID are required" });
+    }
+
+    // Create a PaymentIntent with the order amount and currency
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(amount * 100), // Stripe expects amounts in cents
+      currency: "pkr",
+      metadata: {
+        paymentId,
+        customerEmail,
+      },
+      automatic_payment_methods: {
+        enabled: true,
+      },
+    });
+
+    res.json({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error("Stripe error for /api/payments/create-intent:", error);
+    res.status(500).json({
+      error: "Stripe Payment Error",
+      details: error.message,
+    });
   }
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', service: 'ragBot-api' });
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok", service: "ragBot-api" });
 });
 
 // Initialize directories on startup
@@ -465,8 +486,6 @@ ensureUploadsDir();
 // Start server
 app.listen(PORT, () => {
   console.log(`ragBot API server running on port ${PORT}`);
-  console.log(`Make sure to set GEMINI_API_KEY environment variable`);
 });
 
-module.exports = app;
-
+export default app;
