@@ -6,6 +6,7 @@ const path = require('path');
 const fs = require('fs').promises;
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { createClient } = require('@supabase/supabase-js');
+const http = require('http');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -274,8 +275,8 @@ app.post('/api/gemini/query', async (req, res) => {
       fileContext += `\nAnswer questions based on information from these uploaded real estate documents. If specific information is in the documents, cite it accurately.`;
     }
 
-    // Use Gemini 2.0 Flash - fastest and most efficient model
-    const modelName = 'gemini-2.0-flash';
+    // Use Gemini 2.5 Flash as it is fully supported by the newer API version and has great quotas
+    const modelName = 'gemini-2.5-flash';
 
     // Create a comprehensive prompt with context
     const systemPrompt = `You are a professional real estate customer service representative for ABS Developers. You assist customers with queries about ABS Developers' properties, projects, pricing, features, payment plans, and real estate offerings. You are a helpful human assistant, not an AI.
@@ -462,11 +463,175 @@ app.get('/api/health', (req, res) => {
 // Initialize directories on startup
 ensureUploadsDir();
 
+const server = http.createServer(app);
+
+// Simple Audio Upload Endpoint for STT/Groq
+const uploadAudio = multer({ dest: 'ragBot/uploads/' });
+
+app.post('/api/groq/stt', uploadAudio.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file provided' });
+    }
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'GROQ_API_KEY not configured' });
+    }
+    
+    // Convert to native File object for strict Whisper MIME compatibility
+    const audioData = await fs.readFile(req.file.path);
+    const audioFile = new File([audioData], "audio.webm", { type: req.file.mimetype || "audio/webm" });
+    
+    const formData = new FormData();
+    formData.append('file', audioFile);
+    formData.append('model', 'whisper-large-v3-turbo');
+    formData.append('temperature', '0.0'); // helps prevent "Thank you" hallucinations
+    
+    const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: formData
+    });
+    
+    fs.unlink(req.file.path).catch(() => {});
+    
+    if (!response.ok) {
+        const errObj = await response.json();
+        throw new Error((errObj.error && errObj.error.message) ? errObj.error.message : 'Groq API error');
+    }
+    
+    const data = await response.json();
+    return res.json({ text: data.text });
+  } catch (error) {
+    console.error('STT Query error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Start server
-app.listen(PORT, () => {
+const uploadAudioV2 = multer({ dest: 'ragBot/uploads/' });
+
+app.post('/api/gemini/audio-query', uploadAudioV2.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file provided' });
+    }
+    if (!genAI) {
+      return res.status(500).json({ error: 'Gemini API not initialized.' });
+    }
+
+    const audioData = await fs.readFile(req.file.path);
+    const mimeType = req.file.mimetype || 'audio/webm';
+    const base64Audio = audioData.toString('base64');
+    
+    fs.unlink(req.file.path).catch(() => {});
+
+    const config = await loadConfig();
+    const fileRegistryPath = 'ragBot/config/files-registry.json';
+    let fileRegistry = [];
+
+    try {
+      const registryData = await fs.readFile(fileRegistryPath, 'utf8');
+      fileRegistry = JSON.parse(registryData);
+    } catch (error) { }
+
+    let fileContext = '';
+    if (fileRegistry.length > 0) {
+      fileContext = `\n\nAvailable documents in corpus "${config.corpusId || 'unknown'}":\n`;
+      fileRegistry.forEach((file, index) => {
+        fileContext += `${index + 1}. ${file.fileName} (${file.mimeType}, ${(file.size / 1024 / 1024).toFixed(2)}MB)\n`;
+      });
+      fileContext += `\nAnswer questions based on information from these uploaded real estate documents.`;
+    }
+
+    // Restore Gemini 2.5 Flash for ultra-fast text transcripts
+    const modelName = 'gemini-2.5-flash';
+
+    const systemPrompt = `You are a professional real estate customer service representative for ABS Developers. You assist customers with queries about ABS Developers' properties, projects, pricing, features, payment plans, and real estate offerings. You are a helpful human assistant, not an AI.
+
+${fileContext}
+
+You will receive an audio message from the user.
+Detect the language of the user's speech.
+1. If the user speaks in English, provide both display_text and speak_text in English.
+2. If the user speaks in Urdu, providing a friendly and professional response:
+   - "display_text": MUST be in ROMAN URDU (Urdu written in English characters, e.g., "Main theek hoon, aapki kya madad karoon?").
+   - "speak_text": MUST be in LITERAL URDU SCRIPT (e.g., "میں ٹھیک ہوں، میں آپ کی کیا مدد کر سکتا ہوں؟").
+
+Please return a JSON object with EXACTLY these fields:
+{
+  "transcript": "<What the user said, in the language they spoke>",
+  "display_text": "<The text to be displayed in the chat transcript>",
+  "speak_text": "<The text for the voice bot to speak out loud>"
+}
+
+CRITICAL INSTRUCTIONS:
+1. TRILINGUAL CAPABILITY: Handle English, Urdu Script, and Roman Urdu inputs seamlessly.
+2. STRICT SCOPE: Answer questions related to ABS Developers only.
+3. OFF-TOPIC RESPONSE: If unrelated, redirect with a polite Roman Urdu or English message.
+4. WORD LIMIT: Maximum 80 words.
+5. NO MARKDOWN: Plain text only inside JSON strings. No asterisks.
+6. JSON ONLY: Return ONLY the raw JSON object. No markdown wrapping.`;
+
+    const model = genAI.getGenerativeModel({ model: modelName });
+    
+    const parts = [
+      { text: systemPrompt },
+      { inlineData: { data: base64Audio, mimeType } }
+    ];
+
+    const result = await model.generateContent(parts);
+    const response = await result.response;
+    let textOut = response.text();
+    textOut = textOut.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+
+    let jsonRes;
+    try {
+      jsonRes = JSON.parse(textOut);
+    } catch (e) {
+      jsonRes = { 
+        transcript: "Audio processed", 
+        display_text: textOut, 
+        speak_text: textOut 
+      };
+    }
+
+    // Persist to Supabase AI Logs
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('ai_logs').insert([
+        {
+          input_data: { message: jsonRes.transcript },
+          output_data: { 
+            response: jsonRes.display_text, 
+            speak_text: jsonRes.speak_text,
+            model: modelName 
+          },
+          status: 'success',
+          user_id: user?.id,
+        }
+      ]);
+    } catch (logError) { }
+
+    res.json({
+      success: true,
+      transcript: jsonRes.transcript,
+      display_text: jsonRes.display_text,
+      speak_text: jsonRes.speak_text
+    });
+
+  } catch (error) {
+    console.error('Audio query error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+server.listen(PORT, () => {
   console.log(`ragBot API server running on port ${PORT}`);
   console.log(`Make sure to set GEMINI_API_KEY environment variable`);
 });
 
-module.exports = app;
+module.exports = { app, server };
 

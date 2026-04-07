@@ -27,8 +27,23 @@ import { TeamManagementPage } from '@/pages/Admin/TeamManagementPage';
 import { DashboardProjectsPage } from '@/pages/Dashboard/Projects/DashboardProjectsPage';
 import { SubmitResponse } from '@/pages/SubmitResponse';
 import { NotFoundPage } from '@/pages/NotFoundPage';
+import { TestVoicebot } from '@/pages/TestVoicebot';
+import { TestVoicebotV2 } from '@/pages/TestVoicebotV2';
+import { TestVoicebotV2Manual } from '@/pages/TestVoicebotV2Manual';
 
 export const router = createBrowserRouter([
+  {
+    path: '/test-voicebot',
+    element: <TestVoicebot />,
+  },
+  {
+    path: '/test-voicebot-v2',
+    element: <TestVoicebotV2 />,
+  },
+  {
+    path: '/test-voicebot-v2.0',
+    element: <TestVoicebotV2Manual />,
+  },
   {
     path: '/',
     element: <PublicLayout />,
