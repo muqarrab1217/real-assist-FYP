@@ -1,21 +1,22 @@
 import React from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { Chatbot } from '@/components/ui/Chatbot';
 import { useAuthContext } from '@/contexts/AuthContext';
 
 interface DashboardLayoutProps {
-  role: 'client' | 'admin' | 'employee';
+  role: 'client' | 'admin' | 'employee' | 'sales_rep';
   title: string;
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ role }) => {
   const { logout, user } = useAuthContext();
-  const navigate = useNavigate();
 
   const handleLogout = async () => {
+    console.log('[DEBUG] DashboardLayout: Initiating logout redirect');
     await logout();
-    navigate('/auth/login', { replace: true });
+    // Use hard refresh for persistent session cleanup as requested
+    window.location.href = '/auth/login';
   };
 
   return (

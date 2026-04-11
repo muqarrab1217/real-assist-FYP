@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
     BuildingOfficeIcon,
@@ -6,67 +6,120 @@ import {
     SparklesIcon,
     ArrowRightIcon,
     PlusIcon,
-    ArrowPathIcon
+    ArrowPathIcon,
+    CheckBadgeIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { extractedProperties } from '@/data/extractedMockData';
-import { ProjectEnrollmentModal } from '@/components/Projects/ProjectEnrollmentModal';
+import { InventoryBrowserModal } from '@/components/Projects/InventoryBrowserModal';
 import { AddProjectModal } from '@/components/Projects/AddProjectModal';
+import { EditProjectModal } from '@/components/Projects/EditProjectModal';
+import { SubscriptionsModal } from '@/components/Projects/SubscriptionsModal';
 import { Property } from '@/types';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { commonAPI } from '@/services/api';
+import { useProperties } from '@/hooks/queries/useCommonQueries';
+import { useQueryClient } from '@tanstack/react-query';
+import { commonKeys } from '@/hooks/queries/useCommonQueries';
+import { useAllProjectSubscriptions } from '@/hooks/queries/useAdminQueries';
+import { useUserEnrollments, usePendingEnrollments } from '@/hooks/queries/useClientQueries';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { ClockIcon } from '@heroicons/react/24/outline';
 
 export const DashboardProjectsPage: React.FC = () => {
     const { role } = useAuthContext();
+    const queryClient = useQueryClient();
+    const isAdmin = role === 'admin';
+    const isClient = role === 'client';
+
     const [selectedProject, setSelectedProject] = useState<Property | null>(null);
     const [isEnrollModalOpen, setIsEnrollModalOpen] = useState(false);
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [projectToEdit, setProjectToEdit] = useState<Property | null>(null);
+    const [isSubscriptionsModalOpen, setIsSubscriptionsModalOpen] = useState(false);
+    const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+    const [selectedProjectName, setSelectedProjectName] = useState<string>('');
+    const [alreadyEnrolledProject, setAlreadyEnrolledProject] = useState<Property | null>(null);
+    const [pendingProject, setPendingProject] = useState<Property | null>(null);
 
-    const [projects, setProjects] = useState<Property[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { data: userEnrollments = [] } = useUserEnrollments();
+    const { data: pendingEnrollments = [] } = usePendingEnrollments();
+    const enrolledProjectIds = React.useMemo(
+        () => new Set(userEnrollments.map((e: any) => e.projectId ?? e.project_id)),
+        [userEnrollments]
+    );
+    const pendingProjectIds = React.useMemo(
+        () => new Set(
+            pendingEnrollments
+                .filter((e: any) => e.status === 'pending')
+                .map((e: any) => e.projectId ?? e.project_id)
+        ),
+        [pendingEnrollments]
+    );
 
-    const fetchProjects = async () => {
-        setLoading(true);
-        try {
-            const dbProjects = await commonAPI.getProperties();
-            // Combine mock with DB projects for a rich initial view, 
-            // ensuring no duplicates by ID (if mock IDs match DB IDs)
-            const combined = [...dbProjects];
-            const dbIds = new Set(dbProjects.map(p => p.id));
+    const { data: dbProjects, isLoading: loadingProjects, refetch: fetchProjects } = useProperties();
 
-            extractedProperties.forEach(p => {
-                if (!dbIds.has(p.id)) {
-                    combined.push(p);
-                }
-            });
+    const projects = React.useMemo(() => {
+        if (!dbProjects) return extractedProperties;
+        
+        const combined = [...dbProjects];
+        const dbIds = new Set(dbProjects.map(p => p.id));
 
-            setProjects(combined);
-        } catch (error) {
-            console.error('Failed to fetch projects:', error);
-            setProjects(extractedProperties);
-        } finally {
+        extractedProperties.forEach(p => {
+            if (!dbIds.has(p.id)) {
+                combined.push(p);
+            }
+        });
+        return combined;
+    }, [dbProjects]);
 
-            setLoading(false);
+    const loading = loadingProjects;
+
+    const projectIds = projects.map(p => p.id);
+    const subscriptionResults = useAllProjectSubscriptions(isAdmin ? projectIds : []);
+    
+    // Convert array of queries back into a Map
+    const subscriptionCounts = React.useMemo(() => {
+        const counts = new Map<string, number>();
+        projects.forEach((project, index) => {
+            counts.set(project.id, subscriptionResults[index]?.data?.count || 0);
+        });
+        return counts;
+    }, [projects, subscriptionResults]);
+
+    const handleEnroll = (project: Property) => {
+        if (enrolledProjectIds.has(project.id)) {
+            setAlreadyEnrolledProject(project);
+        } else if (pendingProjectIds.has(project.id)) {
+            setPendingProject(project);
+        } else {
+            setSelectedProject(project);
+            setIsEnrollModalOpen(true);
         }
     };
 
-    useEffect(() => {
-        fetchProjects();
-    }, []);
-
-    const handleEnroll = (project: Property) => {
-        setSelectedProject(project);
-        setIsEnrollModalOpen(true);
+    const handleAddProjectSuccess = (_newProject: Property) => {
+        queryClient.invalidateQueries({ queryKey: commonKeys.properties() });
     };
 
-    const handleAddProjectSuccess = (newProject: Property) => {
-        setProjects(prev => [newProject, ...prev]);
+    const handleEditProject = (project: Property) => {
+        setProjectToEdit(project);
+        setIsEditModalOpen(true);
     };
 
-    const isAdmin = role === 'admin';
-    const isClient = role === 'client';
+    const handleEditProjectSuccess = (_updatedProject: Property) => {
+        queryClient.invalidateQueries({ queryKey: commonKeys.properties() });
+        setIsEditModalOpen(false);
+        setProjectToEdit(null);
+    };
+
+    const handleSubscriptions = (project: Property) => {
+        setSelectedProjectId(project.id);
+        setSelectedProjectName(project.name);
+        setIsSubscriptionsModalOpen(true);
+    };
 
     return (
         <div className="space-y-12 pb-20">
@@ -117,7 +170,7 @@ export const DashboardProjectsPage: React.FC = () => {
                 <div className="flex items-center gap-4 mb-2">
                     <h2 className="text-2xl font-serif italic text-gold-400">"Building Legacies, Delivering Excellence"</h2>
                     <button
-                        onClick={fetchProjects}
+                        onClick={() => fetchProjects()}
                         disabled={loading}
                         className="text-gold-500/50 hover:text-gold-500 transition-colors"
                     >
@@ -145,12 +198,25 @@ export const DashboardProjectsPage: React.FC = () => {
                         >
                             <Card className="group relative overflow-hidden rounded-3xl bg-[#0f0f0f] border-gold-500/20 hover:border-gold-500/40 transition-all duration-500 h-full flex flex-col border border-gold-500/20">
                                 {/* Project Image */}
-                                <div className="relative h-64 overflow-hidden">
-                                    <img
-                                        src={project.images?.[0] || '/images/placeholder.png'}
-                                        alt={project.name}
-                                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                    />
+                                <div className="relative h-64 overflow-hidden bg-gradient-to-br from-[#1a1a1a] to-[#0f0f0f]">
+                                    {project.images && project.images.length > 0 ? (
+                                        <img
+                                            src={project.images[0]}
+                                            alt={project.name}
+                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                                            onError={(e) => {
+                                                // If image fails to load, show placeholder
+                                                (e.target as HTMLImageElement).style.display = 'none';
+                                            }}
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center">
+                                            <div className="text-center">
+                                                <BuildingOfficeIcon className="h-16 w-16 mx-auto mb-2 text-gold-500/40" />
+                                                <p className="text-xs text-gold-500/40">No image available</p>
+                                            </div>
+                                        </div>
+                                    )}
                                     <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f0f] to-transparent opacity-60"></div>
                                     <div className="absolute top-4 right-4">
                                         <Badge className="bg-gold-500 text-black font-bold uppercase tracking-wider text-[10px] px-3">
@@ -198,15 +264,22 @@ export const DashboardProjectsPage: React.FC = () => {
                                     {isAdmin && (
                                         <div className="flex gap-2">
                                             <Button
+                                                onClick={() => handleEditProject(project)}
                                                 variant="outline"
                                                 className="flex-1 border-gold-500/30 text-gold-500 hover:bg-gold-500/10"
                                             >
                                                 Edit Details
                                             </Button>
                                             <Button
-                                                className="flex-1 bg-gold-500/10 text-gold-500 hover:bg-gold-500/20"
+                                                onClick={() => handleSubscriptions(project)}
+                                                className="flex-1 bg-gold-500 text-black hover:bg-gold-400 font-bold relative"
                                             >
                                                 Subscriptions
+                                                {subscriptionCounts.has(project.id) && (
+                                                    <span className="absolute top-1 right-1 inline-flex items-center justify-center h-5 w-5 rounded-full bg-black text-gold-500 text-xs font-bold">
+                                                        {subscriptionCounts.get(project.id)}
+                                                    </span>
+                                                )}
                                             </Button>
                                         </div>
                                     )}
@@ -217,8 +290,62 @@ export const DashboardProjectsPage: React.FC = () => {
                 </div>
             )}
 
-            {/* Enrollment Modal */}
-            <ProjectEnrollmentModal
+            {/* Already Enrolled Dialog */}
+            <Dialog open={!!alreadyEnrolledProject} onOpenChange={() => setAlreadyEnrolledProject(null)}>
+                <DialogContent className="bg-[#0f0f0f] border border-gold-500/30 rounded-2xl max-w-md text-center">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
+                            Already Enrolled
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4 space-y-4">
+                        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-gold-500/10 mx-auto">
+                            <CheckBadgeIcon className="h-8 w-8 text-gold-400" />
+                        </div>
+                        <p className="text-gray-300 leading-relaxed">
+                            You are already enrolled in{' '}
+                            <span className="text-gold-400 font-semibold">{alreadyEnrolledProject?.name}</span>.
+                            Head to <span className="text-gold-400 font-semibold">Project Updates</span> to track your investment progress.
+                        </p>
+                    </div>
+                    <Button
+                        onClick={() => setAlreadyEnrolledProject(null)}
+                        className="w-full bg-gold-500 text-black hover:bg-gold-400 font-bold rounded-xl"
+                    >
+                        Got it
+                    </Button>
+                </DialogContent>
+            </Dialog>
+
+            {/* Pending Approval Dialog */}
+            <Dialog open={!!pendingProject} onOpenChange={() => setPendingProject(null)}>
+                <DialogContent className="bg-[#0f0f0f] border border-gold-500/30 rounded-2xl max-w-md text-center">
+                    <DialogHeader>
+                        <DialogTitle className="text-xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
+                            Request Pending
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="py-4 space-y-4">
+                        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-yellow-500/10 mx-auto">
+                            <ClockIcon className="h-8 w-8 text-yellow-400" />
+                        </div>
+                        <p className="text-gray-300 leading-relaxed">
+                            Your enrollment request for{' '}
+                            <span className="text-gold-400 font-semibold">{pendingProject?.name}</span>{' '}
+                            has been sent to the admin and is awaiting approval. You will be notified once it is reviewed.
+                        </p>
+                    </div>
+                    <Button
+                        onClick={() => setPendingProject(null)}
+                        className="w-full bg-gold-500 text-black hover:bg-gold-400 font-bold rounded-xl"
+                    >
+                        Got it
+                    </Button>
+                </DialogContent>
+            </Dialog>
+
+            {/* Inventory Browser + Enrollment Modal */}
+            <InventoryBrowserModal
                 isOpen={isEnrollModalOpen}
                 onClose={() => setIsEnrollModalOpen(false)}
                 project={selectedProject}
@@ -229,6 +356,28 @@ export const DashboardProjectsPage: React.FC = () => {
                 isOpen={isAddModalOpen}
                 onClose={() => setIsAddModalOpen(false)}
                 onSuccess={handleAddProjectSuccess}
+            />
+
+            {/* Edit Project Modal */}
+            <EditProjectModal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setProjectToEdit(null);
+                }}
+                project={projectToEdit}
+                onSuccess={handleEditProjectSuccess}
+            />
+
+            {/* Subscriptions Modal */}
+            <SubscriptionsModal
+                isOpen={isSubscriptionsModalOpen}
+                onClose={() => {
+                    setIsSubscriptionsModalOpen(false);
+                    setSelectedProjectId(null);
+                }}
+                projectId={selectedProjectId || ''}
+                projectName={selectedProjectName}
             />
         </div>
     );

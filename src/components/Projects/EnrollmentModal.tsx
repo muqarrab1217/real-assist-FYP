@@ -10,7 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { leadAPI } from '@/services/api';
+import { useCreateLead } from '@/hooks/queries/useCommonQueries';
 
 interface EnrollmentModalProps {
     isOpen: boolean;
@@ -20,7 +20,6 @@ interface EnrollmentModalProps {
 
 export const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ isOpen, onClose, project }) => {
     const { user } = useAuthContext();
-    const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
@@ -28,6 +27,9 @@ export const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ isOpen, onClos
         phone: '',
         notes: ''
     });
+
+    const createLeadMutation = useCreateLead();
+    const loading = createLeadMutation.isPending;
 
     useEffect(() => {
         if (user) {
@@ -42,9 +44,8 @@ export const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ isOpen, onClos
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
         try {
-            await leadAPI.createLead({
+            await createLeadMutation.mutateAsync({
                 name: formData.name,
                 email: formData.email,
                 phone: formData.phone,
@@ -60,8 +61,6 @@ export const EnrollmentModal: React.FC<EnrollmentModalProps> = ({ isOpen, onClos
         } catch (error) {
             console.error('Failed to enroll:', error);
             alert('Failed to submit enrollment. Please try again.');
-        } finally {
-            setLoading(false);
         }
     };
 

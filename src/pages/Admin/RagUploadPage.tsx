@@ -111,7 +111,7 @@ export const RagUploadPage: React.FC = () => {
         formData.append('files', file);
       });
 
-      const url = API_BASE_URL ? `${API_BASE_URL}/api/gemini/upload` : '/api/gemini/upload';
+      const url = API_BASE_URL ? `${API_BASE_URL}/api/chatbot/upload` : '/api/chatbot/upload';
       
       // Note: For progress tracking, you'd typically use XMLHttpRequest
       // For now, we'll use fetch and update status after completion

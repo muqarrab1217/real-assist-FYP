@@ -1,154 +1,136 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     UsersIcon,
     PlusIcon,
-    MagnifyingGlassIcon,
     UserPlusIcon,
     TrashIcon,
     ChevronRightIcon,
-    XMarkIcon
+    PencilSquareIcon,
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
-import { adminAPI, authAPI } from '@/services/api';
-import { Team, TeamMember, User } from '@/types';
+import { useAdminTeams, useAdminTeamMembers, useCreateTeam, useUpdateTeam, useDeleteTeam, useRemoveMemberFromTeam } from '@/hooks/queries/useAdminQueries';
+import { useQueryClient } from '@tanstack/react-query';
+import { Team } from '@/types';
 import { formatDate } from '@/lib/utils';
+import { AddMemberModal } from '@/components/Admin/AddMemberModal';
 
 export const TeamManagementPage: React.FC = () => {
-    const [teams, setTeams] = useState<Team[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { data: teams = [], isLoading: loading } = useAdminTeams();
     const [selectedTeam, setSelectedTeam] = useState<Team | null>(null);
-    const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+    const { data: teamMembers = [] } = useAdminTeamMembers(selectedTeam?.id);
+
+    const createTeamMutation = useCreateTeam();
+    const updateTeamMutation = useUpdateTeam();
+    const deleteTeamMutation = useDeleteTeam();
+    const removeMemberMutation = useRemoveMemberFromTeam();
+    const queryClient = useQueryClient();
+
     const [isAddingTeam, setIsAddingTeam] = useState(false);
     const [newTeamName, setNewTeamName] = useState('');
     const [newTeamDesc, setNewTeamDesc] = useState('');
 
-    // Member search/add state
-    const [searchEmail, setSearchEmail] = useState('');
-    const [foundUser, setFoundUser] = useState<User | null>(null);
-    const [isSearching, setIsSearching] = useState(false);
-    const [isRegistering, setIsRegistering] = useState(false);
-    const [registrationData, setRegistrationData] = useState({
-        email: '',
-        firstName: '',
-        lastName: '',
-        password: 'Password123!', // Default password for new members
-    });
+    // Edit team state
+    const [isEditingTeam, setIsEditingTeam] = useState(false);
+    const [editTeamName, setEditTeamName] = useState('');
+    const [editTeamDesc, setEditTeamDesc] = useState('');
 
-    useEffect(() => {
-        fetchTeams();
-    }, []);
+    // Add Member Modal
+    const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
 
-    const fetchTeams = async () => {
-        try {
-            const data = await adminAPI.getTeams();
-            setTeams(data);
-        } catch (error) {
-            console.error('Failed to fetch teams:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchTeamMembers = async (teamId: string) => {
-        try {
-            const data = await adminAPI.getTeamMembers(teamId);
-            setTeamMembers(data);
-        } catch (error) {
-            console.error('Failed to fetch team members:', error);
-        }
-    };
+    // Confirmation modals
+    const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
+    const [confirmRemoveOpen, setConfirmRemoveOpen] = useState(false);
+    const [memberToRemove, setMemberToRemove] = useState<string | null>(null);
 
     const handleCreateTeam = async () => {
         if (!newTeamName.trim()) return;
-        try {
-            await adminAPI.createTeam(newTeamName, newTeamDesc);
-            setNewTeamName('');
-            setNewTeamDesc('');
-            setIsAddingTeam(false);
-            fetchTeams();
-        } catch (error) {
-            console.error('Failed to create team:', error);
-        }
+        createTeamMutation.mutate(
+            { name: newTeamName, description: newTeamDesc },
+            {
+                onSuccess: () => {
+                    setNewTeamName('');
+                    setNewTeamDesc('');
+                    setIsAddingTeam(false);
+                },
+                onError: (error) => console.error('Failed to create team:', error)
+            }
+        );
     };
 
     const handleSelectTeam = (team: Team) => {
         setSelectedTeam(team);
-        fetchTeamMembers(team.id);
     };
 
-    const handleSearchUser = async () => {
-        if (!searchEmail.trim()) return;
-        setIsSearching(true);
-        try {
-            const user = await adminAPI.searchUserByEmail(searchEmail);
-            setFoundUser(user);
-            if (!user) {
-                setRegistrationData(d => ({ ...d, email: searchEmail }));
-                setIsRegistering(true);
-            }
-        } catch (error) {
-            console.error('Search failed:', error);
-        } finally {
-            setIsSearching(false);
-        }
-    };
-
-    const handleAddExistingMember = async () => {
-        if (!selectedTeam || !foundUser) return;
-        try {
-            await adminAPI.addMemberToTeam(selectedTeam.id, foundUser.id);
-            fetchTeamMembers(selectedTeam.id);
-            setFoundUser(null);
-            setSearchEmail('');
-        } catch (error: any) {
-            console.error('Failed to add member:', error);
-            if (error.code === '23505') {
-                alert('This user is already a member of this team.');
-            } else {
-                alert(error.message || 'Failed to add member');
-            }
-        }
-    };
-
-    const handleRegisterAndAdd = async () => {
-        if (!selectedTeam || !registrationData.email) return;
-        try {
-            const newUser = await authAPI.register({
-                email: registrationData.email,
-                password: registrationData.password,
-                firstName: registrationData.firstName,
-                lastName: registrationData.lastName,
-                role: 'employee' // Teams are for internal staff
-            });
-
-            await adminAPI.addMemberToTeam(selectedTeam.id, newUser.id);
-            fetchTeamMembers(selectedTeam.id);
-            setIsRegistering(false);
-            setSearchEmail('');
-            setRegistrationData({ email: '', firstName: '', lastName: '', password: 'Password123!' });
-        } catch (error: any) {
-            console.error('Registration failed:', error);
-            alert(error.message || 'Registration failed');
-        }
-    };
-
-    const handleRemoveMember = async (profileId: string) => {
+    const handleEditTeam = () => {
         if (!selectedTeam) return;
-        if (!confirm('Are you sure you want to remove this member?')) return;
-        try {
-            await adminAPI.removeMemberFromTeam(selectedTeam.id, profileId);
-            fetchTeamMembers(selectedTeam.id);
-        } catch (error) {
-            console.error('Failed to remove member:', error);
-        }
+        setEditTeamName(selectedTeam.name);
+        setEditTeamDesc(selectedTeam.description || '');
+        setIsEditingTeam(true);
     };
 
-    if (loading) {
+    const handleSaveEdit = async () => {
+        if (!selectedTeam || !editTeamName.trim()) return;
+        updateTeamMutation.mutate(
+            { id: selectedTeam.id, name: editTeamName, description: editTeamDesc },
+            {
+                onSuccess: () => {
+                    setSelectedTeam({ ...selectedTeam, name: editTeamName, description: editTeamDesc });
+                    setIsEditingTeam(false);
+                },
+                onError: (error) => console.error('Failed to update team:', error)
+            }
+        );
+    };
+
+    const handleDeleteTeam = () => {
+        if (!selectedTeam) return;
+        setConfirmDeleteOpen(true);
+    };
+
+    const handleConfirmDelete = () => {
+        if (!selectedTeam) return;
+        deleteTeamMutation.mutate(selectedTeam.id, {
+            onSuccess: () => {
+                setSelectedTeam(null);
+                setConfirmDeleteOpen(false);
+            },
+            onError: (error) => console.error('Failed to delete team:', error)
+        });
+    };
+
+    const handleAddMember = (_profileId: string) => {
+        // Team-add is already handled inside AddMemberModal.
+        // This callback just triggers a re-fetch of the members list.
+        if (!selectedTeam) return;
+        queryClient.invalidateQueries({ queryKey: ['admin', 'teamMembers', selectedTeam.id] });
+    };
+
+    const handleRemoveMember = (profileId: string) => {
+        if (!selectedTeam) return;
+        setMemberToRemove(profileId);
+        setConfirmRemoveOpen(true);
+    };
+
+    const handleConfirmRemove = () => {
+        if (!selectedTeam || !memberToRemove) return;
+        removeMemberMutation.mutate(
+            { teamId: selectedTeam.id, profileId: memberToRemove },
+            {
+                onSuccess: () => {
+                    setConfirmRemoveOpen(false);
+                    setMemberToRemove(null);
+                },
+                onError: (error) => console.error('Failed to remove member:', error)
+            }
+        );
+    };
+
+    if (loading && teams.length === 0) {
         return (
             <div className="flex items-center justify-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
@@ -173,7 +155,7 @@ export const TeamManagementPage: React.FC = () => {
                             backgroundClip: 'text',
                             color: 'transparent',
                         }}>Team Management</h1>
-                        <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Organize your employees into teams for lead and project assignment</p>
+                        <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Organize your employees into teams for lead and project assignment (Select any Team for Details)</p>
                     </div>
 
                     <Dialog open={isAddingTeam} onOpenChange={setIsAddingTeam}>
@@ -269,75 +251,34 @@ export const TeamManagementPage: React.FC = () => {
                                             <CardTitle className="text-2xl" style={{ color: '#d4af37' }}>{selectedTeam.name}</CardTitle>
                                             <CardDescription className="text-gray-400 mt-1">{selectedTeam.description}</CardDescription>
                                         </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-gray-400 hover:text-[#d4af37] hover:bg-[#d4af37]/10"
+                                                onClick={handleEditTeam}
+                                            >
+                                                <PencilSquareIcon className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className="text-gray-400 hover:text-red-500 hover:bg-red-500/10"
+                                                onClick={handleDeleteTeam}
+                                            >
+                                                <TrashIcon className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                onClick={() => setIsAddMemberOpen(true)}
+                                                className="text-black font-semibold"
+                                                style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }}
+                                            >
+                                                <UserPlusIcon className="h-4 w-4 mr-2" />
+                                                Add Member
+                                            </Button>
+                                        </div>
                                     </CardHeader>
                                     <CardContent className="space-y-6">
-                                        {/* Add Member Search */}
-                                        <div className="pt-4 border-t border-gold-200/10">
-                                            <h4 className="text-sm font-semibold text-white mb-4 flex items-center">
-                                                <UserPlusIcon className="h-4 w-4 mr-2 text-gold-400" />
-                                                Add Member
-                                            </h4>
-                                            <div className="flex gap-2">
-                                                <div className="relative flex-1">
-                                                    <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
-                                                    <Input
-                                                        placeholder="Search by email..."
-                                                        value={searchEmail}
-                                                        onChange={(e) => setSearchEmail(e.target.value)}
-                                                        onKeyDown={(e) => e.key === 'Enter' && handleSearchUser()}
-                                                        className="pl-10 bg-black border-gold-200/20"
-                                                    />
-                                                </div>
-                                                <Button variant="outline" onClick={handleSearchUser} disabled={isSearching}>
-                                                    {isSearching ? '...' : 'Search'}
-                                                </Button>
-                                            </div>
-
-                                            {foundUser && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    className="mt-4 p-4 bg-gold-900/20 border border-gold-500/20 rounded-xl flex items-center justify-between"
-                                                >
-                                                    <div>
-                                                        <p className="font-semibold text-white">{foundUser.firstName} {foundUser.lastName}</p>
-                                                        <p className="text-sm text-gray-400">{foundUser.email}</p>
-                                                    </div>
-                                                    <Button size="sm" onClick={handleAddExistingMember} style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }} className="text-black">
-                                                        Add to Team
-                                                    </Button>
-                                                </motion.div>
-                                            )}
-
-                                            {isRegistering && (
-                                                <motion.div
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    className="mt-4 p-6 bg-charcoal-900/50 border border-gold-500/20 rounded-xl space-y-4"
-                                                >
-                                                    <div className="flex justify-between items-center">
-                                                        <h5 className="font-semibold text-gold-400">Register New Member</h5>
-                                                        <button onClick={() => setIsRegistering(false)}><XMarkIcon className="h-4 w-4 text-gray-500" /></button>
-                                                    </div>
-                                                    <p className="text-sm text-gray-400">No user found with <strong>{searchEmail}</strong>. Fill details to register them.</p>
-                                                    <div className="space-y-4">
-                                                        <Input
-                                                            placeholder="Email Address"
-                                                            value={registrationData.email}
-                                                            onChange={e => setRegistrationData(d => ({ ...d, email: e.target.value }))}
-                                                            className="bg-black border-gold-200/20"
-                                                        />
-                                                        <div className="grid grid-cols-2 gap-4">
-                                                            <Input placeholder="First Name" value={registrationData.firstName} onChange={e => setRegistrationData(d => ({ ...d, firstName: e.target.value }))} className="bg-black border-gold-200/20" />
-                                                            <Input placeholder="Last Name" value={registrationData.lastName} onChange={e => setRegistrationData(d => ({ ...d, lastName: e.target.value }))} className="bg-black border-gold-200/20" />
-                                                        </div>
-                                                    </div>
-                                                    <Button onClick={handleRegisterAndAdd} className="w-full text-black font-semibold" style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }}>
-                                                        Register & Add as Employee
-                                                    </Button>
-                                                </motion.div>
-                                            )}
-                                        </div>
 
                                         {/* Members Table */}
                                         <div className="pt-4">
@@ -405,6 +346,84 @@ export const TeamManagementPage: React.FC = () => {
                     </AnimatePresence>
                 </div>
             </div>
+
+            {/* Add Member Modal */}
+            {selectedTeam && (
+                <AddMemberModal
+                    open={isAddMemberOpen}
+                    onClose={() => setIsAddMemberOpen(false)}
+                    teamId={selectedTeam.id}
+                    teamName={selectedTeam.name}
+                    onMemberAdded={handleAddMember}
+                />
+            )}
+
+            {/* Confirm Delete Team Dialog */}
+            <Dialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
+                <DialogContent className="sm:max-w-[400px] bg-[#1a1a1a] border-gold-200/20 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="text-red-400">Delete Team</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            Are you sure you want to delete <span className="text-white font-semibold">{selectedTeam?.name}</span>? All members will be removed. This action cannot be undone.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button variant="outline" onClick={() => setConfirmDeleteOpen(false)} className="border-gold-200/20 text-gray-300 hover:bg-gold-900/10">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleConfirmDelete} disabled={deleteTeamMutation.isPending} className="bg-red-600 hover:bg-red-700 text-white">
+                            {deleteTeamMutation.isPending ? 'Deleting...' : 'Delete Team'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Confirm Remove Member Dialog */}
+            <Dialog open={confirmRemoveOpen} onOpenChange={(open) => { setConfirmRemoveOpen(open); if (!open) setMemberToRemove(null); }}>
+                <DialogContent className="sm:max-w-[400px] bg-[#1a1a1a] border-gold-200/20 text-white">
+                    <DialogHeader>
+                        <DialogTitle className="text-red-400">Remove Member</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            Are you sure you want to remove this member from <span className="text-white font-semibold">{selectedTeam?.name}</span>?
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button variant="outline" onClick={() => { setConfirmRemoveOpen(false); setMemberToRemove(null); }} className="border-gold-200/20 text-gray-300 hover:bg-gold-900/10">
+                            Cancel
+                        </Button>
+                        <Button onClick={handleConfirmRemove} disabled={removeMemberMutation.isPending} className="bg-red-600 hover:bg-red-700 text-white">
+                            {removeMemberMutation.isPending ? 'Removing...' : 'Remove Member'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Edit Team Dialog */}
+            <Dialog open={isEditingTeam} onOpenChange={setIsEditingTeam}>
+                <DialogContent className="sm:max-w-[425px] bg-[#1a1a1a] border-gold-200/20 text-white">
+                    <DialogHeader>
+                        <DialogTitle style={{ color: '#d4af37' }}>Edit Team</DialogTitle>
+                        <DialogDescription className="text-gray-400">
+                            Update the team name and description.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <div className="grid gap-4 py-4">
+                        <div className="grid gap-2">
+                            <label htmlFor="edit-name" className="text-sm font-medium text-gold-400">Team Name</label>
+                            <Input id="edit-name" value={editTeamName} onChange={(e) => setEditTeamName(e.target.value)} className="bg-black border-gold-200/20" />
+                        </div>
+                        <div className="grid gap-2">
+                            <label htmlFor="edit-desc" className="text-sm font-medium text-gold-400">Description</label>
+                            <textarea id="edit-desc" value={editTeamDesc} onChange={(e) => setEditTeamDesc(e.target.value)} className="w-full bg-black border border-gold-200/20 rounded-md p-2 text-sm min-h-[100px]" />
+                        </div>
+                    </div>
+                    <DialogFooter>
+                        <Button onClick={handleSaveEdit} disabled={updateTeamMutation.isPending} className="w-full text-black font-semibold" style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }}>
+                            {updateTeamMutation.isPending ? 'Saving...' : 'Save Changes'}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 };

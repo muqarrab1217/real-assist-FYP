@@ -5,10 +5,13 @@ import {
     CheckCircleIcon,
     CurrencyDollarIcon,
     ClockIcon,
-    ArrowRightIcon
+    ArrowRightIcon,
+    HomeIcon,
+    ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
-import { enrollmentAPI } from '@/services/api';
+import { CustomDropdown } from '@/components/ui/CustomDropdown';
+import { useCreateEnrollment } from '@/hooks/queries/useClientQueries';
 import { Property } from '@/types';
 import { useAuthContext } from '@/contexts/AuthContext';
 
@@ -18,12 +21,28 @@ interface ProjectEnrollmentModalProps {
     project: Property | null;
 }
 
+interface ValidationError {
+    field: string;
+    message: string;
+}
+
 export const ProjectEnrollmentModal: React.FC<ProjectEnrollmentModalProps> = ({ isOpen, onClose, project }) => {
     const { role } = useAuthContext();
     const [downPaymentPercent, setDownPaymentPercent] = useState(30);
     const [durationYears, setDurationYears] = useState(2);
-    const [loading, setLoading] = useState(false);
+    const createEnrollmentMutation = useCreateEnrollment();
+    const loading = createEnrollmentMutation.isPending;
     const [success, setSuccess] = useState(false);
+    const [validationErrors, setValidationErrors] = useState<ValidationError[]>([]);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [selectedUnit, setSelectedUnit] = useState({
+        type: '',
+        floor: '',
+        unitNumber: '',
+        bedrooms: '',
+        area: '',
+        view: ''
+    });
 
     const isClient = role === 'client';
 
@@ -32,11 +51,137 @@ export const ProjectEnrollmentModal: React.FC<ProjectEnrollmentModalProps> = ({ 
     const remainingAmount = totalPrice - downPaymentAmount;
     const monthlyInstallment = remainingAmount / (durationYears * 12);
 
+    /**
+     * Validate all form fields against admin-defined constraints
+     */
+    const validateForm = (): boolean => {
+        const errors: ValidationError[] = [];
+
+        // Validate Unit Type
+        if (!selectedUnit.type.trim()) {
+            errors.push({
+                field: 'Unit Type',
+                message: 'Please select a unit type'
+            });
+        } else if (project?.unitTypeOptions && project.unitTypeOptions.length > 0) {
+            // Admin defined specific unit types - user must select from them
+            if (!project.unitTypeOptions.includes(selectedUnit.type)) {
+                errors.push({
+                    field: 'Unit Type',
+                    message: `Unit type must be one of: ${project.unitTypeOptions.join(', ')}`
+                });
+            }
+        }
+
+        // Validate Floor
+        if (!selectedUnit.floor) {
+            errors.push({
+                field: 'Floor',
+                message: 'Please enter a floor number'
+            });
+        } else {
+            const floor = parseInt(selectedUnit.floor);
+            if (project?.floorNumberMin !== undefined && floor < project.floorNumberMin) {
+                errors.push({
+                    field: 'Floor',
+                    message: `Floor must be at least ${project.floorNumberMin}`
+                });
+            }
+            if (project?.floorNumberMax !== undefined && floor > project.floorNumberMax) {
+                errors.push({
+                    field: 'Floor',
+                    message: `Floor cannot exceed ${project.floorNumberMax}`
+                });
+            }
+        }
+
+        // Validate Unit Number
+        if (!selectedUnit.unitNumber.trim()) {
+            errors.push({
+                field: 'Unit Number',
+                message: 'Please enter a unit number'
+            });
+        } else {
+            // Check if unit number is within range (if admin set numeric ranges)
+            const unitNum = selectedUnit.unitNumber.toLowerCase();
+            if (project?.unitNumberMin && project?.unitNumberMax) {
+                const minNum = project.unitNumberMin.toLowerCase();
+                const maxNum = project.unitNumberMax.toLowerCase();
+                if (unitNum < minNum || unitNum > maxNum) {
+                    errors.push({
+                        field: 'Unit Number',
+                        message: `Unit number must be between ${project.unitNumberMin} and ${project.unitNumberMax}`
+                    });
+                }
+            }
+        }
+
+        // Validate Area
+        if (!selectedUnit.area) {
+            errors.push({
+                field: 'Area',
+                message: 'Please enter an area size'
+            });
+        } else {
+            const area = parseFloat(selectedUnit.area);
+            if (project?.areaMin !== undefined && area < project.areaMin) {
+                errors.push({
+                    field: 'Area',
+                    message: `Area must be at least ${project.areaMin} sq ft`
+                });
+            }
+            if (project?.areaMax !== undefined && area > project.areaMax) {
+                errors.push({
+                    field: 'Area',
+                    message: `Area cannot exceed ${project.areaMax} sq ft`
+                });
+            }
+        }
+
+        // Validate Bedrooms
+        if (!selectedUnit.bedrooms) {
+            errors.push({
+                field: 'Bedrooms',
+                message: 'Please enter number of bedrooms'
+            });
+        } else {
+            const bedrooms = parseInt(selectedUnit.bedrooms);
+            if (project?.roomNumberMin !== undefined && bedrooms < project.roomNumberMin) {
+                errors.push({
+                    field: 'Bedrooms',
+                    message: `Bedrooms must be at least ${project.roomNumberMin}`
+                });
+            }
+            if (project?.roomNumberMax !== undefined && bedrooms > project.roomNumberMax) {
+                errors.push({
+                    field: 'Bedrooms',
+                    message: `Bedrooms cannot exceed ${project.roomNumberMax}`
+                });
+            }
+        }
+
+        if (errors.length > 0) {
+            setValidationErrors(errors);
+            setShowErrorModal(true);
+            return false;
+        }
+
+        return true;
+    };
+
     useEffect(() => {
         if (isOpen) {
             setSuccess(false);
             setDownPaymentPercent(30);
             setDurationYears(2);
+            setSelectedUnit({
+                type: '',
+                floor: '',
+                unitNumber: '',
+                bedrooms: '',
+                area: '',
+                view: ''
+            });
         }
     }, [isOpen]);
 
@@ -45,14 +190,20 @@ export const ProjectEnrollmentModal: React.FC<ProjectEnrollmentModalProps> = ({ 
             alert('Only registered clients can enroll in projects.');
             return;
         }
-        setLoading(true);
+
+        // Validate form before submitting
+        if (!validateForm()) {
+            return;
+        }
+
         try {
-            await enrollmentAPI.createEnrollment({
+            await createEnrollmentMutation.mutateAsync({
                 projectId: project.id,
                 totalPrice: totalPrice,
                 downPayment: downPaymentAmount,
                 installmentDurationYears: durationYears,
-                monthlyInstallment: monthlyInstallment
+                monthlyInstallment: monthlyInstallment,
+                unitDetails: selectedUnit
             });
             setSuccess(true);
             setTimeout(() => {
@@ -61,24 +212,81 @@ export const ProjectEnrollmentModal: React.FC<ProjectEnrollmentModalProps> = ({ 
         } catch (error) {
             console.error('Enrollment failed:', error);
             alert('Failed to process enrollment. Please try again.');
-        } finally {
-            setLoading(false);
         }
     };
 
     return (
         <AnimatePresence>
             {isOpen && (
-                <div className="fixed inset-0 z-50 flex justify-center items-start bg-black/80 backdrop-blur-sm overflow-y-auto">
+                // Backdrop - fills entire viewport with no gaps, centers modal
+                <div
+                    className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center"
+                    style={{ display: 'flex' }}
+                >
+                    {/* Error Modal - appears on top of enrollment modal */}
+                    <AnimatePresence>
+                        {showErrorModal && (
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: -20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: -20 }}
+                                className="absolute z-[60] w-[calc(100%-2rem)] max-w-md rounded-2xl bg-red-950/95 border-2 border-red-500/50 shadow-2xl overflow-hidden"
+                            >
+                                <div className="p-6">
+                                    {/* Header */}
+                                    <div className="flex items-start gap-4 mb-4">
+                                        <ExclamationTriangleIcon className="h-6 w-6 text-red-400 flex-shrink-0 mt-1" />
+                                        <div className="flex-1">
+                                            <h3 className="text-lg font-bold text-red-300 mb-1">
+                                                Please Fix the Following Issues
+                                            </h3>
+                                            <p className="text-xs text-red-200/70">
+                                                Your input doesn't match the project requirements
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Error List */}
+                                    <div className="space-y-3 mb-6 max-h-64 overflow-y-auto">
+                                        {validationErrors.map((error, idx) => (
+                                            <div
+                                                key={idx}
+                                                className="p-3 rounded-lg bg-red-900/40 border border-red-500/30"
+                                            >
+                                                <p className="text-sm font-semibold text-red-300">
+                                                    {error.field}
+                                                </p>
+                                                <p className="text-xs text-red-200/80 mt-1">
+                                                    {error.message}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    {/* Action Button */}
+                                    <button
+                                        onClick={() => setShowErrorModal(false)}
+                                        className="w-full px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold transition-colors"
+                                    >
+                                        Got it, let me fix this
+                                    </button>
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                     <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
+                        initial={{ opacity: 0, scale: 0.95 }}
                         animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        className="relative w-full max-w-2xl overflow-hidden rounded-b-3xl border-x border-b border-gold-500/20 bg-[#0a0a0a] shadow-2xl"
-                        style={{ boxShadow: '0 0 50px rgba(212, 175, 55, 0.1)' }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        // Modal container - fixed dimensions, centered by parent flex, responsive width
+                        className="w-[calc(100%-2rem)] max-w-2xl rounded-3xl border border-gold-500/20 bg-[#0a0a0a] shadow-2xl overflow-hidden flex flex-col"
+                        style={{
+                            boxShadow: '0 0 50px rgba(212, 175, 55, 0.1)',
+                            maxHeight: 'calc(100vh - 2rem)',
+                        }}
                     >
-                        {/* Header */}
-                        <div className="relative h-32 bg-gradient-to-r from-[#d4af37] to-[#f4e68c] p-8 border-b border-black/10">
+                        {/* Header - Fixed, no extra spacing */}
+                        <div className="h-32 bg-gradient-to-r from-[#d4af37] to-[#f4e68c] p-8 border-b border-black/10 flex flex-col justify-center relative">
                             <button
                                 onClick={onClose}
                                 className="absolute top-4 right-4 rounded-full bg-black/20 p-2 text-white hover:bg-black/40 transition-colors z-20"
@@ -93,9 +301,113 @@ export const ProjectEnrollmentModal: React.FC<ProjectEnrollmentModalProps> = ({ 
                             </p>
                         </div>
 
-                        <div className="p-8 text-white">
+                        <div className="flex-1 overflow-y-auto p-8 text-white">
                             {!success ? (
                                 <div className="space-y-8">
+                                    {/* Unit Selection */}
+                                    <div className="space-y-4 pb-6 border-b border-gold-500/10">
+                                        <h4 className="font-bold text-gold-400 uppercase tracking-wider text-sm flex items-center gap-2">
+                                            <HomeIcon className="h-4 w-4" />
+                                            Select Your Unit
+                                        </h4>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {/* Unit Type Dropdown */}
+                                            <div className="space-y-2">
+                                                <label className="text-xs text-gray-400">Unit Type</label>
+                                                {project?.unitTypeOptions && project.unitTypeOptions.length > 0 ? (
+                                                    <CustomDropdown
+                                                        value={selectedUnit.type}
+                                                        onChange={(value) => setSelectedUnit({ ...selectedUnit, type: value })}
+                                                        options={project.unitTypeOptions.map(type => ({ label: type, value: type }))}
+                                                        placeholder="Select a unit type"
+                                                    />
+                                                ) : (
+                                                    <input
+                                                        type="text"
+                                                        placeholder="e.g., Penthouse, Suite"
+                                                        value={selectedUnit.type}
+                                                        onChange={(e) => setSelectedUnit({ ...selectedUnit, type: e.target.value })}
+                                                        className="w-full px-4 py-3 rounded-xl bg-black/50 border border-gold-500/20 text-white focus:border-gold-500/50 outline-none transition-colors"
+                                                    />
+                                                )}
+                                            </div>
+
+                                            {/* Floor Number Range */}
+                                            <div className="space-y-2">
+                                                <label className="text-xs text-gray-400">
+                                                    Floor {project?.floorNumberMin !== undefined && project?.floorNumberMax !== undefined ? `(${project.floorNumberMin}-${project.floorNumberMax})` : ''}
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    placeholder="e.g., 5"
+                                                    value={selectedUnit.floor}
+                                                    onChange={(e) => setSelectedUnit({ ...selectedUnit, floor: e.target.value })}
+                                                    min={project?.floorNumberMin}
+                                                    max={project?.floorNumberMax}
+                                                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-gold-500/20 text-white focus:border-gold-500/50 outline-none transition-colors"
+                                                />
+                                            </div>
+
+                                            {/* Unit Number Range */}
+                                            <div className="space-y-2">
+                                                <label className="text-xs text-gray-400">
+                                                    Unit # {project?.unitNumberMin && project?.unitNumberMax ? `(${project.unitNumberMin}-${project.unitNumberMax})` : ''}
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g., 501-A"
+                                                    value={selectedUnit.unitNumber}
+                                                    onChange={(e) => setSelectedUnit({ ...selectedUnit, unitNumber: e.target.value })}
+                                                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-gold-500/20 text-white focus:border-gold-500/50 outline-none transition-colors"
+                                                />
+                                            </div>
+
+                                            {/* Area Range */}
+                                            <div className="space-y-2">
+                                                <label className="text-xs text-gray-400">
+                                                    Area (sq ft) {project?.areaMin && project?.areaMax ? `(${project.areaMin}-${project.areaMax})` : ''}
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    placeholder="e.g., 1200"
+                                                    value={selectedUnit.area}
+                                                    onChange={(e) => setSelectedUnit({ ...selectedUnit, area: e.target.value })}
+                                                    min={project?.areaMin}
+                                                    max={project?.areaMax}
+                                                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-gold-500/20 text-white focus:border-gold-500/50 outline-none transition-colors"
+                                                />
+                                            </div>
+
+                                            {/* Room/Bedrooms */}
+                                            <div className="space-y-2">
+                                                <label className="text-xs text-gray-400">
+                                                    Bedrooms {project?.roomNumberMin !== undefined && project?.roomNumberMax !== undefined ? `(${project.roomNumberMin}-${project.roomNumberMax})` : ''}
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    placeholder="e.g., 3"
+                                                    value={selectedUnit.bedrooms}
+                                                    onChange={(e) => setSelectedUnit({ ...selectedUnit, bedrooms: e.target.value })}
+                                                    min={project?.roomNumberMin}
+                                                    max={project?.roomNumberMax}
+                                                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-gold-500/20 text-white focus:border-gold-500/50 outline-none transition-colors"
+                                                />
+                                            </div>
+
+                                            {/* View Preference */}
+                                            <div className="space-y-2">
+                                                <label className="text-xs text-gray-400">View Preference</label>
+                                                <input
+                                                    type="text"
+                                                    placeholder="e.g., Sea View, Garden View"
+                                                    value={selectedUnit.view}
+                                                    onChange={(e) => setSelectedUnit({ ...selectedUnit, view: e.target.value })}
+                                                    className="w-full px-4 py-3 rounded-xl bg-black/50 border border-gold-500/20 text-white focus:border-gold-500/50 outline-none transition-colors"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {/* Financial Config */}
                                     <div className="grid md:grid-cols-2 gap-8">
                                         <div className="space-y-4">

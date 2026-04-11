@@ -23,7 +23,7 @@ export const RegisterPage: React.FC = () => {
     password: '',
     confirmPassword: '',
     agreeToTerms: false,
-    role: 'client' as 'client' | 'admin',
+    role: 'client' as 'client' | 'admin' | 'employee' | 'sales_rep',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +57,13 @@ export const RegisterPage: React.FC = () => {
       const user = (await Promise.race([registerPromise, timeoutPromise])) as any;
 
       login(user);
-      navigate(user.role === 'admin' ? '/admin/dashboard' : '/client/dashboard');
+      const dashboardRoutes: Record<string, string> = {
+        admin: '/admin/dashboard',
+        employee: '/admin/dashboard',
+        sales_rep: '/sales-rep/dashboard',
+        client: '/client/dashboard',
+      };
+      navigate(dashboardRoutes[user.role] || '/client/dashboard');
     } catch (err: any) {
       console.error('Registration error:', err);
       setError(err.message || 'Registration failed. Please try again.');

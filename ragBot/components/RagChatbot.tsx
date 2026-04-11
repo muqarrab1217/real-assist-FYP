@@ -164,7 +164,7 @@ export const RagChatbot: React.FC = () => {
 
     try {
       // Construct the full URL
-      const url = API_BASE_URL ? `${API_BASE_URL}/api/gemini/query` : '/api/gemini/query';
+      const url = API_BASE_URL ? `${API_BASE_URL}/api/chatbot/query` : '/api/chatbot/query';
       console.log('Sending request to:', url, 'API_BASE_URL:', API_BASE_URL || '(using proxy)'); // Debug log
 
       const response = await fetch(url, {

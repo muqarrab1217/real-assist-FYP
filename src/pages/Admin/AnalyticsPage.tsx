@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { 
   ChartBarIcon,
@@ -12,28 +12,11 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { adminAPI } from '@/services/api';
-import { Analytics } from '@/types';
 import { formatCurrency } from '@/lib/utils';
+import { useAdminAnalytics } from '@/hooks/queries/useAdminQueries';
 
 export const AnalyticsPage: React.FC = () => {
-  const [analytics, setAnalytics] = useState<Analytics | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAnalytics = async () => {
-      try {
-        const data = await adminAPI.getAnalytics();
-        setAnalytics(data);
-      } catch (error) {
-        console.error('Failed to fetch analytics:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAnalytics();
-  }, []);
+  const { data: analytics, isLoading: loading } = useAdminAnalytics();
 
   const metrics = [
     {
@@ -93,7 +76,7 @@ export const AnalyticsPage: React.FC = () => {
   ];
 
 
-  if (loading) {
+  if (loading && !analytics) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>

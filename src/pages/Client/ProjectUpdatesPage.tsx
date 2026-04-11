@@ -12,78 +12,68 @@ import {
   CheckCircleIcon,
   StarIcon,
   ClockIcon,
-  MagnifyingGlassIcon
+  MagnifyingGlassIcon,
+  ExclamationTriangleIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { enrollmentAPI, clientAPI } from '@/services/api';
-import { ProjectUpdate, Property, Payment } from '@/types';
+import { Property } from '@/types';
 import { formatDate } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { PaymentCalendar } from '@/components/Client/PaymentCalendar';
 import { useAuthContext } from '@/contexts/AuthContext';
+import { useUserEnrollments, usePendingEnrollments, useClientProjectUpdates, useProjectPayments, useMakePayment, useUploadPaymentProof } from '@/hooks/queries/useClientQueries';
+import { PaymentMethodModal } from '@/components/Client/PaymentMethodModal';
 
 type TabType = 'journal' | 'timeline' | 'dossier';
 
 export const ProjectUpdatesPage: React.FC = () => {
   const { user } = useAuthContext();
-  const [enrollments, setEnrollments] = useState<any[]>([]);
-  const [selectedEnrollment, setSelectedEnrollment] = useState<any>(null);
-  const [updates, setUpdates] = useState<ProjectUpdate[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
+  const [selectedEnrollmentId, setSelectedEnrollmentId] = useState<string | null>(
+    () => sessionStorage.getItem('projectUpdates_selectedId')
+  );
   const [activeTab, setActiveTab] = useState<TabType>('journal');
-  const [loading, setLoading] = useState(true);
-  const [updatesLoading, setUpdatesLoading] = useState(false);
-  const [paymentsLoading, setPaymentsLoading] = useState(true);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [selectedPaymentForModal, setSelectedPaymentForModal] = useState<{ id: string; amount: number; installmentNumber: number } | null>(null);
 
+  const { data: enrollments = [], isLoading: enrollmentsLoading, isFetching: enrollmentsFetching } = useUserEnrollments();
+  const { data: pendingEnrollments = [] } = usePendingEnrollments();
+
+  // Resolve the selected enrollment object; fall back to first enrollment automatically
+  const selectedEnrollment = React.useMemo(() => {
+    if (enrollments.length === 0) return null;
+    const found = enrollments.find((e: any) => e.id === selectedEnrollmentId);
+    return found ?? enrollments[0];
+  }, [enrollments, selectedEnrollmentId]);
+
+  const handleSelectEnrollment = (enrollment: any) => {
+    setSelectedEnrollmentId(enrollment.id);
+    sessionStorage.setItem('projectUpdates_selectedId', enrollment.id);
+  };
+
+  // Auto-select first enrollment on first load when no prior selection is stored
   useEffect(() => {
-    const initPage = async () => {
-      setLoading(true);
-      try {
-        const data = await enrollmentAPI.getUserEnrollments();
-        setEnrollments(data);
-        if (data.length > 0) {
-          setSelectedEnrollment(data[0]);
-        }
-      } catch (error) {
-        console.error('Failed to fetch enrollments:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (enrollments.length > 0 && !selectedEnrollmentId) {
+      handleSelectEnrollment(enrollments[0]);
+    }
+  }, [enrollments]); // eslint-disable-line react-hooks/exhaustive-deps
 
-    initPage();
-  }, []);
+  const projectId = selectedEnrollment?.projectId || '';
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!selectedEnrollment) return;
+  const { data: allUpdates = [], isLoading: updatesLoading } = useClientProjectUpdates();
+  const { data: payments = [], isLoading: paymentsLoading } = useProjectPayments(projectId);
 
-      setUpdatesLoading(true);
-      setPaymentsLoading(true);
-      try {
-        const [allUpdates, projectPayments] = await Promise.all([
-          clientAPI.getProjectUpdates(),
-          clientAPI.getProjectPayments(selectedEnrollment.projectId)
-        ]);
+  const updates = React.useMemo(() => {
+    return allUpdates.filter(u => u.propertyId === projectId);
+  }, [allUpdates, projectId]);
 
-        const filteredUpdates = allUpdates.filter(u => u.propertyId === selectedEnrollment.projectId);
-        setUpdates(filteredUpdates);
-        setPayments(projectPayments);
-      } catch (error) {
-        console.error('Failed to fetch project data:', error);
-      } finally {
-        setUpdatesLoading(false);
-        setPaymentsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [selectedEnrollment]);
+  const loading = enrollmentsLoading && enrollments.length === 0;
+  const makePaymentMutation = useMakePayment();
+  const uploadProofMutation = useUploadPaymentProof();
 
   const getMilestoneBadge = (milestone: string | undefined) => {
     if (!milestone) return null;
@@ -102,7 +92,7 @@ export const ProjectUpdatesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center h-96 gap-4">
+        <div className="flex flex-col items-center justify-center h-96 gap-4">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
         <p className="text-gold-400 animate-pulse">Synchronizing Portfolios...</p>
       </div>
@@ -112,16 +102,89 @@ export const ProjectUpdatesPage: React.FC = () => {
   if (enrollments.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        {/* Show pending enrollments notification if any */}
+        {pendingEnrollments.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="w-full max-w-2xl mb-8"
+          >
+            <Card className="bg-[#0a0a0a] border-yellow-500/30 rounded-2xl overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex items-start gap-4">
+                  <div className="p-3 rounded-xl bg-yellow-500/10 border border-yellow-500/20">
+                    <ClockIcon className="h-6 w-6 text-yellow-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-bold text-yellow-400 mb-2">
+                      Enrollment{pendingEnrollments.length > 1 ? 's' : ''} Under Verification
+                    </h3>
+                    <p className="text-gray-400 text-sm mb-4">
+                      You have {pendingEnrollments.length} enrollment request{pendingEnrollments.length > 1 ? 's' : ''} being reviewed by our team.
+                      Once approved, you'll have full access to project updates and payment schedules.
+                    </p>
+                    <div className="space-y-3">
+                      {pendingEnrollments.map((enrollment) => (
+                        <div
+                          key={enrollment.id}
+                          className={`flex items-center justify-between p-3 rounded-xl ${
+                            enrollment.status === 'pending'
+                              ? 'bg-yellow-500/5 border border-yellow-500/10'
+                              : 'bg-red-500/5 border border-red-500/10'
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <BuildingOfficeIcon className={`h-5 w-5 ${
+                              enrollment.status === 'pending' ? 'text-yellow-500' : 'text-red-500'
+                            }`} />
+                            <span className="text-white font-medium">{enrollment.projectName}</span>
+                          </div>
+                          <Badge className={`${
+                            enrollment.status === 'pending'
+                              ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20'
+                              : 'bg-red-500/10 text-red-400 border-red-500/20'
+                          }`}>
+                            {enrollment.status === 'pending' ? 'Under Review' : 'Rejected'}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                    {pendingEnrollments.some(e => e.status === 'rejected') && (
+                      <div className="mt-4 p-3 rounded-xl bg-red-500/5 border border-red-500/10">
+                        <div className="flex items-start gap-2">
+                          <ExclamationTriangleIcon className="h-5 w-5 text-red-500 mt-0.5" />
+                          <div>
+                            <p className="text-sm text-red-400 font-medium">Rejected Enrollment</p>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {pendingEnrollments.find(e => e.status === 'rejected')?.rejectedReason ||
+                               'Please contact our team for more information.'}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+
         <div className="w-24 h-24 mb-6 rounded-full bg-gold-500/10 flex items-center justify-center border border-gold-500/20">
           <BuildingOfficeIcon className="h-12 w-12 text-gold-500" />
         </div>
-        <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>No Active Enrollments</h2>
+        <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
+          {pendingEnrollments.length > 0 ? 'No Approved Projects Yet' : 'No Active Enrollments'}
+        </h2>
         <p className="text-gray-400 max-w-md mb-8">
-          You haven't enrolled in any projects yet. Reach out to our consultants to find your next flagship investment.
+          {pendingEnrollments.length > 0
+            ? 'Your enrollment requests are being reviewed. Once approved by our team, your projects will appear here with full access.'
+            : "You haven't enrolled in any projects yet. Reach out to our consultants to find your next flagship investment."
+          }
         </p>
         <Link to="/client/projects">
           <Button className="bg-gold-500 text-black hover:bg-gold-400 font-bold px-8 py-6 rounded-2xl flex items-center gap-2">
-            Explore Projects
+            {pendingEnrollments.length > 0 ? 'Browse More Projects' : 'Explore Projects'}
             <ArrowRightIcon className="h-5 w-5" />
           </Button>
         </Link>
@@ -130,6 +193,9 @@ export const ProjectUpdatesPage: React.FC = () => {
   }
 
   const project = selectedEnrollment?.project as Property;
+
+  // All enrollments in this view are verified (active or completed)
+  // No need to check for pending/rejected anymore
 
   // Derived financial data
   const totalPaid = payments
@@ -140,26 +206,42 @@ export const ProjectUpdatesPage: React.FC = () => {
   const remainingBalance = totalPrice - totalPaid;
 
   const handleSettlePayment = async (paymentId: string) => {
-    try {
-      setIsProcessingPayment(true);
-      const paymentToPay = payments.find(p => p.id === paymentId);
-      if (!paymentToPay) throw new Error('Payment not found');
+    const paymentToPay = payments.find(p => p.id === paymentId);
+    if (!paymentToPay) return;
+    
+    setSelectedPaymentForModal({ id: paymentId, amount: paymentToPay.amount, installmentNumber: paymentToPay.installmentNumber });
+    setPaymentModalOpen(true);
+  };
 
-      await clientAPI.makePayment(paymentId, paymentToPay.amount, 'Portal');
+  const handlePayViaPortal = (paymentId: string, amount: number) => {
+    setIsProcessingPayment(true);
+    makePaymentMutation.mutate(
+      { paymentId, amount, method: 'Portal' },
+      {
+        onSettled: () => setIsProcessingPayment(false),
+        onError: (error) => console.error('Payment failed:', error),
+        onSuccess: () => console.log('Payment successful')
+      }
+    );
+  };
 
-      // Update local state immediately
-      setPayments(prev => prev.map(p =>
-        p.id === paymentId
-          ? { ...p, status: 'paid' as const, paidDate: new Date() }
-          : p
-      ));
-
-      console.log('Payment successful');
-    } catch (error) {
-      console.error('Payment failed:', error);
-    } finally {
-      setIsProcessingPayment(false);
-    }
+  const handleUploadProof = (data: { paymentId: string; proofFile: File; proofType: any; notes?: string }) => {
+    setIsProcessingPayment(true);
+    makePaymentMutation.mutate(
+      { paymentId: data.paymentId, amount: 0, method: 'manual_proof' },
+      {
+        onSuccess: () => {
+          uploadProofMutation.mutate(data, {
+            onSettled: () => setIsProcessingPayment(false),
+            onError: (error) => console.error('Proof upload failed:', error),
+          });
+        },
+        onError: (error) => {
+          console.error('Payment update failed:', error);
+          setIsProcessingPayment(false);
+        }
+      }
+    );
   };
 
   const filteredPayments = payments.filter(p => {
@@ -177,6 +259,54 @@ export const ProjectUpdatesPage: React.FC = () => {
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto">
+      {/* Pending Enrollments Notification Banner */}
+      {pendingEnrollments.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 rounded-2xl bg-yellow-500/10 border border-yellow-500/20"
+        >
+          <div className="flex items-center gap-3">
+            <ClockIcon className="h-5 w-5 text-yellow-500 flex-shrink-0" />
+            <div className="flex-1">
+              <span className="text-sm text-yellow-400 font-medium">
+                {pendingEnrollments.filter(e => e.status === 'pending').length > 0 && (
+                  <>
+                    {pendingEnrollments.filter(e => e.status === 'pending').length} enrollment request{pendingEnrollments.filter(e => e.status === 'pending').length > 1 ? 's' : ''} under verification
+                  </>
+                )}
+                {pendingEnrollments.filter(e => e.status === 'pending').length > 0 &&
+                 pendingEnrollments.filter(e => e.status === 'rejected').length > 0 && ' • '}
+                {pendingEnrollments.filter(e => e.status === 'rejected').length > 0 && (
+                  <span className="text-red-400">
+                    {pendingEnrollments.filter(e => e.status === 'rejected').length} rejected
+                  </span>
+                )}
+              </span>
+            </div>
+            <div className="flex gap-2">
+              {pendingEnrollments.slice(0, 2).map(e => (
+                <Badge
+                  key={e.id}
+                  className={`text-xs ${
+                    e.status === 'pending'
+                      ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                      : 'bg-red-500/20 text-red-400 border-red-500/30'
+                  }`}
+                >
+                  {e.projectName}
+                </Badge>
+              ))}
+              {pendingEnrollments.length > 2 && (
+                <Badge className="bg-gray-500/20 text-gray-400 border-gray-500/30 text-xs">
+                  +{pendingEnrollments.length - 2} more
+                </Badge>
+              )}
+            </div>
+          </div>
+        </motion.div>
+      )}
+
       {/* Header & Project Selector */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <motion.div
@@ -197,15 +327,21 @@ export const ProjectUpdatesPage: React.FC = () => {
           {enrollments.map((env) => (
             <button
               key={env.id}
-              onClick={() => setSelectedEnrollment(env)}
-              className={`flex-shrink-0 px-5 py-2.5 rounded-xl border transition-all whitespace-nowrap font-bold text-sm ${selectedEnrollment?.id === env.id
+              onClick={() => handleSelectEnrollment(env)}
+              className={`flex-shrink-0 px-5 py-2.5 rounded-xl border transition-all whitespace-nowrap font-bold text-sm flex items-center gap-2 ${selectedEnrollment?.id === env.id
                 ? 'bg-gold-500 text-black border-transparent shadow-lg shadow-gold-500/20'
                 : 'bg-[#1a1a1a] text-gray-400 border-gold-500/10 hover:border-gold-500/30'
                 }`}
             >
+              <CheckCircleIcon className="h-4 w-4" />
               {env.project?.name || 'Untitled Project'}
             </button>
           ))}
+          {enrollmentsFetching && !enrollmentsLoading && (
+            <div className="flex-shrink-0 flex items-center px-3">
+              <div className="h-4 w-4 rounded-full border-2 border-gold-500/40 border-t-gold-500 animate-spin" />
+            </div>
+          )}
         </div>
       </div>
 
@@ -262,10 +398,15 @@ export const ProjectUpdatesPage: React.FC = () => {
                 <div className="pt-8 border-t border-gold-500/10">
                   <div className="flex justify-between items-center mb-6">
                     <span className="text-xs uppercase tracking-widest text-gold-500 font-extrabold">Portfolio Value</span>
-                    <Badge variant="outline" className="border-gold-500/30 text-gold-400 py-1 font-bold">
-                      {selectedEnrollment?.status || 'Active'}
+                    <Badge
+                      variant="outline"
+                      className="py-1 font-bold border-green-500/30 text-green-400 bg-green-500/10"
+                    >
+                      <CheckCircleIcon className="h-3 w-3 mr-1" />
+                      Verified
                     </Badge>
                   </div>
+
                   <div className="space-y-4">
                     <div className="flex justify-between items-end">
                       <span className="text-gray-500 text-[10px] uppercase font-bold tracking-widest">Total Valuation</span>
@@ -621,6 +762,20 @@ export const ProjectUpdatesPage: React.FC = () => {
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Payment Method Modal */}
+      {selectedPaymentForModal && (
+        <PaymentMethodModal
+          isOpen={paymentModalOpen}
+          onClose={() => { setPaymentModalOpen(false); setSelectedPaymentForModal(null); }}
+          paymentId={selectedPaymentForModal.id}
+          amount={selectedPaymentForModal.amount}
+          installmentNumber={selectedPaymentForModal.installmentNumber}
+          onPayViaPortal={handlePayViaPortal}
+          onUploadProof={handleUploadProof}
+          isProcessing={isProcessingPayment}
+        />
+      )}
     </div>
   );
 };

@@ -1,15 +1,20 @@
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { User } from '@/types';
+
+type RoleType = 'client' | 'admin' | 'employee' | 'sales_rep';
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  user: any;
+  user: User | null;
   loading: boolean;
-  role: 'client' | 'admin' | 'employee' | null;
-  login: (user: any) => void;
+  profileLoading: boolean;
+  profileReady: boolean;
+  role: RoleType | null;
+  login: (user: User) => void;
   logout: () => void;
-  hasRole: (role: 'client' | 'admin' | 'employee') => boolean;
-  hasAnyRole: (roles: ('client' | 'admin' | 'employee')[]) => boolean;
+  hasRole: (role: RoleType) => boolean;
+  hasAnyRole: (roles: RoleType[]) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import {
   MagnifyingGlassIcon,
@@ -11,62 +11,41 @@ import {
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { CustomDropdown } from '@/components/ui/CustomDropdown';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { adminAPI } from '@/services/api';
+import { useAdminLeads, useUpdateLeadStatus, useAddLeadNote } from '@/hooks/queries/useAdminQueries';
 import { Lead } from '@/types';
 import { formatDate } from '@/lib/utils';
 
 export const LeadManagementPage: React.FC = () => {
-  const [leads, setLeads] = useState<Lead[]>([]);
-  const [filteredLeads, setFilteredLeads] = useState<Lead[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: leads = [], isLoading: loading } = useAdminLeads();
+  const updateLeadStatusMutation = useUpdateLeadStatus();
+  const addLeadNoteMutation = useAddLeadNote();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [newNote, setNewNote] = useState('');
 
-  useEffect(() => {
-    const fetchLeads = async () => {
-      try {
-        const data = await adminAPI.getLeads();
-        setLeads(data);
-        setFilteredLeads(data);
-      } catch (error) {
-        console.error('Failed to fetch leads:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLeads();
-  }, []);
-
-  useEffect(() => {
-    let filtered = leads;
-
+  const filteredLeads = leads.filter(lead => {
+    let matches = true;
     if (searchTerm) {
-      filtered = filtered.filter(lead =>
-        (lead.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+      matches = (lead.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
         (lead.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (lead.phone || '').includes(searchTerm)
-      );
+        (lead.phone || '').includes(searchTerm);
     }
-
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(lead => lead.status === statusFilter);
+    if (matches && statusFilter !== 'all') {
+      matches = lead.status === statusFilter;
     }
-
-    setFilteredLeads(filtered);
-  }, [leads, searchTerm, statusFilter]);
+    return matches;
+  });
 
   const handleStatusUpdate = async (leadId: string, newStatus: 'hot' | 'warm' | 'cold' | 'dead') => {
     try {
-      await adminAPI.updateLeadStatus(leadId, newStatus);
-      const updatedLeads = await adminAPI.getLeads();
-      setLeads(updatedLeads);
+      await updateLeadStatusMutation.mutateAsync({ leadId, status: newStatus });
     } catch (error) {
       console.error('Failed to update lead status:', error);
     }
@@ -76,9 +55,7 @@ export const LeadManagementPage: React.FC = () => {
     if (!selectedLead || !newNote.trim()) return;
 
     try {
-      await adminAPI.addLeadNote(selectedLead.id, newNote);
-      const updatedLeads = await adminAPI.getLeads();
-      setLeads(updatedLeads);
+      await addLeadNoteMutation.mutateAsync({ leadId: selectedLead.id, note: newNote });
       setNewNote('');
       setSelectedLead(null);
     } catch (error) {
@@ -116,7 +93,7 @@ export const LeadManagementPage: React.FC = () => {
     dead: leads.filter(l => l.status === 'dead').length,
   };
 
-  if (loading) {
+  if (loading && leads.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2" style={{ borderColor: '#d4af37' }}></div>
@@ -238,22 +215,20 @@ export const LeadManagementPage: React.FC = () => {
                 </div>
               </div>
               <div className="flex gap-2">
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 rounded-lg"
-                  style={{
-                    background: '#000000',
-                    border: '1px solid rgba(212,175,55,0.25)',
-                    color: '#ffffff'
-                  }}
-                >
-                  <option value="all">All Status</option>
-                  <option value="hot">Hot</option>
-                  <option value="warm">Warm</option>
-                  <option value="cold">Cold</option>
-                  <option value="dead">Dead</option>
-                </select>
+                <div className="w-48">
+                  <CustomDropdown
+                    value={statusFilter}
+                    onChange={(value) => setStatusFilter(value)}
+                    options={[
+                      { label: 'All Status', value: 'all' },
+                      { label: 'Hot', value: 'hot' },
+                      { label: 'Warm', value: 'warm' },
+                      { label: 'Cold', value: 'cold' },
+                      { label: 'Dead', value: 'dead' }
+                    ]}
+                    placeholder="Filter by status"
+                  />
+                </div>
                 <Button variant="outline">
                   <FunnelIcon className="h-4 w-4 mr-2" />
                   More Filters
@@ -382,16 +357,19 @@ export const LeadManagementPage: React.FC = () => {
 
                                 <div className="flex justify-between">
                                   <div className="flex space-x-2">
-                                    <select
-                                      value={lead.status}
-                                      onChange={(e) => handleStatusUpdate(lead.id, e.target.value as any)}
-                                      className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                                    >
-                                      <option value="hot">Hot</option>
-                                      <option value="warm">Warm</option>
-                                      <option value="cold">Cold</option>
-                                      <option value="dead">Dead</option>
-                                    </select>
+                                    <div className="w-40">
+                                      <CustomDropdown
+                                        value={lead.status}
+                                        onChange={(value) => handleStatusUpdate(lead.id, value as any)}
+                                        options={[
+                                          { label: 'Hot', value: 'hot' },
+                                          { label: 'Warm', value: 'warm' },
+                                          { label: 'Cold', value: 'cold' },
+                                          { label: 'Dead', value: 'dead' }
+                                        ]}
+                                        placeholder="Select status"
+                                      />
+                                    </div>
                                   </div>
                                   <Button onClick={handleAddNote} disabled={!newNote.trim()}>
                                     Add Note

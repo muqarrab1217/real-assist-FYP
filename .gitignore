@@ -1,5 +1,30 @@
+# ========================
+# Dependencies
+# ========================
+node_modules/
+jspm_packages/
+.npm
+.yarn-integrity
+*.tgz
+
+# ========================
+# Build Outputs
+# ========================
+dist/
+dist-ssr/
+*.local
+
+# ========================
+# Environment Variables
+# ========================
+.env
+.env.*
+!.env.example
+
+# ========================
 # Logs
-logs
+# ========================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -7,77 +32,104 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# ========================
+# Testing / Coverage
+# ========================
+coverage/
+*.lcov
+.nyc_output/
 
-# Editor directories and files
+# ========================
+# Editor / IDE
+# ========================
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+!.vscode/settings.json
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Gemini RAG config and uploads
-ragBot/config/
-ragBot/uploads/
-
-# OS generated files
+# ========================
+# OS Generated Files
+# ========================
+.DS_Store
 Thumbs.db
 ehthumbs.db
 Desktop.ini
 $RECYCLE.BIN/
 
-# Temporary files
+# ========================
+# Temporary Files
+# ========================
 *.tmp
 *.temp
 
-# Large local documents
+# ========================
+# RAG Bot (uploads & runtime config)
+# ========================
+ragBot/config/
+ragBot/uploads/
+
+# ========================
+# Large Local Documents
+# ========================
 RagDocuments/
 
-# Coverage directory used by tools like istanbul
-coverage
-*.lcov
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+.Python
+*.egg-info/
+*.egg
+venv/
+.venv/
+env/
 
-# nyc test coverage
-.nyc_output
+# ========================
+# ML Model Artifacts
+# ========================
+models/**/*.pkl
+models/**/*.h5
+models/**/*.pt
+models/**/*.pth
+models/**/*.onnx
+models/**/*.joblib
 
-# Dependency directories
-node_modules/
-jspm_packages/
+# ========================
+# Jupyter Notebooks Checkpoints
+# ========================
+.ipynb_checkpoints/
 
-# Optional npm cache directory
-.npm
+# ========================
+# PDF Extractor Outputs
+# ========================
+pdf_extractor/output/
+pdf_extractor/*.json
+!pdf_extractor/manual_extraction_template.json
 
-# Optional eslint cache
+# ========================
+# Caches
+# ========================
 .eslintcache
-
-# Microbundle cache
 .rpt2_cache/
 .rts2_cache_cjs/
 .rts2_cache_es/
 .rts2_cache_umd/
 
-# Optional REPL history
+# ========================
+# Misc
+# ========================
 .node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
+test_output.txt
+ts_output.txt
+leads.zip
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

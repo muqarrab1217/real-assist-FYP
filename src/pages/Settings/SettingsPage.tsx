@@ -1,22 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import {
   UserIcon,
   BellIcon,
   ShieldCheckIcon,
   PaintBrushIcon,
-  GlobeAltIcon
+  GlobeAltIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
+  EyeIcon,
+  EyeSlashIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { CustomDropdown } from '@/components/ui/CustomDropdown';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuthContext } from '@/contexts/AuthContext';
-import { authAPI } from '@/services/api';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { authAPI, adminAPI } from '@/services/api';
 
 export const SettingsPage: React.FC = () => {
-  const { user } = useAuthContext();
+  const { user, login } = useAuthContext();
+  const needsProfileCompletion = (user?.role === 'employee' || user?.role === 'sales_rep') && !user?.profileCompleted;
+
+  const [profileForm, setProfileForm] = useState({
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    phone: user?.phone || '',
+  });
+
+  // Re-sync form when user profile loads from DB (auth is async, user starts minimal)
+  useEffect(() => {
+    setProfileForm({
+      firstName: user?.firstName || '',
+      lastName: user?.lastName || '',
+      phone: user?.phone || '',
+    });
+  }, [user?.firstName, user?.lastName, user?.phone]);
+  const [isSavingProfile, setIsSavingProfile] = useState(false);
+  const [profileMsg, setProfileMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
   const [settings, setSettings] = useState({
     notifications: true,
     emailUpdates: true,
@@ -26,67 +49,80 @@ export const SettingsPage: React.FC = () => {
     timezone: 'UTC-5',
   });
 
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [isOtpModalOpen, setIsOtpModalOpen] = useState(false);
-  const [isRequestingOtp, setIsRequestingOtp] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [otpCode, setOtpCode] = useState('');
-  const [passwords, setPasswords] = useState({
-    new: '',
-    confirm: '',
-  });
+  const [passwords, setPasswords] = useState({ current: '', new: '', confirm: '' });
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+  const [passwordMsg, setPasswordMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const handleRequestOtp = async () => {
-    if (!currentPassword) {
-      alert('Please enter your current password first');
+  const handleUpdatePassword = async () => {
+    setPasswordMsg(null);
+    if (!passwords.current || !passwords.new || !passwords.confirm) {
+      setPasswordMsg({ type: 'error', text: 'Please fill in all password fields.' });
       return;
     }
-
-    setIsRequestingOtp(true);
-    try {
-      // 1. Verify current password
-      await authAPI.verifyPassword(user?.email || '', currentPassword);
-
-      // 2. Request OTP
-      await authAPI.requestPasswordResetOTP(user?.email || '');
-      setIsOtpModalOpen(true);
-    } catch (error: any) {
-      console.error('Failed to request OTP:', error);
-      alert(error.message || 'Verification failed or failed to send OTP. Please try again.');
-    } finally {
-      setIsRequestingOtp(false);
-    }
-  };
-
-  const handleVerifyOtpAndReset = async () => {
-    if (!otpCode || !passwords.new || !passwords.confirm) {
-      alert('Please fill in all fields');
+    if (passwords.new.length < 6) {
+      setPasswordMsg({ type: 'error', text: 'New password must be at least 6 characters.' });
       return;
     }
-
     if (passwords.new !== passwords.confirm) {
-      alert('Passwords do not match');
+      setPasswordMsg({ type: 'error', text: 'New passwords do not match.' });
+      return;
+    }
+    if (passwords.current === passwords.new) {
+      setPasswordMsg({ type: 'error', text: 'New password must differ from the current password.' });
       return;
     }
 
-    setIsVerifying(true);
+    setIsUpdatingPassword(true);
     try {
-      await authAPI.verifyOTPAndUpdatePassword(user?.email || '', otpCode, passwords.new);
-      alert('Password updated successfully!');
-      setIsOtpModalOpen(false);
-      setCurrentPassword('');
-      setOtpCode('');
-      setPasswords({ new: '', confirm: '' });
+      await authAPI.updatePassword(passwords.current, passwords.new);
+      setPasswordMsg({ type: 'success', text: 'Password updated successfully.' });
+      setPasswords({ current: '', new: '', confirm: '' });
     } catch (error: any) {
-      console.error('Failed to reset password:', error);
-      alert(error.message || 'Invalid OTP or failed to update password.');
+      console.error('Failed to update password:', error);
+      setPasswordMsg({ type: 'error', text: error.message || 'Failed to update password. Please try again.' });
     } finally {
-      setIsVerifying(false);
+      setIsUpdatingPassword(false);
     }
   };
 
   const handleSettingChange = (key: string, value: any) => {
     setSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveProfile = async () => {
+    setProfileMsg(null);
+    if (!profileForm.firstName.trim() || !profileForm.lastName.trim()) {
+      setProfileMsg({ type: 'error', text: 'First Name and Last Name are required.' });
+      return;
+    }
+    if (!user) return;
+
+    setIsSavingProfile(true);
+    try {
+      await adminAPI.updateProfile(user.id, {
+        first_name: profileForm.firstName.trim(),
+        last_name: profileForm.lastName.trim(),
+        phone: profileForm.phone.trim(),
+        profile_completed: true,
+      });
+
+      const updatedUser = {
+        ...user,
+        firstName: profileForm.firstName.trim(),
+        lastName: profileForm.lastName.trim(),
+        phone: profileForm.phone.trim(),
+        profileCompleted: true,
+      };
+      login(updatedUser);
+      setProfileMsg({ type: 'success', text: 'Profile saved successfully.' });
+    } catch (error: any) {
+      console.error('Failed to save profile:', error);
+      setProfileMsg({ type: 'error', text: error.message || 'Failed to save profile. Please try again.' });
+    } finally {
+      setIsSavingProfile(false);
+    }
   };
 
   return (
@@ -107,13 +143,34 @@ export const SettingsPage: React.FC = () => {
         <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Manage your account preferences and system settings</p>
       </motion.div>
 
+      {/* Profile Completion Banner */}
+      {needsProfileCompletion && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 rounded-xl border flex items-start gap-3"
+          style={{
+            background: 'linear-gradient(135deg, rgba(212,175,55,0.15), rgba(0,0,0,0.8))',
+            borderColor: 'rgba(212,175,55,0.4)',
+          }}
+        >
+          <ExclamationTriangleIcon className="h-6 w-6 text-yellow-500 flex-shrink-0 mt-0.5" />
+          <div>
+            <h3 className="font-semibold text-white text-lg">Complete Your Profile</h3>
+            <p className="text-gray-400 text-sm mt-1">
+              Please fill in your profile details below before accessing other sections. All fields are required.
+            </p>
+          </div>
+        </motion.div>
+      )}
+
       {/* Profile Settings */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <Card className="abs-card">
+        <Card className="abs-card" style={needsProfileCompletion ? { borderColor: 'rgba(212,175,55,0.5)', boxShadow: '0 0 20px rgba(212,175,55,0.15)' } : undefined}>
           <CardHeader>
             <CardTitle className="flex items-center" style={{
               fontFamily: 'Playfair Display, serif',
@@ -121,30 +178,67 @@ export const SettingsPage: React.FC = () => {
             }}>
               <UserIcon className="h-5 w-5 mr-2" />
               Profile Settings
+              {needsProfileCompletion && (
+                <Badge className="ml-3" style={{ background: 'rgba(239,68,68,0.15)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.3)' }}>Required</Badge>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Full Name</label>
-                <Input defaultValue={`${user?.firstName || ''} ${user?.lastName || ''}`} style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>First Name <span className="text-red-400">*</span></label>
+                <Input
+                  value={profileForm.firstName}
+                  onChange={(e) => setProfileForm(prev => ({ ...prev, firstName: e.target.value }))}
+                  placeholder="Enter your first name"
+                  style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Last Name <span className="text-red-400">*</span></label>
+                <Input
+                  value={profileForm.lastName}
+                  onChange={(e) => setProfileForm(prev => ({ ...prev, lastName: e.target.value }))}
+                  placeholder="Enter your last name"
+                  style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Email</label>
                 <Input defaultValue={user?.email || ''} disabled style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Phone</label>
-                <Input defaultValue="" placeholder="Not set" style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Phone <span className="text-red-400">*</span></label>
+                <Input
+                  value={profileForm.phone}
+                  onChange={(e) => setProfileForm(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="Enter your phone number"
+                  style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Role</label>
-                <Input defaultValue={user?.role?.charAt(0).toUpperCase() + user?.role?.slice(1) || ''} disabled style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
+                <Input defaultValue={user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : ''} disabled style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }} />
               </div>
             </div>
-            <Button className="text-black font-semibold" style={{
-              backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
-            }}>Save Changes</Button>
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={handleSaveProfile}
+                disabled={isSavingProfile}
+                className="text-black font-semibold"
+                style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }}
+              >
+                {isSavingProfile ? 'Saving...' : (needsProfileCompletion ? 'Complete Profile & Continue' : 'Save Changes')}
+              </Button>
+              {profileMsg && (
+                <div className={`flex items-center gap-2 text-sm ${profileMsg.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                  {profileMsg.type === 'success'
+                    ? <CheckCircleIcon className="h-4 w-4 flex-shrink-0" />
+                    : <ExclamationTriangleIcon className="h-4 w-4 flex-shrink-0" />}
+                  {profileMsg.text}
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </motion.div>
@@ -264,39 +358,31 @@ export const SettingsPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Language</label>
-                <select
+                <CustomDropdown
                   value={settings.language}
-                  onChange={(e) => handleSettingChange('language', e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg"
-                  style={{
-                    background: '#000000',
-                    border: '1px solid rgba(212,175,55,0.25)',
-                    color: '#ffffff'
-                  }}
-                >
-                  <option value="en">English</option>
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
-                  <option value="de">German</option>
-                </select>
+                  onChange={(value) => handleSettingChange('language', value)}
+                  options={[
+                    { label: 'English', value: 'en' },
+                    { label: 'Spanish', value: 'es' },
+                    { label: 'French', value: 'fr' },
+                    { label: 'German', value: 'de' }
+                  ]}
+                  placeholder="Select language"
+                />
               </div>
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Timezone</label>
-                <select
+                <CustomDropdown
                   value={settings.timezone}
-                  onChange={(e) => handleSettingChange('timezone', e.target.value)}
-                  className="w-full px-3 py-2 rounded-lg"
-                  style={{
-                    background: '#000000',
-                    border: '1px solid rgba(212,175,55,0.25)',
-                    color: '#ffffff'
-                  }}
-                >
-                  <option value="UTC-5">UTC-5 (EST)</option>
-                  <option value="UTC-8">UTC-8 (PST)</option>
-                  <option value="UTC+0">UTC+0 (GMT)</option>
-                  <option value="UTC+1">UTC+1 (CET)</option>
-                </select>
+                  onChange={(value) => handleSettingChange('timezone', value)}
+                  options={[
+                    { label: 'UTC-5 (EST)', value: 'UTC-5' },
+                    { label: 'UTC-8 (PST)', value: 'UTC-8' },
+                    { label: 'UTC+0 (GMT)', value: 'UTC+0' },
+                    { label: 'UTC+1 (CET)', value: 'UTC+1' }
+                  ]}
+                  placeholder="Select timezone"
+                />
               </div>
             </div>
           </CardContent>
@@ -320,83 +406,90 @@ export const SettingsPage: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="max-w-md">
-              <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Current Password</label>
-              <div className="flex gap-4">
+            <div className="max-w-md space-y-3">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Current Password</label>
                 <Input
                   type="password"
                   placeholder="Enter current password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  value={passwords.current}
+                  onChange={(e) => setPasswords(prev => ({ ...prev, current: e.target.value }))}
                   style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
                 />
-                <Button
-                  onClick={handleRequestOtp}
-                  disabled={isRequestingOtp}
-                  style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }}
-                  className="text-black font-semibold whitespace-nowrap"
-                >
-                  {isRequestingOtp ? 'Sending...' : 'Change Password'}
-                </Button>
               </div>
-              <p className="text-xs text-gray-400 mt-2">We will send a 6-digit verification code to your email.</p>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>New Password</label>
+                <div className="relative">
+                  <Input
+                    type={showNewPassword ? 'text' : 'password'}
+                    placeholder="Enter new password (min. 6 characters)"
+                    value={passwords.new}
+                    onChange={(e) => setPasswords(prev => ({ ...prev, new: e.target.value }))}
+                    className="pr-10"
+                    style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNewPassword(prev => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-300"
+                    style={{ color: 'rgba(212,175,55,0.7)' }}
+                    aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+                  >
+                    {showNewPassword ? (
+                      <EyeSlashIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>Confirm New Password</label>
+                <div className="relative">
+                  <Input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    placeholder="Re-enter new password"
+                    value={passwords.confirm}
+                    onChange={(e) => setPasswords(prev => ({ ...prev, confirm: e.target.value }))}
+                    className="pr-10"
+                    style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(prev => !prev)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors duration-300"
+                    style={{ color: 'rgba(212,175,55,0.7)' }}
+                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
+                  >
+                    {showConfirmPassword ? (
+                      <EyeSlashIcon className="h-5 w-5" />
+                    ) : (
+                      <EyeIcon className="h-5 w-5" />
+                    )}
+                  </button>
+                </div>
+              </div>
+              <div className="flex items-center gap-4 pt-1">
+                <Button
+                  onClick={handleUpdatePassword}
+                  disabled={isUpdatingPassword}
+                  style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }}
+                  className="text-black font-semibold"
+                >
+                  {isUpdatingPassword ? 'Updating...' : 'Update Password'}
+                </Button>
+                {passwordMsg && (
+                  <div className={`flex items-center gap-2 text-sm ${passwordMsg.type === 'success' ? 'text-green-400' : 'text-red-400'}`}>
+                    {passwordMsg.type === 'success'
+                      ? <CheckCircleIcon className="h-4 w-4 flex-shrink-0" />
+                      : <ExclamationTriangleIcon className="h-4 w-4 flex-shrink-0" />}
+                    {passwordMsg.text}
+                  </div>
+                )}
+              </div>
             </div>
           </CardContent>
         </Card>
-
-        {/* Change Password Modal */}
-        <Dialog open={isOtpModalOpen} onOpenChange={setIsOtpModalOpen}>
-          <DialogContent className="sm:max-w-[425px] bg-[#1a1a1a] border-[#d4af37]/30 text-white">
-            <DialogHeader>
-              <DialogTitle style={{ color: '#d4af37', fontFamily: 'Playfair Display, serif' }}>Verify Security Code</DialogTitle>
-              <DialogDescription className="text-gray-400">
-                Enter the 6-digit code sent to your email and your new password.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-6 py-4">
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-gold-400">6-Digit OTP Code</label>
-                <Input
-                  placeholder="000000"
-                  value={otpCode}
-                  onChange={(e) => setOtpCode(e.target.value)}
-                  className="bg-black border-gold-200/20 text-center text-xl tracking-widest"
-                  maxLength={6}
-                />
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-gold-400">New Password</label>
-                <Input
-                  type="password"
-                  placeholder="Enter new password"
-                  value={passwords.new}
-                  onChange={(e) => setPasswords(prev => ({ ...prev, new: e.target.value }))}
-                  className="bg-black border-gold-200/20"
-                />
-              </div>
-              <div className="grid gap-2">
-                <label className="text-sm font-medium text-gold-400">Confirm New Password</label>
-                <Input
-                  type="password"
-                  placeholder="Re-type new password"
-                  value={passwords.confirm}
-                  onChange={(e) => setPasswords(prev => ({ ...prev, confirm: e.target.value }))}
-                  className="bg-black border-gold-200/20"
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <Button
-                onClick={handleVerifyOtpAndReset}
-                disabled={isVerifying}
-                className="w-full text-black font-semibold"
-                style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }}
-              >
-                {isVerifying ? 'Updating...' : 'Save New Password'}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </motion.div>
 
       {/* System Information */}

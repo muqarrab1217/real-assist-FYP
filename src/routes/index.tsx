@@ -24,9 +24,13 @@ import { SettingsPage } from '@/pages/Settings/SettingsPage';
 import { RagUploadPage } from '@/pages/Admin/RagUploadPage';
 import { RagChatHistoryPage } from '@/pages/Admin/RagChatHistoryPage';
 import { TeamManagementPage } from '@/pages/Admin/TeamManagementPage';
+import { EnrollmentRequestsPage } from '@/pages/Admin/EnrollmentRequestsPage';
 import { DashboardProjectsPage } from '@/pages/Dashboard/Projects/DashboardProjectsPage';
 import { SubmitResponse } from '@/pages/SubmitResponse';
+import { GetHelpPage } from '@/pages/Support/GetHelpPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
+import { SalesRepDashboard } from '@/pages/SalesRep/SalesRepDashboard';
+import { VerificationsPage } from '@/pages/SalesRep/VerificationsPage';
 
 export const router = createBrowserRouter([
   {
@@ -127,6 +131,10 @@ export const router = createBrowserRouter([
         element: <SubmitResponse />,
       },
       {
+        path: 'get-help',
+        element: <GetHelpPage />,
+      },
+      {
         path: 'projects',
         element: <DashboardProjectsPage />,
       },
@@ -166,6 +174,10 @@ export const router = createBrowserRouter([
         element: <SubmitResponse />,
       },
       {
+        path: 'get-help',
+        element: <GetHelpPage />,
+      },
+      {
         path: 'chat-history',
         element: <RagChatHistoryPage />,
       },
@@ -195,6 +207,10 @@ export const router = createBrowserRouter([
       {
         path: 'leads',
         element: <LeadManagementPage />,
+      },
+      {
+        path: 'enrollments',
+        element: <EnrollmentRequestsPage />,
       },
       {
         path: 'customers',
@@ -228,6 +244,48 @@ export const router = createBrowserRouter([
       {
         path: 'submit-feedback',
         element: <SubmitResponse />,
+      },
+      {
+        path: 'get-help',
+        element: <GetHelpPage />,
+      },
+    ],
+  },
+  {
+    path: '/sales-rep',
+    element: (
+      <ProtectedRoute requiredRole="sales_rep">
+        <DashboardLayout role="sales_rep" title="Sales Rep Dashboard" />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <Navigate to="/sales-rep/dashboard" replace />,
+      },
+      {
+        path: 'dashboard',
+        element: <SalesRepDashboard />,
+      },
+      {
+        path: 'verifications',
+        element: <VerificationsPage />,
+      },
+      {
+        path: 'settings',
+        element: <SettingsPage />,
+      },
+      {
+        path: 'chat-history',
+        element: <RagChatHistoryPage />,
+      },
+      {
+        path: 'submit-feedback',
+        element: <SubmitResponse />,
+      },
+      {
+        path: 'get-help',
+        element: <GetHelpPage />,
       },
     ],
   },

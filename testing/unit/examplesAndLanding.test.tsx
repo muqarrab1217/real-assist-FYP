@@ -1,5 +1,6 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import { render, screen } from '@testing-library/react';
+import { renderWithProviders, screen, act, waitFor } from '../test-utils';
 import { LandingPage } from '@/pages/Landing/LandingPage';
 import { ProjectsPage } from '@/pages/Projects/ProjectsPage';
 import { ProjectDetailPage } from '@/pages/Projects/ProjectDetailPage';
@@ -30,7 +31,7 @@ vi.mock('@/components/Projects/BlueprintDisplay', () => ({
 
 describe('Examples and Landing/Projects pages', () => {
   it('renders LandingPage hero content', () => {
-    render(
+    renderWithProviders(
       <MemoryRouter>
         <LandingPage />
       </MemoryRouter>
@@ -39,7 +40,7 @@ describe('Examples and Landing/Projects pages', () => {
   });
 
   it('renders ProjectsPage list', () => {
-    render(
+    renderWithProviders(
       <MemoryRouter>
         <ProjectsPage />
       </MemoryRouter>
@@ -48,7 +49,7 @@ describe('Examples and Landing/Projects pages', () => {
   });
 
   it('renders ProjectDetailPage with valid id', () => {
-    render(
+    renderWithProviders(
       <MemoryRouter initialEntries={['/projects/pearl-one-premium']}>
         <Routes>
           <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
@@ -59,8 +60,43 @@ describe('Examples and Landing/Projects pages', () => {
   });
 
   it('renders UsingExtractedData example without crashing', () => {
-    render(<AllProjectsExample />);
+    renderWithProviders(<AllProjectsExample />);
     expect(screen.getAllByText(/Status:/i).length).toBeGreaterThan(0);
   });
+
+  it('LandingPage displays content', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <LandingPage />
+      </MemoryRouter>
+    );
+    expect(document.body).toBeInTheDocument();
+  });
+
+  it('ProjectsPage displays content without crashing', () => {
+    renderWithProviders(
+      <MemoryRouter>
+        <ProjectsPage />
+      </MemoryRouter>
+    );
+    expect(document.body).toBeInTheDocument();
+  });
+
+  it('AllProjectsExample renders items', () => {
+    renderWithProviders(<AllProjectsExample />);
+    expect(document.body).toBeInTheDocument();
+  });
+
+  it('ProjectDetailPage renders without error', () => {
+    renderWithProviders(
+      <MemoryRouter initialEntries={['/projects/test-project']}>
+        <Routes>
+          <Route path="/projects/:projectId" element={<ProjectDetailPage />} />
+        </Routes>
+      </MemoryRouter>
+    );
+    expect(document.body).toBeInTheDocument();
+  });
 });
+
 

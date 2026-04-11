@@ -7,6 +7,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { CustomDropdown } from '@/components/ui/CustomDropdown';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 
@@ -121,23 +122,18 @@ export const SubmitResponse: React.FC = () => {
                     <label className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>
                       Category
                     </label>
-                    <select
-                      name="category"
+                    <CustomDropdown
                       value={formData.category}
-                      onChange={handleInputChange}
-                      className="w-full px-3 py-2 rounded-lg"
-                      style={{ 
-                        background: '#000000', 
-                        border: '1px solid rgba(212,175,55,0.25)',
-                        color: '#ffffff'
-                      }}
-                    >
-                      <option value="general">General Feedback</option>
-                      <option value="bug">Bug Report</option>
-                      <option value="feature">Feature Request</option>
-                      <option value="support">Support</option>
-                      <option value="other">Other</option>
-                    </select>
+                      onChange={(value) => setFormData({ ...formData, category: value })}
+                      options={[
+                        { label: 'General Feedback', value: 'general' },
+                        { label: 'Bug Report', value: 'bug' },
+                        { label: 'Feature Request', value: 'feature' },
+                        { label: 'Support', value: 'support' },
+                        { label: 'Other', value: 'other' }
+                      ]}
+                      placeholder="Select category"
+                    />
                   </div>
                 </div>
 

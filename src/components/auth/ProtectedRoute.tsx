@@ -4,7 +4,7 @@ import { useAuthContext } from '@/contexts/AuthContext';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requiredRole?: 'client' | 'admin' | 'employee';
+  requiredRole?: 'client' | 'admin' | 'employee' | 'sales_rep';
   fallbackPath?: string;
 }
 
@@ -13,9 +13,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   requiredRole,
   fallbackPath = '/auth/login'
 }) => {
-  const { isAuthenticated, role, loading } = useAuthContext();
+  const { isAuthenticated, user, role, loading, profileReady } = useAuthContext();
   const location = useLocation();
 
+  // Initial auth check still running
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
@@ -29,9 +30,19 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   }
 
   if (requiredRole && role !== requiredRole) {
-    const redirectPath = role === 'admin' ? '/admin/dashboard' : (role === 'employee' ? '/employee/dashboard' : '/client/dashboard');
+    const redirectPath = role === 'admin' ? '/admin/dashboard' : (role === 'employee' ? '/employee/dashboard' : (role === 'sales_rep' ? '/sales-rep/dashboard' : '/client/dashboard'));
     return <Navigate to={redirectPath} replace />;
   }
 
+  // Profile completion gate: employee/sales_rep must complete their profile first.
+  // Only enforce AFTER profileReady (DB data loaded), not while still fetching.
+  const isSettingsPage = location.pathname.includes('/settings');
+  if ((role === 'employee' || role === 'sales_rep') && profileReady && !user?.profileCompleted && !isSettingsPage) {
+    const settingsPath = role === 'employee' ? '/employee/settings' : '/sales-rep/settings';
+    return <Navigate to={settingsPath} replace />;
+  }
+
+  // Profile is loading in the background — render children immediately.
+  // The page will re-render with full profile data once the fetch completes.
   return <>{children}</>;
 };

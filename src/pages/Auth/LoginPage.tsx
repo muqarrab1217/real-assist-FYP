@@ -8,11 +8,20 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useAuthContext } from '@/contexts/AuthContext';
 import { authAPI } from '@/services/api';
 
+const LOADING_STEPS = [
+  'Signing in...',
+  'Verifying credentials...',
+  'Fetching user details...',
+  'Initializing payment plans...',
+  'Loading your dashboard...',
+];
+
 export const LoginPage: React.FC = () => {
   const { login } = useAuthContext();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingStep, setLoadingStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: '',
@@ -22,31 +31,54 @@ export const LoginPage: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setLoadingStep(0);
     setError(null);
 
-    // Role is ignored by the login service as it's fetched from the DB, but signature expects it.
-    // Passing 'client' as a default that will be overwritten by reality.
-    const loginPromise = authAPI.login(formData.email, formData.password, 'client');
-
-    // Timeout protective logic - increased to 30s for better tolerance
-    const timeoutPromise = new Promise((_, reject) =>
-      setTimeout(() => reject(new Error('Login timed out. This may be due to a slow connection. Please try again or refresh the page.')), 30000)
-    );
+    // Cycle through loading messages at random intervals
+    let cancelled = false;
+    const scheduleNextStep = (currentStep: number) => {
+      if (cancelled || currentStep >= LOADING_STEPS.length - 1) return;
+      const delay = 900 + Math.random() * 1800; // 0.9s – 2.7s
+      setTimeout(() => {
+        if (cancelled) return;
+        const nextStep = currentStep + 1;
+        setLoadingStep(nextStep);
+        scheduleNextStep(nextStep);
+      }, delay);
+    };
+    scheduleNextStep(0);
 
     try {
-      const user = (await Promise.race([loginPromise, timeoutPromise])) as any;
+      console.log('[DEBUG] LoginPage: Initiating login for', formData.email);
+      const user = await authAPI.login(formData.email, formData.password);
+      cancelled = true;
 
-      // Update local auth state (login function updates state and session is handled by listener)
+      // 1. Update local auth state immediately for snappiness
+      // The useAuth hook will eventually refine this with the full profile data
       login(user);
 
-      // Navigate to appropriate dashboard
-      const isAdmin = user.email.toLowerCase() === 'realassist@admin.com' || user.role === 'admin';
-      const redirectPath = isAdmin ? '/admin/dashboard' : '/client/dashboard';
+      // 2. Navigate immediately based on email or returned hint
+      const dashboardRoutes: Record<string, string> = {
+        admin: '/admin/dashboard',
+        employee: '/admin/dashboard',
+        sales_rep: '/sales-rep/dashboard',
+        client: '/client/dashboard',
+      };
+      const isAdmin = user.role === 'admin';
+      const redirectPath = isAdmin ? '/admin/dashboard' : (dashboardRoutes[user.role] || '/client/dashboard');
+      
+      console.log('[DEBUG] LoginPage: Login successful, redirecting to', redirectPath);
       navigate(redirectPath, { replace: true });
     } catch (err: any) {
+      cancelled = true;
       console.error('Login error:', err);
-      setError(err.message || 'Invalid email or password');
+      if (err.message?.includes('timeout') || err.message?.includes('taking too long')) {
+        setError('Login is taking longer than usual. Please check your internet or try refreshing.');
+      } else {
+        setError(err.message || 'Invalid email or password');
+      }
     } finally {
+      cancelled = true;
       setIsLoading(false);
     }
   };
@@ -170,14 +202,38 @@ export const LoginPage: React.FC = () => {
             <Button
               type="submit"
               disabled={isLoading}
-              className="w-full text-black font-semibold"
+              className="w-full font-semibold flex items-center justify-center gap-3"
               style={{
                 backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
                 borderRadius: '12px',
                 padding: '14px',
+                color: '#000000',
               }}
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              <span className="flex-1 text-center">
+                {isLoading ? LOADING_STEPS[loadingStep] : 'Sign In'}
+              </span>
+              {isLoading && (
+                <svg
+                  className="h-5 w-5 animate-spin flex-shrink-0"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  style={{ color: 'rgba(0,0,0,0.5)' }}
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12" cy="12" r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  />
+                </svg>
+              )}
             </Button>
           </form>
 

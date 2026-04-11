@@ -13,14 +13,27 @@ import {
   ArrowRightOnRectangleIcon,
   CloudArrowUpIcon,
   ChatBubbleLeftRightIcon,
-  BuildingOfficeIcon
+  BuildingOfficeIcon,
+  ClipboardDocumentListIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import { cn } from '@/lib/utils';
 import { User } from '@/types';
 
+// Hide scrollbar styles
+const scrollbarHideStyle = `
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+`;
+
 interface SidebarProps {
-  role: 'client' | 'admin' | 'employee';
-  onRoleChange?: (role: 'client' | 'admin' | 'employee') => void;
+  role: 'client' | 'admin' | 'employee' | 'sales_rep';
+  onRoleChange?: (role: 'client' | 'admin' | 'employee' | 'sales_rep') => void;
   onLogout?: () => void;
   user?: User | null;
 }
@@ -48,6 +61,7 @@ const adminNavigation = [
   { name: 'Projects', href: '/admin/projects', icon: BuildingOfficeIcon },
   { name: 'Team Management', href: '/admin/teams', icon: UserGroupIcon },
   { name: 'Lead Management', href: '/admin/leads', icon: UsersIcon },
+  { name: 'Enrollment Requests', href: '/admin/enrollments', icon: ClipboardDocumentListIcon },
   { name: 'Customer Management', href: '/admin/customers', icon: UserGroupIcon },
   { name: 'Payments & Ledger', href: '/admin/payments', icon: CurrencyDollarIcon },
   { name: 'Analytics', href: '/admin/analytics', icon: ChartBarIcon },
@@ -57,31 +71,41 @@ const adminNavigation = [
   { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
 ];
 
+const salesRepNavigation = [
+  { name: 'Dashboard', href: '/sales-rep/dashboard', icon: HomeIcon },
+  { name: 'Verifications', href: '/sales-rep/verifications', icon: ShieldCheckIcon },
+  { name: 'Chat History', href: '/sales-rep/chat-history', icon: ChatBubbleLeftRightIcon },
+  { name: 'Settings', href: '/sales-rep/settings', icon: Cog6ToothIcon },
+];
+
 export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange, onLogout, user }) => {
   const location = useLocation();
-  const navigation = role === 'client' ? clientNavigation : (role === 'employee' ? employeeNavigation : adminNavigation);
+  const navigation = role === 'client' ? clientNavigation : (role === 'employee' ? employeeNavigation : (role === 'sales_rep' ? salesRepNavigation : adminNavigation));
 
+  const roleSlug = role.replace('_', '-');
   const supportNavigation = [
-    { name: 'Get Help', href: '/help', icon: UsersIcon },
-    { name: 'Submit Feedback', href: `/${role}/submit-feedback`, icon: DocumentTextIcon },
+    { name: 'Get Help', href: `/${roleSlug}/get-help`, icon: UsersIcon },
+    { name: 'Submit Feedback', href: `/${roleSlug}/submit-feedback`, icon: DocumentTextIcon },
   ];
   const [isCollapsed, setIsCollapsed] = useState(false);
 
   return (
-    <div
-      className={cn(
-        "flex h-full flex-col transition-all duration-300 ease-in-out border-r border-gold-200/20 dark:border-gold-800/20",
-        isCollapsed ? "w-16" : "w-64"
-      )}
-      style={{
-        background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.95) 100%)',
-        backgroundColor: 'rgba(212, 175, 55, 0.05)',
-        backdropFilter: 'blur(20px)',
-        boxShadow: 'inset 0 0 200px rgba(212, 175, 55, 0.08)'
-      }}
-      onMouseEnter={() => setIsCollapsed(false)}
-      onMouseLeave={() => setIsCollapsed(true)}
-    >
+    <>
+      <style>{scrollbarHideStyle}</style>
+      <div
+        className={cn(
+          "flex h-full flex-col transition-all duration-300 ease-in-out border-r border-gold-200/20 dark:border-gold-800/20",
+          isCollapsed ? "w-16" : "w-64"
+        )}
+        style={{
+          background: 'linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(0, 0, 0, 0.95) 100%)',
+          backgroundColor: 'rgba(212, 175, 55, 0.05)',
+          backdropFilter: 'blur(20px)',
+          boxShadow: 'inset 0 0 200px rgba(212, 175, 55, 0.08)'
+        }}
+        onMouseEnter={() => setIsCollapsed(false)}
+        onMouseLeave={() => setIsCollapsed(true)}
+      >
       {/* Header */}
       <div className="flex h-16 items-center justify-center border-b border-gold-200/20 dark:border-gold-800/20">
         <Link to="/" className="flex items-center justify-center group mt-4">
@@ -96,51 +120,48 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange, onLogout, 
         </Link>
       </div>
 
-      {/* Role Toggle */}
+      {/* Role Badge / Toggle */}
       {!isCollapsed && (
         <div className="px-4 py-4">
-          <div className="flex bg-charcoal-800/50 backdrop-blur-sm rounded-xl p-1 border border-gold-200/20">
-            <button
-              onClick={() => onRoleChange?.('admin')}
-              className={cn(
-                "flex-1 py-2 px-3 text-sm font-semibold rounded-lg transition-all duration-300",
-                role === 'admin'
-                  ? "bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-white shadow-gold"
-                  : "text-charcoal-300 hover:text-gold-400 hover:bg-gold-900/20"
-              )}
-            >
-              Admin
-            </button>
-            <button
-              onClick={() => onRoleChange?.('client')}
-              className={cn(
-                "flex-1 py-2 px-3 text-sm font-semibold rounded-lg transition-all duration-300",
-                role === 'client'
-                  ? "bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-white shadow-gold"
-                  : "text-charcoal-300 hover:text-gold-400 hover:bg-gold-900/20"
-              )}
-            >
-              Client
-            </button>
-            {user?.role === 'employee' && (
+          {user?.role === 'admin' ? (
+            <div className="flex bg-charcoal-800/50 backdrop-blur-sm rounded-xl p-1 border border-gold-200/20">
               <button
-                onClick={() => onRoleChange?.('employee')}
+                onClick={() => onRoleChange?.('admin')}
                 className={cn(
                   "flex-1 py-2 px-3 text-sm font-semibold rounded-lg transition-all duration-300",
-                  role === 'employee'
-                    ? "bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-white shadow-gold"
+                  role === 'admin'
+                    ? "bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-black shadow-gold"
                     : "text-charcoal-300 hover:text-gold-400 hover:bg-gold-900/20"
                 )}
               >
-                Staff
+                Admin
               </button>
-            )}
-          </div>
+              <button
+                onClick={() => onRoleChange?.('client')}
+                className={cn(
+                  "flex-1 py-2 px-3 text-sm font-semibold rounded-lg transition-all duration-300",
+                  role === 'client'
+                    ? "bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-black shadow-gold"
+                    : "text-charcoal-300 hover:text-gold-400 hover:bg-gold-900/20"
+                )}
+              >
+                Client
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center rounded-xl px-4 py-2 border border-gold-200/20"
+              style={{ background: 'rgba(212,175,55,0.08)' }}>
+              <span className="text-sm font-semibold capitalize"
+                style={{ color: '#d4af37' }}>
+                {user?.role?.replace('_', ' ') || role.replace('_', ' ')}
+              </span>
+            </div>
+          )}
         </div>
       )}
 
       {/* Main Navigation */}
-      <nav className="flex-1 space-y-1 px-4 py-2">
+      <nav className="flex-1 overflow-y-auto px-4 py-2 space-y-1 scrollbar-hide">
         <div className="space-y-1">
           <div className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-gold-400">
             {!isCollapsed && "Main"}
@@ -281,18 +302,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ role, onRoleChange, onLogout, 
           )}
 
 
-          {/* Logout Icon - Hidden when collapsed */}
+          {/* Logout Icon */}
           {onLogout && !isCollapsed && (
             <button
               onClick={onLogout}
               className="flex items-center justify-center rounded-lg transition-all duration-200 p-2 text-charcoal-400 hover:bg-red-100/10 hover:text-red-500"
               title="Logout"
             >
-              <ArrowRightOnRectangleIcon className="h-5 w-5" />
+              <ArrowRightOnRectangleIcon className="h-5 w-5 shrink-0" />
             </button>
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
