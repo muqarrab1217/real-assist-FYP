@@ -129,6 +129,39 @@ pdf_extractor/*.json
 .node_repl_history
 test_output.txt
 ts_output.txt
+
+# ========================
+# Leads Data (imported files / exports)
+# ========================
+leads/
+leads.zip
+*.zip
+
+# ========================
+# AI Agent & Claude Config
+# ========================
+.agent/
+.agents/
+.claude/
+
+# ========================
+# Vite / TypeScript caches
+# ========================
+*.tsbuildinfo
+.vite/
+
+# ========================
+# Vercel / Render build artifacts
+# ========================
+.vercel/
+.render/
+
+# ========================
+# pnpm / Bun lockfiles (not used; keep only package-lock.json)
+# ========================
+pnpm-lock.yaml
+bun.lockb
+ts_output.txt
 leads.zip
 
 # parcel-bundler cache (https://parceljs.org/)
