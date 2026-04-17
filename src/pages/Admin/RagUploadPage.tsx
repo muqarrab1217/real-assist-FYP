@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { CloudArrowUpIcon, DocumentTextIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { CloudArrowUpIcon, DocumentTextIcon, CheckCircleIcon, XCircleIcon, TrashIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -22,6 +22,14 @@ interface FileUploadStatus {
   error?: string;
 }
 
+interface RegisteredFile {
+  id: string;
+  fileName: string;
+  fileSize: number;
+  uploadPath: string;
+  uploadedAt?: string;
+}
+
 export const RagUploadPage: React.FC = () => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [fileStatuses, setFileStatuses] = useState<FileUploadStatus[]>([]);
@@ -30,6 +38,77 @@ export const RagUploadPage: React.FC = () => {
     type: 'success' | 'error' | null;
     message: string;
   }>({ type: null, message: '' });
+
+  // Registered files state
+  const [registeredFiles, setRegisteredFiles] = useState<RegisteredFile[]>([]);
+  const [isLoadingFiles, setIsLoadingFiles] = useState(false);
+  const [deletingFileId, setDeletingFileId] = useState<string | null>(null);
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+  const [fileActionStatus, setFileActionStatus] = useState<{
+    type: 'success' | 'error' | null;
+    message: string;
+  }>({ type: null, message: '' });
+
+  const fetchRegisteredFiles = useCallback(async () => {
+    setIsLoadingFiles(true);
+    try {
+      const url = API_BASE_URL ? `${API_BASE_URL}/api/chatbot/files` : '/api/chatbot/files';
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        setRegisteredFiles(data.files || []);
+      }
+    } catch {
+      // silently ignore fetch errors on load
+    } finally {
+      setIsLoadingFiles(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchRegisteredFiles();
+  }, [fetchRegisteredFiles]);
+
+  const handleDeleteFile = async (fileId: string) => {
+    setDeletingFileId(fileId);
+    setFileActionStatus({ type: null, message: '' });
+    try {
+      const url = API_BASE_URL ? `${API_BASE_URL}/api/chatbot/files/${fileId}` : `/api/chatbot/files/${fileId}`;
+      const res = await fetch(url, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        setFileActionStatus({ type: 'success', message: data.message || 'File deleted.' });
+        setRegisteredFiles(prev => prev.filter(f => f.id !== fileId));
+      } else {
+        setFileActionStatus({ type: 'error', message: data.error || 'Failed to delete file.' });
+      }
+    } catch (err) {
+      setFileActionStatus({ type: 'error', message: 'Network error deleting file.' });
+    } finally {
+      setDeletingFileId(null);
+    }
+  };
+
+  const handleDeleteAll = async () => {
+    if (!window.confirm(`Delete all ${registeredFiles.length} registered file(s)? This cannot be undone.`)) return;
+    setIsDeletingAll(true);
+    setFileActionStatus({ type: null, message: '' });
+    try {
+      const url = API_BASE_URL ? `${API_BASE_URL}/api/chatbot/files/all` : '/api/chatbot/files/all';
+      const res = await fetch(url, { method: 'DELETE' });
+      const data = await res.json();
+      if (res.ok) {
+        setFileActionStatus({ type: 'success', message: data.message || 'All files cleared.' });
+        setRegisteredFiles([]);
+      } else {
+        setFileActionStatus({ type: 'error', message: data.error || 'Failed to clear files.' });
+      }
+    } catch {
+      setFileActionStatus({ type: 'error', message: 'Network error clearing files.' });
+    } finally {
+      setIsDeletingAll(false);
+    }
+  };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -174,7 +253,10 @@ export const RagUploadPage: React.FC = () => {
           if (fileInput) {
             fileInput.value = '';
           }
+          fetchRegisteredFiles(); // refresh registered files list
         }, 3000);
+      } else {
+        fetchRegisteredFiles(); // refresh even on partial success
       }
     } catch (error) {
       console.error('Upload error:', error);
@@ -424,6 +506,119 @@ export const RagUploadPage: React.FC = () => {
                 )}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Registered Files Card */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.15 }}
+      >
+        <Card className="abs-card">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="flex items-center" style={{ 
+                fontFamily: 'Playfair Display, serif',
+                color: '#d4af37'
+              }}>
+                <DocumentTextIcon className="h-5 w-5 mr-2" />
+                Registered Documents ({registeredFiles.length})
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={fetchRegisteredFiles}
+                  disabled={isLoadingFiles}
+                  className="p-1.5 rounded hover:bg-white/10 transition-colors"
+                  title="Refresh list"
+                  style={{ color: 'rgba(212,175,55,0.8)' }}
+                >
+                  <ArrowPathIcon className={`h-4 w-4 ${isLoadingFiles ? 'animate-spin' : ''}`} />
+                </button>
+                {registeredFiles.length > 0 && (
+                  <Button
+                    onClick={handleDeleteAll}
+                    disabled={isDeletingAll || !!deletingFileId}
+                    className="text-white text-xs px-3 py-1 h-auto"
+                    style={{ backgroundColor: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.4)' }}
+                  >
+                    <TrashIcon className="h-3.5 w-3.5 mr-1" />
+                    {isDeletingAll ? 'Clearing...' : 'Delete All'}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            {/* Action status for file operations */}
+            {fileActionStatus.type && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 rounded-lg flex items-start space-x-3 border"
+                style={fileActionStatus.type === 'success' ? {
+                  background: 'rgba(34,197,94,0.08)',
+                  borderColor: 'rgba(34,197,94,0.3)'
+                } : {
+                  background: 'rgba(239,68,68,0.08)',
+                  borderColor: 'rgba(239,68,68,0.3)'
+                }}
+              >
+                {fileActionStatus.type === 'success'
+                  ? <CheckCircleIcon className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: '#22c55e' }} />
+                  : <XCircleIcon className="h-4 w-4 mt-0.5 flex-shrink-0" style={{ color: '#ef4444' }} />
+                }
+                <p className="text-sm" style={{ color: fileActionStatus.type === 'success' ? '#22c55e' : '#ef4444' }}>
+                  {fileActionStatus.message}
+                </p>
+              </motion.div>
+            )}
+
+            {isLoadingFiles ? (
+              <div className="flex items-center justify-center py-8" style={{ color: 'rgba(156,163,175,0.7)' }}>
+                <ArrowPathIcon className="h-5 w-5 animate-spin mr-2" />
+                Loading files...
+              </div>
+            ) : registeredFiles.length === 0 ? (
+              <div className="text-center py-8" style={{ color: 'rgba(156,163,175,0.6)' }}>
+                <DocumentTextIcon className="h-10 w-10 mx-auto mb-2 opacity-40" />
+                <p className="text-sm">No documents registered yet. Upload files above to get started.</p>
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-80 overflow-y-auto">
+                {registeredFiles.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex items-center justify-between p-3 rounded-lg border"
+                    style={{ background: 'rgba(212,175,55,0.04)', borderColor: 'rgba(212,175,55,0.18)' }}
+                  >
+                    <div className="flex items-center space-x-3 flex-1 min-w-0">
+                      <DocumentTextIcon className="h-5 w-5 flex-shrink-0" style={{ color: 'rgba(212,175,55,0.7)' }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate" style={{ color: '#ffffff' }}>{file.fileName}</p>
+                        <p className="text-xs mt-0.5" style={{ color: 'rgba(156,163,175,0.6)' }}>
+                          {file.fileSize ? `${(file.fileSize / 1024 / 1024).toFixed(2)} MB` : '—'}
+                          {file.uploadedAt && ` • ${new Date(file.uploadedAt).toLocaleDateString()}`}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteFile(file.id)}
+                      disabled={deletingFileId === file.id || isDeletingAll}
+                      className="ml-3 p-1.5 rounded transition-colors hover:bg-red-500/20 disabled:opacity-40"
+                      title="Delete file"
+                      style={{ color: '#ef4444' }}
+                    >
+                      {deletingFileId === file.id
+                        ? <ArrowPathIcon className="h-4 w-4 animate-spin" />
+                        : <TrashIcon className="h-4 w-4" />
+                      }
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </motion.div>

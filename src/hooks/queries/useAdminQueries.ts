@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query';
-import { adminAPI, enrollmentAPI, inventoryAPI } from '@/services/api';
+import { adminAPI, enrollmentAPI, inventoryAPI, leadAPI } from '@/services/api';
 import { useAuthContext } from '@/contexts/AuthContext';
 
 export const adminKeys = {
@@ -109,6 +109,27 @@ export function useAddLeadNote() {
   return useMutation({
     mutationFn: ({ leadId, note }: { leadId: string; note: string }) =>
       adminAPI.addLeadNote(leadId, note),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.leads() });
+    },
+  });
+}
+
+export function useAddLead() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: Parameters<typeof leadAPI.createLead>[0]) => leadAPI.createLead(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: adminKeys.leads() });
+    },
+  });
+}
+
+export function useBulkCreateLeads() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (leads: Parameters<typeof leadAPI.bulkCreateLeads>[0]) =>
+      leadAPI.bulkCreateLeads(leads),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: adminKeys.leads() });
     },

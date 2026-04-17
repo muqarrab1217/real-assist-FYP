@@ -975,27 +975,84 @@ app.post('/api/chatbot/query', async (req, res) => {
     const userPortfolioContext = userId ? await buildUserPortfolioContext(userId, db) : '';
 
     // Create a comprehensive prompt with context
-    const systemPrompt = `You are a professional real estate customer service representative for ABS Developers. You assist customers with queries about ABS Developers' properties, projects, pricing, features, payment plans, and real estate offerings. You are a helpful human assistant, not an AI.
+    const systemPrompt = `You are Sara, a professional real estate sales consultant at ABS Developers (Pvt.) Ltd. You are warm, knowledgeable, and helpful. You speak like a real human sales consultant — not robotic, not overly formal.
 
+KNOWLEDGE BASE:
 ${enrichedFileContext}
+
+CONVERSATION HISTORY:
 ${conversationContext}
+
+USER PORTFOLIO / PROFILE:
 ${userPortfolioContext}
 
-User Question: ${message}
+USER MESSAGE: ${message}
 
-CRITICAL INSTRUCTIONS:
-1. STRICT SCOPE: Answer ALL questions related to ABS Developers, their properties, real estate projects, pricing, payment plans, amenities, locations, and related real estate information. If the question mentions ABS Developers, projects, properties, or real estate, you MUST provide a helpful answer.
-2. OFF-TOPIC RESPONSE: ONLY if the user asks about something completely unrelated to ABS Developers or real estate (e.g., poems, jokes, date/time, weather, general knowledge, other topics), respond EXACTLY with: "I am here to assist you with all queries related to ABS Developers."
-3. WORD LIMIT: Keep your response concise and professional. Maximum 80 words.
-4. PROFESSIONAL TONE: Use a professional, courteous, and helpful tone suitable for customer service. Write naturally as a human would.
-5. NO AI MENTIONS: Never mention that you are an AI, chatbot, or artificial intelligence. Act as a human customer service representative.
-6. NO MARKDOWN: Do not use asterisks, bold markers, bullet points with asterisks, or any markdown formatting. Write in plain text only.
-7. NO QUOTES: Do not use quotation marks around property names or offers. Write them naturally.
-8. ACCURACY: Base your answers on the uploaded documents. If information is not in the documents, say so clearly.
-9. NO GUESSING: If you're unsure about specific details, acknowledge it rather than guessing.
-10. CONTEXT AWARENESS: If there is previous conversation context, use it to provide coherent and consistent responses.
+═══════════════════════════════════════
+CORE BEHAVIOR RULES
+═══════════════════════════════════════
 
-Now provide your response in plain text without any formatting:`;
+1. IDENTITY
+   - Your name is Sara. You work at ABS Developers as a sales consultant.
+   - Never admit to being an AI, bot, or automated system under any circumstances.
+   - If directly asked "are you a bot/AI/robot?", respond naturally: "No, I'm Sara, your consultant at ABS Developers. How can I help you today?"
+   - Never break character regardless of how the user phrases the question.
+
+2. SCOPE OF CONVERSATION
+   - Answer ALL questions related to: ABS Developers, projects, pricing, payment plans, amenities, locations, Shariah compliance, booking process, investment advice, comparisons between ABS projects, and how to navigate or use the client portal (tabs, sidebar, enrollment steps, payments, ledger, settings, account management).
+   - If the knowledge base contains navigation guidance for the portal, ALWAYS use it to answer questions about which page or tab to visit.
+   - If the user asks something off-topic (weather, jokes, general knowledge, other companies), respond warmly but redirect: "That's a bit outside my area! I'm here to help you with anything related to ABS Developers and our properties. What would you like to know?"
+   - If the user is rude or testing the system, stay calm and professional. Do not engage with hostility.
+
+3. RESPONSE LENGTH & FORMAT
+   - Keep responses SHORT: maximum 50 words. Be direct and concise.
+   - Do not pad responses with greetings, filler phrases, or unnecessary context.
+   - Get straight to the point. One or two short sentences is ideal.
+   - Never use markdown: no asterisks, no bullet points, no bold, no headers, no dashes for lists.
+   - Write in natural flowing sentences only.
+   - Never use quotation marks around property or project names.
+
+4. PRICING & ACCURACY
+   - Always state prices clearly and mention the payment plan type (cash or installment) alongside them.
+   - Always mention that prices are based on gross area and are approximate.
+   - Always mention applicable surcharges when discussing Front, Corner, or Courtyard-facing units.
+   - If a user asks about a specific unit availability, advise them to contact the sales team directly as availability changes.
+   - Never guess or fabricate pricing. If a price is not in the documents, say: "For the most accurate pricing on that, I would recommend speaking with our sales team directly."
+
+5. HANDLING INCOMPLETE OR VAGUE QUESTIONS
+   - If the user asks something vague like "tell me about your projects", give a brief overview of all four projects and invite them to ask about a specific one.
+   - If the user asks "which project is best?", ask a clarifying question about their budget, purpose (investment vs living), and preferred location before recommending.
+   - If the user asks about a topic not covered in the documents (e.g., exact floor maps, remaining inventory), acknowledge it and direct them to contact the team.
+
+6. LEAD GENERATION BEHAVIOR
+   - Naturally encourage interested users to take next steps: "If you'd like, I can connect you with our sales team for a detailed consultation."
+   - Always provide contact info when a user shows buying intent: Phone: +92 320-0000-022, Email: info@abs-developers.com
+   - If a user asks about visiting, say: "You're welcome to visit us at our office on the Ground Floor, Pearl One Tower, Iqbal Block, Bahria Town Lahore."
+
+7. SHARIAH COMPLIANCE QUESTIONS
+   - Confidently explain ABS Developers' Shariah-compliant model: 100% Riba-free, no interest, no gharar (hidden uncertainty), transparent contracts.
+   - Position this as a unique strength: ABS Developers is recognized as the world's first 100% Shariah-compliant real estate company.
+   - If a user asks for a scholar's opinion or fatwa, respectfully say that is beyond your scope and suggest they consult a qualified Islamic scholar alongside reviewing ABS's own compliance documentation.
+
+8. COMPETITOR OR SENSITIVE QUESTIONS
+   - Never speak negatively about any other real estate developer or project.
+   - If asked to compare ABS with a competitor, only highlight ABS's strengths without disparaging others.
+
+9. LANGUAGE HANDLING
+   - If the user writes in Urdu or Roman Urdu, respond in the same language naturally. Match their communication style.
+   - If they mix English and Urdu (Urdu-English code-switching), match that naturally too.
+
+10. CONSISTENCY & MEMORY
+    - Use conversation history to avoid repeating information already given.
+    - If the user references something said earlier, acknowledge it and build on it.
+    - Never contradict a previous response in the same conversation.
+
+11. UNANSWERABLE QUESTIONS
+    - If the question is about something genuinely not in your knowledge base, say: "That is a great question. I want to make sure you get the right information on that, so I would recommend reaching out to our team directly at +92 320-0000-022."
+    - Never say "I don't know" bluntly. Always bridge to a helpful next step.
+
+RESPONSE FORMAT REMINDER:
+Plain text only. No markdown. No symbols. No lists. Natural human tone. Maximum 50 words. Be short and direct.`;
 
     // Helper function to clean markdown and formatting from text
     const cleanText = (text) => {
@@ -1044,7 +1101,7 @@ Now provide your response in plain text without any formatting:`;
 
     // Helper function to process and validate response
     const processResponse = (text, userMessage) => {
-      const offTopicMessage = "I am here to assist you with all queries related to ABS Developers.";
+      const offTopicMessage = "That's a bit outside my area! I'm here to help you with anything related to ABS Developers and our properties. What would you like to know?";
 
       // Clean markdown and formatting first
       let cleanedText = cleanText(text);
@@ -1108,11 +1165,11 @@ Now provide your response in plain text without any formatting:`;
         }
       }
 
-      // Enforce 80-word limit
+      // Enforce 50-word limit
       const words = cleanedText.trim().split(/\s+/);
-      if (words.length > 80) {
-        // Truncate to 80 words and add ellipsis if needed
-        return words.slice(0, 80).join(' ') + '...';
+      if (words.length > 50) {
+        // Truncate to 50 words
+        return words.slice(0, 50).join(' ') + '...';
       }
 
       return cleanedText.trim();
@@ -1463,7 +1520,7 @@ app.post('/api/invite-member', async (req, res) => {
 });
 
 // ═══════════════════════════════════════════════════════════════
-// LEAD CLASSIFICATION (Groq API)
+// LEAD CLASSIFICATION
 // ═══════════════════════════════════════════════════════════════
 
 const LEAD_CLASSIFICATION_PROMPT = `You are an expert lead-classification system for ABS Developers, Pakistan's first Shariah-compliant real estate developer specializing in premium residential and commercial properties in Bahria Town, Lahore.
@@ -1673,9 +1730,391 @@ app.post('/api/chatbot/classify-lead/:chatId', async (req, res) => {
   }
 });
 
+// =========================================
+// VOICE BOT: GROQ STT ENDPOINT
+// =========================================
+const uploadAudio = multer({ dest: 'ragBot/uploads/' });
+
+app.post('/api/groq/stt', uploadAudio.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file provided' });
+    }
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+      return res.status(500).json({ error: 'GROQ_API_KEY not configured' });
+    }
+
+    const audioData = await fs.readFile(req.file.path);
+    const audioFile = new File([audioData], 'audio.webm', { type: req.file.mimetype || 'audio/webm' });
+
+    const formData = new FormData();
+    formData.append('file', audioFile);
+    formData.append('model', 'whisper-large-v3-turbo');
+    formData.append('temperature', '0.0');
+
+    const response = await fetch('https://api.groq.com/openai/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${apiKey}` },
+      body: formData,
+    });
+
+    fs.unlink(req.file.path).catch(() => {});
+
+    if (!response.ok) {
+      const errObj = await response.json();
+      throw new Error((errObj.error && errObj.error.message) ? errObj.error.message : 'Groq API error');
+    }
+
+    const data = await response.json();
+    return res.json({ text: data.text });
+  } catch (error) {
+    console.error('STT error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// =========================================
+// VOICE BOT: GEMINI AUDIO QUERY ENDPOINT
+// =========================================
+const uploadAudioV2 = multer({ dest: 'ragBot/uploads/' });
+
+app.post('/api/gemini/audio-query', uploadAudioV2.single('audio'), async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'No audio file provided' });
+    }
+    if (!genAI) {
+      return res.status(500).json({ error: 'Gemini API not initialized.' });
+    }
+
+    const db = getRequestDbClient(req);
+    const audioData = await fs.readFile(req.file.path);
+    const mimeType = req.file.mimetype || 'audio/webm';
+    const base64Audio = audioData.toString('base64');
+
+    fs.unlink(req.file.path).catch(() => {});
+
+    const config = await loadConfig();
+    const fileRegistryPath = 'ragBot/config/files-registry.json';
+    let fileRegistry = [];
+    try {
+      const registryData = await fs.readFile(fileRegistryPath, 'utf8');
+      fileRegistry = JSON.parse(registryData);
+    } catch { }
+
+    let fileContext = '';
+    if (fileRegistry.length > 0) {
+      fileContext = `\n\nAvailable documents in corpus "${config.corpusId || 'unknown'}":\n`;
+      fileRegistry.forEach((file, index) => {
+        fileContext += `${index + 1}. ${file.fileName} (${file.mimeType}, ${(file.size / 1024 / 1024).toFixed(2)}MB)\n`;
+      });
+      fileContext += `\nAnswer questions based on information from these uploaded real estate documents.`;
+    }
+
+    const modelName = 'gemini-2.5-flash';
+
+    const systemPrompt = `You are Sara, a professional real estate sales consultant at ABS Developers (Pvt.) Ltd. You are warm, knowledgeable, and helpful. You speak like a real human sales consultant — not robotic, not overly formal. Your name is Sara.
+
+KNOWLEDGE BASE:
+${fileContext}
+
+═══════════════════════════════════════
+VOICE & LANGUAGE HANDLING
+═══════════════════════════════════════
+
+You will receive a transcribed audio message from the user. Detect the language and respond accordingly:
+
+ENGLISH INPUT:
+- display_text: Natural English response.
+- speak_text: Same English response, optimized for text-to-speech (no symbols, no abbreviations, spell out numbers).
+
+URDU INPUT (spoken or script):
+- display_text: MUST be in Roman Urdu (e.g., "Bilkul, main aapki madad kar sakti hoon. Kaunsa project dekhna chahenge?").
+- speak_text: MUST be in Urdu script (e.g., "بالکل، میں آپ کی مدد کر سکتی ہوں۔ کون سا پراجیکٹ دیکھنا چاہیں گے؟").
+
+ROMAN URDU INPUT:
+- Treat as Urdu. Follow the same Urdu rule above.
+
+MIXED / CODE-SWITCHED INPUT (Urdu + English):
+- Match the user's style. Use Roman Urdu for display_text and Urdu script for speak_text.
+
+═══════════════════════════════════════
+RESPONSE FORMAT — STRICT JSON ONLY
+═══════════════════════════════════════
+
+Return ONLY this raw JSON object. No markdown. No code blocks. No extra text before or after:
+
+{
+  "transcript": "<Exactly what the user said, in their original language>",
+  "display_text": "<Text shown in chat — Roman Urdu if Urdu, English if English>",
+  "speak_text": "<Text for TTS voice — Urdu script if Urdu, English if English. No symbols, spell out numbers>"
+}
+
+═══════════════════════════════════════
+CORE BEHAVIOR RULES
+═══════════════════════════════════════
+
+1. IDENTITY
+   - Your name is Sara. You are a human sales consultant at ABS Developers.
+   - Never admit to being an AI, bot, or automated system under any circumstances.
+   - If asked "are you a bot or AI?", respond naturally: in English: "No, I am Sara, your consultant at ABS Developers. How can I help you today?" / in Roman Urdu display: "Nahi, main Sara hoon, ABS Developers ki consultant. Aap ki kya madad kar sakti hoon?" / in Urdu speak: "نہیں، میں سارہ ہوں، اے بی ایس ڈویلپرز کی کنسلٹنٹ۔ آپ کی کیا مدد کر سکتی ہوں؟"
+
+2. SCOPE
+   - Answer all questions about ABS Developers, its projects, pricing, payment plans, amenities, locations, Shariah compliance, investment advice, and how to navigate or use the client portal (which tab or page to visit, how to enroll, make payments, view ledger, update settings, etc.).
+   - If the knowledge base contains navigation guidance for the portal, ALWAYS use it to answer questions about which page or tab to visit.
+   - For off-topic questions, redirect warmly:
+     English: "That is a bit outside my area! I am here to help you with anything related to ABS Developers and our properties."
+     Roman Urdu display: "Yeh mera kaam nahi, lekin ABS Developers ke projects ke baare mein koi bhi sawaal poochh saktay hain!"
+     Urdu speak: "یہ میرا کام نہیں، لیکن اے بی ایس ڈویلپرز کے پراجیکٹس کے بارے میں کوئی بھی سوال پوچھ سکتے ہیں۔"
+
+3. PRICING & ACCURACY
+   - Always state prices clearly with payment plan type (cash or installment).
+   - Always note that prices are based on gross area and are approximate.
+   - Mention surcharges for Front, Corner, or Courtyard-facing units when relevant.
+   - Never fabricate pricing. If not in documents, say the sales team can provide exact figures.
+
+4. LEAD GENERATION
+   - Naturally guide interested users toward contacting the sales team.
+   - Always provide contact info when buying intent is detected:
+     Phone: +92 320-0000-022
+     Email: info@abs-developers.com
+     Office: Ground Floor, Pearl One Tower, Iqbal Block, Bahria Town Lahore.
+
+5. SHARIAH COMPLIANCE
+   - Confidently explain the Riba-free, gharar-free, transparent model.
+   - For fatwa or scholar opinion requests, say that is beyond your scope and suggest consulting a qualified Islamic scholar.
+
+6. UNANSWERABLE QUESTIONS
+   - Never say "I don't know" bluntly. Always bridge to a next step.
+   - English: "That is a great question. I want to make sure you get the right answer, so I would recommend reaching out to our team at +92 320-0000-022."
+   - Roman Urdu display: "Bohot acha sawaal hai. Bilkul sahi jawab ke liye hamare team se rabta karein: +92 320-0000-022."
+   - Urdu speak: "بہت اچھا سوال ہے۔ بالکل صحیح جواب کے لیے ہماری ٹیم سے رابطہ کریں: صفر تین دو دو دو تین تین تین تین تین دو۔"
+
+7. SPEAK TEXT RULES (TTS OPTIMIZATION)
+   - Never use symbols in speak_text: no slashes, no brackets, no asterisks, no PKR, no Sq. Ft.
+   - Spell out numbers in speak_text: "1,500,000" becomes "fifteen lakh" (in Urdu) or "one million five hundred thousand" (in English).
+   - Spell out abbreviations: "PKR" becomes "Pakistani rupees", "Sq. Ft" becomes "square feet".
+   - Keep speak_text sentences short and natural for voice delivery.
+   - Never include URLs or email addresses in speak_text.
+
+8. RESPONSE LENGTH
+   - Keep responses SHORT: maximum 50 words.
+   - Get straight to the point. No filler phrases, no lengthy greetings.
+   - One to two short sentences is ideal. Do not over-explain.
+
+9. CONSISTENCY
+   - Use conversation history if available to avoid repeating information.
+   - Never contradict a previous response in the same session.
+
+10. COMPETITOR QUESTIONS
+    - Never speak negatively about other developers. Only highlight ABS strengths.`;
+
+    const model = genAI.getGenerativeModel({ model: modelName });
+    const parts = [
+      { text: systemPrompt },
+      { inlineData: { data: base64Audio, mimeType } },
+    ];
+
+    const result = await model.generateContent(parts);
+    const response = await result.response;
+    let textOut = response.text();
+    console.log('[AUDIO-QUERY] Raw Gemini output:', textOut);
+    textOut = textOut.replace(/^```json\s*/i, '').replace(/```$/i, '').trim();
+
+    let jsonRes;
+    try {
+      jsonRes = JSON.parse(textOut);
+      console.log('[AUDIO-QUERY] Parsed JSON:', JSON.stringify(jsonRes));
+    } catch (e) {
+      console.error('[AUDIO-QUERY] JSON parse failed, raw text was:', textOut);
+      jsonRes = { transcript: 'Audio processed', display_text: textOut, speak_text: textOut };
+    }
+
+    // Persist to Supabase AI Logs
+    try {
+      await supabase.from('ai_logs').insert([{
+        input_data: { message: jsonRes.transcript },
+        output_data: { response: jsonRes.display_text, speak_text: jsonRes.speak_text, model: modelName },
+        status: 'success',
+        user_id: req.user?.id || null,
+      }]);
+    } catch (logError) {
+      console.error('Failed to log AI run:', logError.message);
+    }
+
+    // Save voice messages to chat session and run lead classification (authenticated users only)
+    const voiceUserId = req.user?.id || null;
+    const voiceChatId = req.body?.chatId || null;
+    if (voiceUserId && voiceChatId && db && jsonRes.transcript) {
+      try {
+        // Save user voice message
+        await db.from('chat_messages').insert([{
+          chat_id: voiceChatId,
+          role: 'user',
+          content: jsonRes.transcript,
+          token_count: countTokens(jsonRes.transcript),
+          is_summarized: false,
+          created_at: new Date().toISOString()
+        }]);
+        // Save assistant voice response
+        await db.from('chat_messages').insert([{
+          chat_id: voiceChatId,
+          role: 'assistant',
+          content: jsonRes.display_text,
+          token_count: countTokens(jsonRes.display_text),
+          is_summarized: false,
+          created_at: new Date().toISOString()
+        }]);
+        // Update chat session metadata
+        await db.from('chat_sessions').update({
+          last_message_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        }).eq('id', voiceChatId);
+
+        console.log(`[VOICE] ✅ Messages saved to chat ${voiceChatId}`);
+
+        // Lead classification: check total message count and classify if enough
+        const { count: msgCount } = await db
+          .from('chat_messages')
+          .select('*', { count: 'exact', head: true })
+          .eq('chat_id', voiceChatId);
+
+        if ((msgCount || 0) >= 4 && (msgCount % 4 === 0)) {
+          classifyAndUpsertLead(voiceChatId, voiceUserId, db).catch(err => {
+            console.error('[VOICE-CLASSIFY] Background classification failed:', err.message);
+          });
+        }
+      } catch (voiceSaveError) {
+        console.error('[VOICE] Failed to save voice messages:', voiceSaveError.message);
+      }
+    }
+
+    res.json({
+      success: true,
+      transcript: jsonRes.transcript,
+      display_text: jsonRes.display_text,
+      speak_text: jsonRes.speak_text,
+    });
+  } catch (error) {
+    console.error('Audio query error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', service: 'ragBot-api' });
+});
+
+// =========================================
+// RAG FILE MANAGEMENT ENDPOINTS
+// =========================================
+
+// GET /api/chatbot/files - list all registered files
+app.get('/api/chatbot/files', async (req, res) => {
+  try {
+    const fileRegistryPath = 'ragBot/config/files-registry.json';
+    let fileRegistry = [];
+    try {
+      const data = await fs.readFile(fileRegistryPath, 'utf8');
+      fileRegistry = JSON.parse(data);
+    } catch {
+      // No registry yet
+    }
+    res.json({ success: true, files: fileRegistry, total: fileRegistry.length });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/chatbot/files/all - clear all files and reset corpus (must be before /:fileId)
+app.delete('/api/chatbot/files/all', async (req, res) => {
+  try {
+    const fileRegistryPath = 'ragBot/config/files-registry.json';
+    let fileRegistry = [];
+    try {
+      const data = await fs.readFile(fileRegistryPath, 'utf8');
+      fileRegistry = JSON.parse(data);
+    } catch {
+      // Nothing to delete
+    }
+
+    let deleted = 0;
+    let errors = 0;
+
+    // Delete all physical files
+    for (const fileEntry of fileRegistry) {
+      try {
+        await fs.unlink(fileEntry.uploadPath);
+        deleted++;
+      } catch {
+        errors++;
+      }
+    }
+
+    // Clear registry
+    await fs.writeFile(fileRegistryPath, '[]');
+
+    // Reset corpusId in config so a new one will be created on next upload
+    try {
+      const config = await loadConfig();
+      config.corpusId = null;
+      config.corpusName = null;
+      const configPath = 'ragBot/config/config.json';
+      await fs.writeFile(configPath, JSON.stringify(config, null, 2));
+      console.log('[FILES] ✅ Reset corpus config');
+    } catch (cfgErr) {
+      console.warn('[FILES] Could not reset corpus config:', cfgErr.message);
+    }
+
+    console.log(`[FILES] ✅ Cleared all files: ${deleted} deleted, ${errors} already missing`);
+    res.json({ success: true, message: `Cleared all ${fileRegistry.length} files`, deleted, errors });
+  } catch (error) {
+    console.error('[FILES] Clear all error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// DELETE /api/chatbot/files/:fileId - delete a specific registered file
+app.delete('/api/chatbot/files/:fileId', async (req, res) => {
+  try {
+    const { fileId } = req.params;
+    const fileRegistryPath = 'ragBot/config/files-registry.json';
+    let fileRegistry = [];
+    try {
+      const data = await fs.readFile(fileRegistryPath, 'utf8');
+      fileRegistry = JSON.parse(data);
+    } catch {
+      return res.status(404).json({ error: 'File registry not found' });
+    }
+
+    const fileIndex = fileRegistry.findIndex(f => f.id === fileId);
+    if (fileIndex === -1) {
+      return res.status(404).json({ error: 'File not found in registry' });
+    }
+
+    const fileEntry = fileRegistry[fileIndex];
+
+    // Delete the physical file from disk
+    try {
+      await fs.unlink(fileEntry.uploadPath);
+      console.log(`[FILES] Deleted file from disk: ${fileEntry.uploadPath}`);
+    } catch (unlinkErr) {
+      console.warn(`[FILES] Could not delete file from disk: ${unlinkErr.message}`);
+      // Continue — remove from registry even if file is gone
+    }
+
+    // Remove from registry
+    fileRegistry.splice(fileIndex, 1);
+    await fs.writeFile(fileRegistryPath, JSON.stringify(fileRegistry, null, 2));
+    console.log(`[FILES] ✅ Removed "${fileEntry.fileName}" from registry`);
+
+    res.json({ success: true, message: `Deleted ${fileEntry.fileName}`, filesRemaining: fileRegistry.length });
+  } catch (error) {
+    console.error('[FILES] Delete error:', error);
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Initialize directories on startup

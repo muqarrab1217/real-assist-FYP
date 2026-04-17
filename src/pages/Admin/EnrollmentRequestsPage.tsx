@@ -156,30 +156,38 @@ export const EnrollmentRequestsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto p-6">
+    <div className="space-y-8">
       {/* Header */}
-      <div>
-        <h1 className="text-4xl font-bold text-white mb-2" style={{ fontFamily: 'Playfair Display, serif' }}>
-          Enrollment <span className="text-gold-400">Requests</span>
-        </h1>
-        <p className="text-gray-400">Review and manage project enrollment applications</p>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h1 className="text-3xl font-bold mb-2" style={{
+          fontFamily: 'Playfair Display, serif',
+          backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          color: 'transparent',
+        }}>Enrollment Requests</h1>
+        <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Review and manage project enrollment applications</p>
+      </motion.div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <Card className="bg-[#0a0a0a] border-gold-500/20">
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">Pending Review</p>
-                  <p className="text-3xl font-bold text-yellow-500">{pendingCount}</p>
+                  <p className="text-sm" style={{ color: 'rgba(156,163,175,0.8)' }}>Pending Review</p>
+                  <p className="text-3xl font-bold" style={{ color: '#eab308' }}>{pendingCount}</p>
                 </div>
-                <ClockIcon className="h-12 w-12 text-yellow-500/20" />
+                <ClockIcon className="h-10 w-10" style={{ color: 'rgba(234,179,8,0.2)' }} />
               </div>
             </CardContent>
           </Card>
@@ -190,14 +198,14 @@ export const EnrollmentRequestsPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.1 }}
         >
-          <Card className="bg-[#0a0a0a] border-gold-500/20">
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">Approved</p>
-                  <p className="text-3xl font-bold text-green-500">{approvedCount}</p>
+                  <p className="text-sm" style={{ color: 'rgba(156,163,175,0.8)' }}>Approved</p>
+                  <p className="text-3xl font-bold" style={{ color: '#22c55e' }}>{approvedCount}</p>
                 </div>
-                <CheckCircleIcon className="h-12 w-12 text-green-500/20" />
+                <CheckCircleIcon className="h-10 w-10" style={{ color: 'rgba(34,197,94,0.2)' }} />
               </div>
             </CardContent>
           </Card>
@@ -208,14 +216,14 @@ export const EnrollmentRequestsPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.2 }}
         >
-          <Card className="bg-[#0a0a0a] border-gold-500/20">
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">Rejected</p>
-                  <p className="text-3xl font-bold text-red-500">{rejectedCount}</p>
+                  <p className="text-sm" style={{ color: 'rgba(156,163,175,0.8)' }}>Rejected</p>
+                  <p className="text-3xl font-bold" style={{ color: '#ef4444' }}>{rejectedCount}</p>
                 </div>
-                <XCircleIcon className="h-12 w-12 text-red-500/20" />
+                <XCircleIcon className="h-10 w-10" style={{ color: 'rgba(239,68,68,0.2)' }} />
               </div>
             </CardContent>
           </Card>
@@ -226,14 +234,14 @@ export const EnrollmentRequestsPage: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: 0.3 }}
         >
-          <Card className="bg-[#0a0a0a] border-gold-500/20">
+          <Card className="abs-card-premium">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-400">Total Requests</p>
-                  <p className="text-3xl font-bold text-gold-500">{enrollments.length}</p>
+                  <p className="text-sm" style={{ color: 'rgba(156,163,175,0.8)' }}>Total Requests</p>
+                  <p className="text-3xl font-bold" style={{ color: '#d4af37' }}>{enrollments.length}</p>
                 </div>
-                <UserGroupIcon className="h-12 w-12 text-gold-500/20" />
+                <UserGroupIcon className="h-10 w-10" style={{ color: 'rgba(212,175,55,0.2)' }} />
               </div>
             </CardContent>
           </Card>
@@ -241,58 +249,67 @@ export const EnrollmentRequestsPage: React.FC = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="flex-1 relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-          <Input
-            placeholder="Search by name, email, or unit number..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-[#0a0a0a] border-gold-500/20 text-white"
-          />
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant={statusFilter === 'all' ? 'default' : 'outline'}
-            onClick={() => setStatusFilter('all')}
-            className={statusFilter === 'all' ? 'bg-gold-500 text-black' : 'border-gold-500/20 text-gray-400'}
-          >
-            All
-          </Button>
-          <Button
-            variant={statusFilter === 'pending' ? 'default' : 'outline'}
-            onClick={() => setStatusFilter('pending')}
-            className={statusFilter === 'pending' ? 'bg-yellow-500 text-black' : 'border-gold-500/20 text-gray-400'}
-          >
-            Pending
-          </Button>
-          <Button
-            variant={statusFilter === 'active' ? 'default' : 'outline'}
-            onClick={() => setStatusFilter('active')}
-            className={statusFilter === 'active' ? 'bg-green-500 text-black' : 'border-gold-500/20 text-gray-400'}
-          >
-            Approved
-          </Button>
-          <Button
-            variant={statusFilter === 'rejected' ? 'default' : 'outline'}
-            onClick={() => setStatusFilter('rejected')}
-            className={statusFilter === 'rejected' ? 'bg-red-500 text-black' : 'border-gold-500/20 text-gray-400'}
-          >
-            Rejected
-          </Button>
-        </div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        <Card className="abs-card">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: '#d4af37' }} />
+                <Input
+                  placeholder="Search by name, email, or unit number..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                  style={{ background: '#000000', border: '1px solid rgba(212,175,55,0.25)', color: '#ffffff' }}
+                />
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {(['all', 'pending', 'active', 'rejected'] as const).map((filter) => {
+                  const labels: Record<string, string> = { all: 'All', pending: 'Pending', active: 'Approved', rejected: 'Rejected' };
+                  const isActive = statusFilter === filter;
+                  return (
+                    <button
+                      key={filter}
+                      onClick={() => setStatusFilter(filter)}
+                      className="px-4 py-2 rounded-md text-sm font-medium transition-all"
+                      style={isActive ? {
+                        backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)',
+                        color: '#000000',
+                      } : {
+                        background: 'rgba(212,175,55,0.08)',
+                        border: '1px solid rgba(212,175,55,0.25)',
+                        color: 'rgba(212,175,55,0.8)',
+                      }}
+                    >
+                      {labels[filter]}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Enrollments Table */}
-      <Card className="bg-[#0a0a0a] border-gold-500/20">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.5 }}
+      >
+      <Card className="abs-card">
         <CardHeader>
-          <CardTitle className="text-white">All Enrollment Requests</CardTitle>
+          <CardTitle style={{ fontFamily: 'Playfair Display, serif', color: '#d4af37' }}>All Enrollment Requests ({filteredEnrollments.length})</CardTitle>
         </CardHeader>
         <CardContent>
           {filteredEnrollments.length === 0 ? (
             <div className="text-center py-12">
-              <UserGroupIcon className="h-16 w-16 text-gray-600 mx-auto mb-4" />
-              <p className="text-gray-400">No enrollment requests found</p>
+              <UserGroupIcon className="h-16 w-16 mx-auto mb-4" style={{ color: 'rgba(212,175,55,0.3)' }} />
+              <p style={{ color: 'rgba(156,163,175,0.7)' }}>No enrollment requests found</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -403,9 +420,12 @@ export const EnrollmentRequestsPage: React.FC = () => {
         </CardContent>
       </Card>
 
+      {/* close table card+motion */}
+      </motion.div>
+
       {/* Approval Dialog */}
       <Dialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
-        <DialogContent className="bg-[#0a0a0a] border-gold-500/20 text-white max-w-md">
+        <DialogContent style={{ background: '#0a0a0a', borderColor: 'rgba(212,175,55,0.2)', color: '#ffffff' }} className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-white">Approve Enrollment</DialogTitle>
             <DialogDescription className="text-gray-400">
@@ -455,7 +475,7 @@ export const EnrollmentRequestsPage: React.FC = () => {
 
       {/* Rejection Dialog */}
       <Dialog open={showRejectionDialog} onOpenChange={setShowRejectionDialog}>
-        <DialogContent className="bg-[#0a0a0a] border-gold-500/20 text-white max-w-md">
+        <DialogContent style={{ background: '#0a0a0a', borderColor: 'rgba(212,175,55,0.2)', color: '#ffffff' }} className="max-w-md">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-white">Reject Enrollment</DialogTitle>
             <DialogDescription className="text-gray-400">
@@ -506,7 +526,7 @@ export const EnrollmentRequestsPage: React.FC = () => {
 
       {/* Details Dialog */}
       <Dialog open={showDetailsDialog} onOpenChange={setShowDetailsDialog}>
-        <DialogContent className="bg-[#0a0a0a] border-gold-500/20 text-white max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
+        <DialogContent style={{ background: '#0a0a0a', borderColor: 'rgba(212,175,55,0.2)', color: '#ffffff' }} className="max-w-2xl overflow-hidden max-h-[90vh] flex flex-col">
           <DialogHeader className="flex-shrink-0">
             <DialogTitle className="text-2xl font-bold text-white">Enrollment Details</DialogTitle>
           </DialogHeader>

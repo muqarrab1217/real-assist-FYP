@@ -17,7 +17,8 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { useAdminLeads, useUpdateLeadStatus, useAddLeadNote } from '@/hooks/queries/useAdminQueries';
+import { useAdminLeads, useUpdateLeadStatus, useAddLeadNote, useAddLead, useBulkCreateLeads } from '@/hooks/queries/useAdminQueries';
+import { AddLeadModal } from '@/components/Leads/AddLeadModal';
 import { Lead } from '@/types';
 import { formatDate } from '@/lib/utils';
 
@@ -32,6 +33,10 @@ export const LeadManagementPage: React.FC = () => {
   const [newNote, setNewNote] = useState('');
 
   const [sourceFilter, setSourceFilter] = useState<string>('all');
+  const [isAddLeadModalOpen, setIsAddLeadModalOpen] = useState(false);
+
+  const addLeadMutation = useAddLead();
+  const bulkCreateLeadsMutation = useBulkCreateLeads();
 
   const filteredLeads = leads.filter(lead => {
     let matches = true;
@@ -53,9 +58,16 @@ export const LeadManagementPage: React.FC = () => {
     return matches;
   });
 
+  const STATUS_ORDER: Record<string, number> = { hot: 0, cold: 1, dead: 2 };
+  const sortedLeads = [...filteredLeads].sort((a, b) => {
+    const aOrder = STATUS_ORDER[a.status ?? ''] ?? 3;
+    const bOrder = STATUS_ORDER[b.status ?? ''] ?? 3;
+    return aOrder - bOrder;
+  });
+
   const aiClassifiedCount = leads.filter(l => l.classificationSource === 'ai_chatbot').length;
 
-  const handleStatusUpdate = async (leadId: string, newStatus: 'hot' | 'warm' | 'cold' | 'dead') => {
+  const handleStatusUpdate = async (leadId: string, newStatus: 'hot' | 'cold' | 'dead') => {
     try {
       await updateLeadStatusMutation.mutateAsync({ leadId, status: newStatus });
     } catch (error) {
@@ -132,9 +144,11 @@ export const LeadManagementPage: React.FC = () => {
             }}>Lead Management</h1>
             <p style={{ color: 'rgba(156, 163, 175, 0.9)' }}>Manage and track your sales leads with AI-powered insights</p>
           </div>
-          <Button className="text-black font-semibold" style={{
-            backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)'
-          }}>
+          <Button
+            className="text-black font-semibold"
+            style={{ backgroundImage: 'linear-gradient(135deg, #d4af37, #f4e68c)' }}
+            onClick={() => setIsAddLeadModalOpen(true)}
+          >
             <PlusIcon className="h-4 w-4 mr-2" />
             Add Lead
           </Button>
@@ -142,7 +156,7 @@ export const LeadManagementPage: React.FC = () => {
       </motion.div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -174,18 +188,6 @@ export const LeadManagementPage: React.FC = () => {
         >
           <Card className="abs-card-premium">
             <CardContent className="p-4 text-center">
-              <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{leadStats.warm}</p>
-              <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Warm Leads</p>
-            </CardContent>
-          </Card>
-        </motion.div>
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-        >
-          <Card className="abs-card-premium">
-            <CardContent className="p-4 text-center">
               <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>{leadStats.cold}</p>
               <p className="text-sm" style={{ color: 'rgba(212,175,55,0.9)' }}>Cold Leads</p>
             </CardContent>
@@ -210,9 +212,10 @@ export const LeadManagementPage: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.6 }}
+        style={{ position: 'relative', zIndex: 50 }}
       >
-        <Card className="abs-card">
-          <CardContent className="p-6">
+        <Card className="abs-card" style={{ overflow: 'visible' }}>
+          <CardContent className="p-6" style={{ overflow: 'visible' }}>
             <div className="flex flex-col md:flex-row gap-4">
               <div className="flex-1">
                 <div className="relative">
@@ -226,7 +229,7 @@ export const LeadManagementPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-2 relative" style={{ zIndex: 20 }}>
                 <div className="w-48">
                   <CustomDropdown
                     value={statusFilter}
@@ -234,7 +237,6 @@ export const LeadManagementPage: React.FC = () => {
                     options={[
                       { label: 'All Status', value: 'all' },
                       { label: 'Hot', value: 'hot' },
-                      { label: 'Warm', value: 'warm' },
                       { label: 'Cold', value: 'cold' },
                       { label: 'Dead', value: 'dead' }
                     ]}
@@ -270,7 +272,7 @@ export const LeadManagementPage: React.FC = () => {
             <CardTitle style={{
               fontFamily: 'Playfair Display, serif',
               color: '#d4af37'
-            }}>Leads ({filteredLeads.length})</CardTitle>
+            }}>Leads ({sortedLeads.length})</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -287,7 +289,7 @@ export const LeadManagementPage: React.FC = () => {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredLeads.map((lead) => (
+                  {sortedLeads.map((lead) => (
                     <TableRow key={lead.id}>
                       <TableCell className="font-medium dark:text-white">{lead.name}</TableCell>
                       <TableCell>
@@ -401,7 +403,6 @@ export const LeadManagementPage: React.FC = () => {
                                         onChange={(value) => handleStatusUpdate(lead.id, value as any)}
                                         options={[
                                           { label: 'Hot', value: 'hot' },
-                                          { label: 'Warm', value: 'warm' },
                                           { label: 'Cold', value: 'cold' },
                                           { label: 'Dead', value: 'dead' }
                                         ]}
@@ -429,6 +430,12 @@ export const LeadManagementPage: React.FC = () => {
           </CardContent>
         </Card>
       </motion.div>
+      <AddLeadModal
+        isOpen={isAddLeadModalOpen}
+        onClose={() => setIsAddLeadModalOpen(false)}
+        onAddLead={async (lead) => { await addLeadMutation.mutateAsync(lead as any); }}
+        onBulkAddLeads={async (leads) => { await bulkCreateLeadsMutation.mutateAsync(leads as any); }}
+      />
     </div>
   );
 };

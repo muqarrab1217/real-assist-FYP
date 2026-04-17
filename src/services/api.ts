@@ -1167,16 +1167,42 @@ export const commonAPI = {
 
 
 // Lead API
+function toLeadRow(lead: Partial<Lead>): Record<string, unknown> {
+  const row: Record<string, unknown> = {};
+  if (lead.name !== undefined)                 row['name']                  = lead.name;
+  if (lead.email !== undefined)                row['email']                 = lead.email;
+  if (lead.phone !== undefined)                row['phone']                 = lead.phone;
+  if (lead.status !== undefined)               row['status']                = lead.status;
+  if (lead.source !== undefined)               row['source']                = lead.source;
+  if (lead.notes !== undefined)                row['notes']                 = lead.notes;
+  if (lead.assignedTo !== undefined)           row['assigned_to']           = lead.assignedTo;
+  if (lead.lastContact !== undefined)          row['last_contact']          = lead.lastContact;
+  if (lead.userId !== undefined)               row['user_id']               = lead.userId;
+  if (lead.chatSessionId !== undefined)        row['chat_session_id']       = lead.chatSessionId;
+  if (lead.classificationSource !== undefined) row['classification_source'] = lead.classificationSource;
+  return row;
+}
+
 export const leadAPI = {
   async createLead(leadData: Partial<Lead>): Promise<Lead> {
     const { data, error } = await supabase
       .from('leads')
-      .insert([leadData])
+      .insert([toLeadRow(leadData)])
       .select()
       .single();
 
     if (error) throw error;
     return data;
+  },
+
+  async bulkCreateLeads(leadsData: Partial<Lead>[]): Promise<Lead[]> {
+    const { data, error } = await supabase
+      .from('leads')
+      .insert(leadsData.map(toLeadRow))
+      .select();
+
+    if (error) throw error;
+    return data ?? [];
   },
 };
 // Helper to validate UUID format
