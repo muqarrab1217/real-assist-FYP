@@ -7,6 +7,7 @@ const fs = require('fs').promises;
 const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { createClient } = require('@supabase/supabase-js');
 const nodemailer = require('nodemailer');
+const stripeRoutes = require('./lib/stripeRoutes.cjs');
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -29,8 +30,11 @@ const getRequestDbClient = (req) => {
   });
 };
 
-// Middleware
+// IMPORTANT: Stripe webhook needs raw body BEFORE express.json() parses it
 app.use(cors());
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), stripeRoutes);
+
+// Middleware (after webhook route so JSON parsing doesn't interfere)
 app.use(express.json({ limit: '500mb' }));
 app.use(express.urlencoded({ limit: '500mb', extended: true }));
 
@@ -377,6 +381,9 @@ const getOrCreateCorpus = async () => {
 };
 
 // Upload endpoint - supports both single and multiple files
+// Mount Stripe API routes (auth-protected routes, not webhook)
+app.use('/api/stripe', stripeRoutes);
+
 app.post('/api/chatbot/upload', upload.array('files', 50), async (req, res) => {
   try {
     const files = req.files || (req.file ? [req.file] : []);
@@ -1289,6 +1296,17 @@ Now provide your response in plain text without any formatting:`;
       console.error('Failed to log AI run:', logError);
     }
 
+    // AUTO LEAD CLASSIFICATION: Run in background after enough messages (4+)
+    if (userId && chatId && currentChat) {
+      const messageCount = (currentChat.total_messages || 0) + 2;
+      // Classify after every 4th message (2nd exchange) and re-classify periodically
+      if (messageCount >= 4 && messageCount % 4 === 0) {
+        classifyAndUpsertLead(chatId, userId, db).catch(err => {
+          console.error('[CLASSIFY] Background classification failed:', err.message);
+        });
+      }
+    }
+
     console.log(`✅ Using model: ${modelName}`);
 
     res.json({
@@ -1441,6 +1459,217 @@ app.post('/api/invite-member', async (req, res) => {
   } catch (error) {
     console.error('[INVITE] Failed to invite member:', error);
     res.status(500).json({ success: false, error: 'Failed to invite member', details: error.message });
+  }
+});
+
+// ═══════════════════════════════════════════════════════════════
+// LEAD CLASSIFICATION (Groq API)
+// ═══════════════════════════════════════════════════════════════
+
+const LEAD_CLASSIFICATION_PROMPT = `You are an expert lead-classification system for ABS Developers, Pakistan's first Shariah-compliant real estate developer specializing in premium residential and commercial properties in Bahria Town, Lahore.
+
+## YOUR TASK
+Analyze the complete customer-agent conversation and classify it into EXACTLY ONE category. Output ONLY the category name as a single word with no punctuation, explanation, or additional text.
+
+### Hot
+A lead demonstrating HIGH PURCHASE INTENT with immediate action potential. Indicators include:
+- Asks about SPECIFIC projects, units, size/floor/facing preferences
+- Discusses PAYMENT DETAILS (down payment, installments, booking fee)
+- Shows BUDGET CLARITY, requests CONCRETE NEXT STEPS (site visit, booking)
+- Mentions bringing CNIC or other commitment documents
+- Discusses TIMELINE urgently
+- Uses COMMITMENT LANGUAGE ("I'll take it", "Reserve a unit", "Let's proceed")
+
+Decision Rule: If 4+ hot indicators present AND customer shows readiness for next steps → Hot
+
+### Cold
+A lead showing MILD INTEREST but NOT ready to commit. Indicators include:
+- VAGUE INQUIRIES ("What do you have?", "Just looking around")
+- PRICE SENSITIVITY (complains cost is high, asks for discounts)
+- NO BUDGET CLARITY or DELAY TACTICS ("I'll think about it", "Maybe next month")
+- NON-COMMITTAL RESPONSES ("Just send me details", "I'll review the brochure")
+
+Decision Rule: If person shows interest BUT lacks commitment indicators OR expresses uncertainty → Cold
+
+### Dead
+A lead with ZERO PROPERTY PURCHASE INTENT or completely OFF-TOPIC. Indicators include:
+- JOB INQUIRIES or SUPPLIER/VENDOR QUERIES
+- WRONG EXPECTATIONS (looking for rent when ABS only sells)
+- IMMEDIATE DISQUALIFICATION ("I have no money", refuses all options)
+- SPAM/RANDOM or CLEARLY NOT A BUYER
+
+Decision Rule: If person shows ZERO buying intent OR topic is completely unrelated → Dead
+
+## CRITICAL RULES
+1. Output format: Single word only (Hot, Cold, or Dead)
+2. Consider the OVERALL conversation arc, not just individual messages
+3. Final customer sentiment weighs more than initial questions
+4. Action-oriented language = strong Hot signal
+5. Hesitation language = Cold signal unless overcome
+6. Irrelevant topics or job inquiries = instant Dead classification
+7. Output ONLY one word: Hot, Cold, or Dead`;
+
+async function classifyLeadWithGroq(conversationText) {
+  const groqApiKey = process.env.GROQ_API_KEY;
+  if (!groqApiKey) {
+    throw new Error('GROQ_API_KEY not configured');
+  }
+
+  const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${groqApiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      model: 'llama-3.1-8b-instant',
+      messages: [
+        { role: 'system', content: LEAD_CLASSIFICATION_PROMPT },
+        { role: 'user', content: `Conversation transcript:\n\n${conversationText}\n\nReturn only one word: Hot or Cold or Dead.` }
+      ],
+      temperature: 0.2,
+      max_tokens: 5,
+    }),
+  });
+
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`Groq API error ${response.status}: ${errText}`);
+  }
+
+  const data = await response.json();
+  const text = (data.choices?.[0]?.message?.content || '').trim().toLowerCase();
+
+  if (text.includes('hot')) return 'hot';
+  if (text.includes('cold')) return 'cold';
+  if (text.includes('dead')) return 'dead';
+
+  console.warn(`[CLASSIFY] Unexpected Groq response: "${text}", defaulting to cold`);
+  return 'cold';
+}
+
+async function classifyAndUpsertLead(chatId, userId, db) {
+  try {
+    if (!supabaseAdmin) {
+      console.error('[CLASSIFY] No service role client available');
+      return null;
+    }
+
+    // Fetch all messages for this chat session
+    const { data: messages, error: msgError } = await db
+      .from('chat_messages')
+      .select('role, content, created_at')
+      .eq('chat_id', chatId)
+      .order('created_at', { ascending: true });
+
+    if (msgError || !messages || messages.length < 4) {
+      console.log(`[CLASSIFY] Skipping — not enough messages (${messages?.length || 0})`);
+      return null;
+    }
+
+    // Build conversation transcript
+    const transcript = messages
+      .filter(m => m.role !== 'system')
+      .map(m => `${m.role === 'user' ? 'Customer' : 'Agent'}: ${m.content}`)
+      .join('\n');
+
+    // Classify via Groq
+    const classification = await classifyLeadWithGroq(transcript);
+    console.log(`[CLASSIFY] Chat ${chatId} → ${classification}`);
+
+    // Get user profile info
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('first_name, last_name, email, phone')
+      .eq('id', userId)
+      .single();
+
+    const userName = profile
+      ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || profile.email || 'Unknown'
+      : 'Unknown';
+
+    // Upsert lead: update if user already has a lead, insert otherwise
+    const { data: existingLead } = await supabaseAdmin
+      .from('leads')
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (existingLead) {
+      // Update existing lead with new classification
+      const { error: updateError } = await supabaseAdmin
+        .from('leads')
+        .update({
+          status: classification,
+          chat_session_id: chatId,
+          classification_source: 'ai_chatbot',
+          last_contact: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          notes: `AI classified as "${classification}" from chat on ${new Date().toLocaleDateString()}`,
+        })
+        .eq('id', existingLead.id);
+
+      if (updateError) console.error('[CLASSIFY] Lead update error:', updateError);
+      else console.log(`[CLASSIFY] ✅ Updated lead ${existingLead.id} → ${classification}`);
+    } else {
+      // Create new lead
+      const { error: insertError } = await supabaseAdmin
+        .from('leads')
+        .insert({
+          name: userName,
+          email: profile?.email || null,
+          phone: profile?.phone || null,
+          status: classification,
+          source: 'ai_chatbot',
+          classification_source: 'ai_chatbot',
+          user_id: userId,
+          chat_session_id: chatId,
+          last_contact: new Date().toISOString(),
+          notes: `AI classified as "${classification}" from chat on ${new Date().toLocaleDateString()}`,
+        });
+
+      if (insertError) console.error('[CLASSIFY] Lead insert error:', insertError);
+      else console.log(`[CLASSIFY] ✅ Created new lead for user ${userId} → ${classification}`);
+    }
+
+    return classification;
+  } catch (error) {
+    console.error('[CLASSIFY] Classification failed:', error.message);
+    return null;
+  }
+}
+
+// Manual classification endpoint (admin can trigger)
+app.post('/api/chatbot/classify-lead/:chatId', async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const { chatId } = req.params;
+    const db = getRequestDbClient(req);
+
+    // Get chat session to find the user
+    const { data: chat, error: chatError } = await db
+      .from('chat_sessions')
+      .select('user_id')
+      .eq('id', chatId)
+      .single();
+
+    if (chatError || !chat) {
+      return res.status(404).json({ error: 'Chat session not found' });
+    }
+
+    const classification = await classifyAndUpsertLead(chatId, chat.user_id, db);
+
+    if (!classification) {
+      return res.status(400).json({ error: 'Classification failed — not enough messages or API error' });
+    }
+
+    res.json({ success: true, classification, chatId, userId: chat.user_id });
+  } catch (error) {
+    console.error('[CLASSIFY] Endpoint error:', error);
+    res.status(500).json({ error: 'Classification failed', details: error.message });
   }
 });
 

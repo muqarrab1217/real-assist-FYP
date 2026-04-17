@@ -1,3 +1,4 @@
+import React, { Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { PublicLayout } from '@/layouts/PublicLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
@@ -5,32 +6,46 @@ import { DashboardLayout } from '@/layouts/DashboardLayout';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { PublicRoute } from '@/components/auth/PublicRoute';
 import { LandingPage } from '@/pages/Landing/LandingPage';
-import { ProjectsPage } from '@/pages/Projects/ProjectsPage';
-import { ProjectDetailPage } from '@/pages/Projects/ProjectDetailPage';
-import { AboutPage } from '@/pages/About/AboutPage';
-import { LoginPage } from '@/pages/Auth/LoginPage';
-import { RegisterPage } from '@/pages/Auth/RegisterPage';
-import { ForgotPasswordPage } from '@/pages/Auth/ForgotPasswordPage';
-import { ClientDashboard } from '@/pages/Client/ClientDashboard';
-import { PaymentsPage } from '@/pages/Client/PaymentsPage';
-import { LedgerPage } from '@/pages/Client/LedgerPage';
-import { ProjectUpdatesPage } from '@/pages/Client/ProjectUpdatesPage';
-import { AdminDashboard } from '@/pages/Admin/AdminDashboard';
-import { LeadManagementPage } from '@/pages/Admin/LeadManagementPage';
-import { CustomerManagementPage } from '@/pages/Admin/CustomerManagementPage';
-import { PaymentsManagementPage } from '@/pages/Admin/PaymentsManagementPage';
-import { AnalyticsPage } from '@/pages/Admin/AnalyticsPage';
-import { SettingsPage } from '@/pages/Settings/SettingsPage';
-import { RagUploadPage } from '@/pages/Admin/RagUploadPage';
-import { RagChatHistoryPage } from '@/pages/Admin/RagChatHistoryPage';
-import { TeamManagementPage } from '@/pages/Admin/TeamManagementPage';
-import { EnrollmentRequestsPage } from '@/pages/Admin/EnrollmentRequestsPage';
-import { DashboardProjectsPage } from '@/pages/Dashboard/Projects/DashboardProjectsPage';
-import { SubmitResponse } from '@/pages/SubmitResponse';
-import { GetHelpPage } from '@/pages/Support/GetHelpPage';
-import { NotFoundPage } from '@/pages/NotFoundPage';
-import { SalesRepDashboard } from '@/pages/SalesRep/SalesRepDashboard';
-import { VerificationsPage } from '@/pages/SalesRep/VerificationsPage';
+
+// ── Lazy-loaded pages (code-split into separate chunks) ─────────────
+const ProjectsPage = React.lazy(() => import('@/pages/Projects/ProjectsPage').then(m => ({ default: m.ProjectsPage })));
+const ProjectDetailPage = React.lazy(() => import('@/pages/Projects/ProjectDetailPage').then(m => ({ default: m.ProjectDetailPage })));
+const AboutPage = React.lazy(() => import('@/pages/About/AboutPage').then(m => ({ default: m.AboutPage })));
+const LoginPage = React.lazy(() => import('@/pages/Auth/LoginPage').then(m => ({ default: m.LoginPage })));
+const RegisterPage = React.lazy(() => import('@/pages/Auth/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const ForgotPasswordPage = React.lazy(() => import('@/pages/Auth/ForgotPasswordPage').then(m => ({ default: m.ForgotPasswordPage })));
+const ClientDashboard = React.lazy(() => import('@/pages/Client/ClientDashboard').then(m => ({ default: m.ClientDashboard })));
+const PaymentsPage = React.lazy(() => import('@/pages/Client/PaymentsPage').then(m => ({ default: m.PaymentsPage })));
+const LedgerPage = React.lazy(() => import('@/pages/Client/LedgerPage').then(m => ({ default: m.LedgerPage })));
+const ProjectUpdatesPage = React.lazy(() => import('@/pages/Client/ProjectUpdatesPage').then(m => ({ default: m.ProjectUpdatesPage })));
+const AdminDashboard = React.lazy(() => import('@/pages/Admin/AdminDashboard').then(m => ({ default: m.AdminDashboard })));
+const LeadManagementPage = React.lazy(() => import('@/pages/Admin/LeadManagementPage').then(m => ({ default: m.LeadManagementPage })));
+const CustomerManagementPage = React.lazy(() => import('@/pages/Admin/CustomerManagementPage').then(m => ({ default: m.CustomerManagementPage })));
+const PaymentsManagementPage = React.lazy(() => import('@/pages/Admin/PaymentsManagementPage').then(m => ({ default: m.PaymentsManagementPage })));
+const AnalyticsPage = React.lazy(() => import('@/pages/Admin/AnalyticsPage').then(m => ({ default: m.AnalyticsPage })));
+const SettingsPage = React.lazy(() => import('@/pages/Settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const RagUploadPage = React.lazy(() => import('@/pages/Admin/RagUploadPage').then(m => ({ default: m.RagUploadPage })));
+const RagChatHistoryPage = React.lazy(() => import('@/pages/Admin/RagChatHistoryPage').then(m => ({ default: m.RagChatHistoryPage })));
+const TeamManagementPage = React.lazy(() => import('@/pages/Admin/TeamManagementPage').then(m => ({ default: m.TeamManagementPage })));
+const EnrollmentRequestsPage = React.lazy(() => import('@/pages/Admin/EnrollmentRequestsPage').then(m => ({ default: m.EnrollmentRequestsPage })));
+const DashboardProjectsPage = React.lazy(() => import('@/pages/Dashboard/Projects/DashboardProjectsPage').then(m => ({ default: m.DashboardProjectsPage })));
+const SubmitResponse = React.lazy(() => import('@/pages/SubmitResponse').then(m => ({ default: m.SubmitResponse })));
+const GetHelpPage = React.lazy(() => import('@/pages/Support/GetHelpPage').then(m => ({ default: m.GetHelpPage })));
+const NotFoundPage = React.lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
+const SalesRepDashboard = React.lazy(() => import('@/pages/SalesRep/SalesRepDashboard').then(m => ({ default: m.SalesRepDashboard })));
+const VerificationsPage = React.lazy(() => import('@/pages/SalesRep/VerificationsPage').then(m => ({ default: m.VerificationsPage })));
+const PaymentSuccessPage = React.lazy(() => import('@/pages/Client/PaymentSuccessPage').then(m => ({ default: m.PaymentSuccessPage })));
+const PaymentCancelPage = React.lazy(() => import('@/pages/Client/PaymentCancelPage').then(m => ({ default: m.PaymentCancelPage })));
+
+const LazyFallback = () => (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-yellow-500"></div>
+  </div>
+);
+
+const S: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+  <Suspense fallback={<LazyFallback />}>{children}</Suspense>
+);
 
 export const router = createBrowserRouter([
   {
@@ -43,16 +58,16 @@ export const router = createBrowserRouter([
       },
       {
         path: 'projects',
-        element: <ProjectsPage />,
+        element: <S><ProjectsPage /></S>,
       },
 
       {
         path: 'projects/:projectId',
-        element: <ProjectDetailPage />,
+        element: <S><ProjectDetailPage /></S>,
       },
       {
         path: 'about',
-        element: <AboutPage />,
+        element: <S><AboutPage /></S>,
       },
     ],
   },
@@ -64,7 +79,7 @@ export const router = createBrowserRouter([
         path: 'login',
         element: (
           <PublicRoute>
-            <LoginPage />
+            <S><LoginPage /></S>
           </PublicRoute>
         ),
       },
@@ -72,7 +87,7 @@ export const router = createBrowserRouter([
         path: 'register',
         element: (
           <PublicRoute>
-            <RegisterPage />
+            <S><RegisterPage /></S>
           </PublicRoute>
         ),
       },
@@ -80,7 +95,7 @@ export const router = createBrowserRouter([
         path: 'forgot-password',
         element: (
           <PublicRoute>
-            <ForgotPasswordPage />
+            <S><ForgotPasswordPage /></S>
           </PublicRoute>
         ),
       },
@@ -112,39 +127,47 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard',
-        element: <ClientDashboard />,
+        element: <S><ClientDashboard /></S>,
       },
       {
         path: 'payments',
-        element: <PaymentsPage />,
+        element: <S><PaymentsPage /></S>,
       },
       {
         path: 'ledger',
-        element: <LedgerPage />,
+        element: <S><LedgerPage /></S>,
       },
       {
         path: 'updates',
-        element: <ProjectUpdatesPage />,
+        element: <S><ProjectUpdatesPage /></S>,
       },
       {
         path: 'submit-feedback',
-        element: <SubmitResponse />,
+        element: <S><SubmitResponse /></S>,
       },
       {
         path: 'get-help',
-        element: <GetHelpPage />,
+        element: <S><GetHelpPage /></S>,
       },
       {
         path: 'projects',
-        element: <DashboardProjectsPage />,
+        element: <S><DashboardProjectsPage /></S>,
       },
       {
         path: 'settings',
-        element: <SettingsPage />,
+        element: <S><SettingsPage /></S>,
       },
       {
         path: 'chat-history',
-        element: <RagChatHistoryPage />,
+        element: <S><RagChatHistoryPage /></S>,
+      },
+      {
+        path: 'payment-success',
+        element: <S><PaymentSuccessPage /></S>,
+      },
+      {
+        path: 'payment-cancel',
+        element: <S><PaymentCancelPage /></S>,
       },
     ],
 
@@ -167,19 +190,19 @@ export const router = createBrowserRouter([
       },
       {
         path: 'settings',
-        element: <SettingsPage />,
+        element: <S><SettingsPage /></S>,
       },
       {
         path: 'submit-feedback',
-        element: <SubmitResponse />,
+        element: <S><SubmitResponse /></S>,
       },
       {
         path: 'get-help',
-        element: <GetHelpPage />,
+        element: <S><GetHelpPage /></S>,
       },
       {
         path: 'chat-history',
-        element: <RagChatHistoryPage />,
+        element: <S><RagChatHistoryPage /></S>,
       },
     ],
 
@@ -198,56 +221,56 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard',
-        element: <AdminDashboard />,
+        element: <S><AdminDashboard /></S>,
       },
       {
         path: 'teams',
-        element: <TeamManagementPage />,
+        element: <S><TeamManagementPage /></S>,
       },
       {
         path: 'leads',
-        element: <LeadManagementPage />,
+        element: <S><LeadManagementPage /></S>,
       },
       {
         path: 'enrollments',
-        element: <EnrollmentRequestsPage />,
+        element: <S><EnrollmentRequestsPage /></S>,
       },
       {
         path: 'customers',
-        element: <CustomerManagementPage />,
+        element: <S><CustomerManagementPage /></S>,
       },
       {
         path: 'payments',
-        element: <PaymentsManagementPage />,
+        element: <S><PaymentsManagementPage /></S>,
       },
       {
         path: 'analytics',
-        element: <AnalyticsPage />,
+        element: <S><AnalyticsPage /></S>,
       },
       {
         path: 'projects',
-        element: <DashboardProjectsPage />,
+        element: <S><DashboardProjectsPage /></S>,
       },
       {
         path: 'settings',
-        element: <SettingsPage />,
+        element: <S><SettingsPage /></S>,
       },
       {
         path: 'rag-upload',
-        element: <RagUploadPage />,
+        element: <S><RagUploadPage /></S>,
       },
       {
         path: 'chat-history',
-        element: <RagChatHistoryPage />,
+        element: <S><RagChatHistoryPage /></S>,
       },
 
       {
         path: 'submit-feedback',
-        element: <SubmitResponse />,
+        element: <S><SubmitResponse /></S>,
       },
       {
         path: 'get-help',
-        element: <GetHelpPage />,
+        element: <S><GetHelpPage /></S>,
       },
     ],
   },
@@ -265,32 +288,32 @@ export const router = createBrowserRouter([
       },
       {
         path: 'dashboard',
-        element: <SalesRepDashboard />,
+        element: <S><SalesRepDashboard /></S>,
       },
       {
         path: 'verifications',
-        element: <VerificationsPage />,
+        element: <S><VerificationsPage /></S>,
       },
       {
         path: 'settings',
-        element: <SettingsPage />,
+        element: <S><SettingsPage /></S>,
       },
       {
         path: 'chat-history',
-        element: <RagChatHistoryPage />,
+        element: <S><RagChatHistoryPage /></S>,
       },
       {
         path: 'submit-feedback',
-        element: <SubmitResponse />,
+        element: <S><SubmitResponse /></S>,
       },
       {
         path: 'get-help',
-        element: <GetHelpPage />,
+        element: <S><GetHelpPage /></S>,
       },
     ],
   },
   {
     path: '*',
-    element: <NotFoundPage />,
+    element: <S><NotFoundPage /></S>,
   },
 ]);

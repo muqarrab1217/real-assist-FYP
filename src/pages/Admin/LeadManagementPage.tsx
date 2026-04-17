@@ -7,7 +7,8 @@ import {
   EyeIcon,
   PencilIcon,
   PhoneIcon,
-  EnvelopeIcon
+  EnvelopeIcon,
+  CpuChipIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,8 @@ export const LeadManagementPage: React.FC = () => {
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [newNote, setNewNote] = useState('');
 
+  const [sourceFilter, setSourceFilter] = useState<string>('all');
+
   const filteredLeads = leads.filter(lead => {
     let matches = true;
     if (searchTerm) {
@@ -40,8 +43,17 @@ export const LeadManagementPage: React.FC = () => {
     if (matches && statusFilter !== 'all') {
       matches = lead.status === statusFilter;
     }
+    if (matches && sourceFilter !== 'all') {
+      if (sourceFilter === 'ai') {
+        matches = lead.classificationSource === 'ai_chatbot';
+      } else if (sourceFilter === 'manual') {
+        matches = lead.classificationSource !== 'ai_chatbot';
+      }
+    }
     return matches;
   });
+
+  const aiClassifiedCount = leads.filter(l => l.classificationSource === 'ai_chatbot').length;
 
   const handleStatusUpdate = async (leadId: string, newStatus: 'hot' | 'warm' | 'cold' | 'dead') => {
     try {
@@ -229,10 +241,18 @@ export const LeadManagementPage: React.FC = () => {
                     placeholder="Filter by status"
                   />
                 </div>
-                <Button variant="outline">
-                  <FunnelIcon className="h-4 w-4 mr-2" />
-                  More Filters
-                </Button>
+                <div className="w-48">
+                  <CustomDropdown
+                    value={sourceFilter}
+                    onChange={(value) => setSourceFilter(value)}
+                    options={[
+                      { label: 'All Sources', value: 'all' },
+                      { label: `AI Classified (${aiClassifiedCount})`, value: 'ai' },
+                      { label: 'Manual', value: 'manual' }
+                    ]}
+                    placeholder="Filter by source"
+                  />
+                </div>
               </div>
             </div>
           </CardContent>
@@ -282,7 +302,17 @@ export const LeadManagementPage: React.FC = () => {
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell className="dark:text-white">{lead.source}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5">
+                          <span className="dark:text-white">{lead.source}</span>
+                          {lead.classificationSource === 'ai_chatbot' && (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                              <CpuChipIcon className="h-3 w-3" />
+                              AI
+                            </span>
+                          )}
+                        </div>
+                      </TableCell>
                       <TableCell>{getStatusBadge(lead.status)}</TableCell>
                       <TableCell>
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${getScoreColor(lead.score || 0)}`}>
@@ -325,7 +355,15 @@ export const LeadManagementPage: React.FC = () => {
                                   </div>
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Source</label>
-                                    <p className="text-gray-900 dark:text-white">{lead.source}</p>
+                                    <div className="flex items-center gap-2">
+                                      <p className="text-gray-900 dark:text-white">{lead.source}</p>
+                                      {lead.classificationSource === 'ai_chatbot' && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-400 border border-blue-500/30">
+                                          <CpuChipIcon className="h-3.5 w-3.5" />
+                                          AI Classified
+                                        </span>
+                                      )}
+                                    </div>
                                   </div>
                                   <div>
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Status</label>

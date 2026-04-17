@@ -95,7 +95,7 @@ export const LoginPage: React.FC = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex items-center justify-center min-h-screen"
+      className="flex items-center justify-center h-full w-full"
     >
       <Card className="w-full max-w-2xl mx-auto" style={{
         background: 'rgba(26,26,26,0.75)',

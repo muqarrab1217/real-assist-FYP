@@ -511,7 +511,7 @@ export const EnrollmentRequestsPage: React.FC = () => {
             <DialogTitle className="text-2xl font-bold text-white">Enrollment Details</DialogTitle>
           </DialogHeader>
           {selectedEnrollment && (
-            <div className="space-y-3 mt-2 flex-1 overflow-hidden">
+            <div className="space-y-3 mt-2 flex-1 overflow-y-auto pr-1">
               {/* User Information */}
               <div className="space-y-2">
                 <h3 className="text-sm font-bold text-gold-400 uppercase tracking-wider">User Information</h3>
@@ -688,32 +688,32 @@ export const EnrollmentRequestsPage: React.FC = () => {
                 </div>
               )}
 
-              {/* Action Buttons in Details Dialog */}
-              {selectedEnrollment.status === 'pending' && (
-                <div className="flex gap-3 pt-2 border-t border-gold-500/10 flex-shrink-0">
-                  <Button
-                    className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm"
-                    onClick={() => {
-                      setShowDetailsDialog(false);
-                      setShowApprovalDialog(true);
-                    }}
-                  >
-                    <CheckCircleIcon className="h-4 w-4 mr-2" />
-                    Approve
-                  </Button>
-                  <Button
-                    variant="destructive"
-                    className="flex-1 text-sm"
-                    onClick={() => {
-                      setShowDetailsDialog(false);
-                      setShowRejectionDialog(true);
-                    }}
-                  >
-                    <XCircleIcon className="h-4 w-4 mr-2" />
-                    Reject
-                  </Button>
-                </div>
-              )}
+            </div>
+          )}
+          {/* Action Buttons - Always visible at bottom */}
+          {selectedEnrollment?.status === 'pending' && (
+            <div className="flex gap-3 pt-3 border-t border-gold-500/10 flex-shrink-0">
+              <Button
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white text-sm"
+                onClick={() => {
+                  setShowDetailsDialog(false);
+                  setShowApprovalDialog(true);
+                }}
+              >
+                <CheckCircleIcon className="h-4 w-4 mr-2" />
+                Approve
+              </Button>
+              <Button
+                variant="destructive"
+                className="flex-1 text-sm"
+                onClick={() => {
+                  setShowDetailsDialog(false);
+                  setShowRejectionDialog(true);
+                }}
+              >
+                <XCircleIcon className="h-4 w-4 mr-2" />
+                Reject
+              </Button>
             </div>
           )}
         </DialogContent>

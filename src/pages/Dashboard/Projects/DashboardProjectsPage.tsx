@@ -7,7 +7,6 @@ import {
     ArrowRightIcon,
     PlusIcon,
     ArrowPathIcon,
-    CheckBadgeIcon
 } from '@heroicons/react/24/outline';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -24,8 +23,6 @@ import { useQueryClient } from '@tanstack/react-query';
 import { commonKeys } from '@/hooks/queries/useCommonQueries';
 import { useAllProjectSubscriptions } from '@/hooks/queries/useAdminQueries';
 import { useUserEnrollments, usePendingEnrollments } from '@/hooks/queries/useClientQueries';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ClockIcon } from '@heroicons/react/24/outline';
 
 export const DashboardProjectsPage: React.FC = () => {
     const { role } = useAuthContext();
@@ -41,23 +38,40 @@ export const DashboardProjectsPage: React.FC = () => {
     const [isSubscriptionsModalOpen, setIsSubscriptionsModalOpen] = useState(false);
     const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
     const [selectedProjectName, setSelectedProjectName] = useState<string>('');
-    const [alreadyEnrolledProject, setAlreadyEnrolledProject] = useState<Property | null>(null);
-    const [pendingProject, setPendingProject] = useState<Property | null>(null);
 
     const { data: userEnrollments = [] } = useUserEnrollments();
     const { data: pendingEnrollments = [] } = usePendingEnrollments();
-    const enrolledProjectIds = React.useMemo(
-        () => new Set(userEnrollments.map((e: any) => e.projectId ?? e.project_id)),
+
+    // Collect inventory_item_ids that this user already has active or pending enrollments for
+    const enrolledInventoryIds = React.useMemo(
+        () => new Set(userEnrollments.map((e: any) => e.inventory_item_id).filter(Boolean)),
         [userEnrollments]
     );
-    const pendingProjectIds = React.useMemo(
+    const pendingInventoryIds = React.useMemo(
         () => new Set(
             pendingEnrollments
                 .filter((e: any) => e.status === 'pending')
-                .map((e: any) => e.projectId ?? e.project_id)
+                .map((e: any) => e.inventoryItemId ?? e.inventory_item_id)
+                .filter(Boolean)
         ),
         [pendingEnrollments]
     );
+
+    // Count enrollments per project (for badge display)
+    const enrollmentCountByProject = React.useMemo(() => {
+        const counts = new Map<string, number>();
+        for (const e of userEnrollments) {
+            const pid = (e as any).projectId ?? (e as any).project_id;
+            if (pid) counts.set(pid, (counts.get(pid) || 0) + 1);
+        }
+        for (const e of pendingEnrollments) {
+            if ((e as any).status === 'pending') {
+                const pid = (e as any).projectId ?? (e as any).project_id;
+                if (pid) counts.set(pid, (counts.get(pid) || 0) + 1);
+            }
+        }
+        return counts;
+    }, [userEnrollments, pendingEnrollments]);
 
     const { data: dbProjects, isLoading: loadingProjects, refetch: fetchProjects } = useProperties();
 
@@ -90,14 +104,10 @@ export const DashboardProjectsPage: React.FC = () => {
     }, [projects, subscriptionResults]);
 
     const handleEnroll = (project: Property) => {
-        if (enrolledProjectIds.has(project.id)) {
-            setAlreadyEnrolledProject(project);
-        } else if (pendingProjectIds.has(project.id)) {
-            setPendingProject(project);
-        } else {
-            setSelectedProject(project);
-            setIsEnrollModalOpen(true);
-        }
+        // Always allow opening the inventory browser — duplicate prevention
+        // is handled at the unit level inside the modal and by the DB trigger
+        setSelectedProject(project);
+        setIsEnrollModalOpen(true);
     };
 
     const handleAddProjectSuccess = (_newProject: Property) => {
@@ -254,10 +264,17 @@ export const DashboardProjectsPage: React.FC = () => {
                                     {isClient && (
                                         <Button
                                             onClick={() => handleEnroll(project)}
-                                            className="w-full bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-black hover:bg-gold-500 hover:text-black font-bold py-6 rounded-2xl transition-all group/btn"
+                                            className="w-full bg-gradient-to-r from-[#d4af37] to-[#f4e68c] text-black hover:bg-gold-500 hover:text-black font-bold py-6 rounded-2xl transition-all group/btn relative"
                                         >
-                                            Experience & Enroll
+                                            {enrollmentCountByProject.has(project.id)
+                                                ? 'Enroll in Another Unit'
+                                                : 'Experience & Enroll'}
                                             <ArrowRightIcon className="h-5 w-5 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                                            {enrollmentCountByProject.has(project.id) && (
+                                                <span className="absolute -top-2 -right-2 inline-flex items-center justify-center h-6 w-6 rounded-full bg-black text-gold-500 text-xs font-bold border border-gold-500/40">
+                                                    {enrollmentCountByProject.get(project.id)}
+                                                </span>
+                                            )}
                                         </Button>
                                     )}
 
@@ -290,65 +307,14 @@ export const DashboardProjectsPage: React.FC = () => {
                 </div>
             )}
 
-            {/* Already Enrolled Dialog */}
-            <Dialog open={!!alreadyEnrolledProject} onOpenChange={() => setAlreadyEnrolledProject(null)}>
-                <DialogContent className="bg-[#0f0f0f] border border-gold-500/30 rounded-2xl max-w-md text-center">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
-                            Already Enrolled
-                        </DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4 space-y-4">
-                        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-gold-500/10 mx-auto">
-                            <CheckBadgeIcon className="h-8 w-8 text-gold-400" />
-                        </div>
-                        <p className="text-gray-300 leading-relaxed">
-                            You are already enrolled in{' '}
-                            <span className="text-gold-400 font-semibold">{alreadyEnrolledProject?.name}</span>.
-                            Head to <span className="text-gold-400 font-semibold">Project Updates</span> to track your investment progress.
-                        </p>
-                    </div>
-                    <Button
-                        onClick={() => setAlreadyEnrolledProject(null)}
-                        className="w-full bg-gold-500 text-black hover:bg-gold-400 font-bold rounded-xl"
-                    >
-                        Got it
-                    </Button>
-                </DialogContent>
-            </Dialog>
-
-            {/* Pending Approval Dialog */}
-            <Dialog open={!!pendingProject} onOpenChange={() => setPendingProject(null)}>
-                <DialogContent className="bg-[#0f0f0f] border border-gold-500/30 rounded-2xl max-w-md text-center">
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
-                            Request Pending
-                        </DialogTitle>
-                    </DialogHeader>
-                    <div className="py-4 space-y-4">
-                        <div className="flex items-center justify-center h-16 w-16 rounded-full bg-yellow-500/10 mx-auto">
-                            <ClockIcon className="h-8 w-8 text-yellow-400" />
-                        </div>
-                        <p className="text-gray-300 leading-relaxed">
-                            Your enrollment request for{' '}
-                            <span className="text-gold-400 font-semibold">{pendingProject?.name}</span>{' '}
-                            has been sent to the admin and is awaiting approval. You will be notified once it is reviewed.
-                        </p>
-                    </div>
-                    <Button
-                        onClick={() => setPendingProject(null)}
-                        className="w-full bg-gold-500 text-black hover:bg-gold-400 font-bold rounded-xl"
-                    >
-                        Got it
-                    </Button>
-                </DialogContent>
-            </Dialog>
-
             {/* Inventory Browser + Enrollment Modal */}
             <InventoryBrowserModal
                 isOpen={isEnrollModalOpen}
                 onClose={() => setIsEnrollModalOpen(false)}
                 project={selectedProject}
+                enrolledInventoryIds={enrolledInventoryIds}
+                pendingInventoryIds={pendingInventoryIds}
+                enrollmentCount={selectedProject ? (enrollmentCountByProject.get(selectedProject.id) || 0) : 0}
             />
 
             {/* Add Project Modal */}

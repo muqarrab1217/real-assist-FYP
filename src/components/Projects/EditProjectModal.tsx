@@ -1,18 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     XMarkIcon,
     PlusIcon,
     PhotoIcon,
-    CurrencyDollarIcon,
     MapPinIcon,
     DocumentTextIcon,
-    SparklesIcon
+    SparklesIcon,
+    CalendarIcon,
+    TableCellsIcon,
+    CheckIcon,
+    PencilSquareIcon,
+    XCircleIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { CustomDropdown } from '@/components/ui/CustomDropdown';
-import { useUpdateProperty } from '@/hooks/queries/useAdminQueries';
-import { Property } from '@/types';
+import { ImageUpload } from '@/components/Images/ImageUpload';
+import { useUpdateProperty, useUpdateInventoryRow } from '@/hooks/queries/useAdminQueries';
+import { useProjectInventory } from '@/hooks/queries/useCommonQueries';
+import { Property, InventoryItem } from '@/types';
 
 interface EditProjectModalProps {
     isOpen: boolean;
@@ -23,21 +29,54 @@ interface EditProjectModalProps {
 
 export const EditProjectModal: React.FC<EditProjectModalProps> = ({ isOpen, onClose, project, onSuccess }) => {
     const updatePropertyMutation = useUpdateProperty();
+    const updateInventoryRowMutation = useUpdateInventoryRow();
     const loading = updatePropertyMutation.isPending;
+    const { data: inventory = [], isLoading: inventoryLoading } = useProjectInventory(project?.id);
+    const headers = project?.inventoryHeaders || [];
+
     const [formData, setFormData] = useState<Partial<Property>>({
         name: '',
         type: 'Luxury Residential',
         location: '',
-        priceMin: 0,
-        priceMax: 0,
         description: '',
         amenities: [],
         images: [],
-        status: 'pending'
+        status: 'pending',
     });
 
     const [amenityInput, setAmenityInput] = useState('');
-    const [imageInput, setImageInput] = useState('');
+
+    // Inventory editing state
+    const [editingRowId, setEditingRowId] = useState<string | null>(null);
+    const [editRowData, setEditRowData] = useState<Record<string, string>>({});
+    const [editRowStatus, setEditRowStatus] = useState<string>('available');
+
+    const handleEditRow = useCallback((item: InventoryItem) => {
+        setEditingRowId(item.id);
+        setEditRowData({ ...item.rowData });
+        setEditRowStatus(item.status);
+    }, []);
+
+    const handleCancelEdit = useCallback(() => {
+        setEditingRowId(null);
+        setEditRowData({});
+        setEditRowStatus('available');
+    }, []);
+
+    const handleSaveRow = useCallback(async () => {
+        if (!editingRowId || !project?.id) return;
+        try {
+            await updateInventoryRowMutation.mutateAsync({
+                itemId: editingRowId,
+                rowData: editRowData,
+                status: editRowStatus,
+                projectId: project.id,
+            });
+            setEditingRowId(null);
+        } catch (error) {
+            console.error('Failed to update inventory row:', error);
+        }
+    }, [editingRowId, editRowData, editRowStatus, project?.id, updateInventoryRowMutation]);
 
     // Initialize form data when project changes
     useEffect(() => {
@@ -46,12 +85,11 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({ isOpen, onCl
                 name: project.name || '',
                 type: project.type || 'Luxury Residential',
                 location: project.location || '',
-                priceMin: project.priceMin || 0,
-                priceMax: project.priceMax || 0,
                 description: project.description || '',
                 amenities: project.amenities || [],
                 images: project.images || [],
-                status: project.status || 'pending'
+                status: project.status || 'pending',
+                bookingDeadline: project.bookingDeadline || undefined,
             });
         }
     }, [project, isOpen]);
@@ -70,23 +108,6 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({ isOpen, onCl
         setFormData(prev => ({
             ...prev,
             amenities: (prev.amenities || []).filter((_, i) => i !== index)
-        }));
-    };
-
-    const handleAddImage = () => {
-        if (imageInput.trim()) {
-            setFormData(prev => ({
-                ...prev,
-                images: [...(prev.images || []), imageInput.trim()]
-            }));
-            setImageInput('');
-        }
-    };
-
-    const handleRemoveImage = (index: number) => {
-        setFormData(prev => ({
-            ...prev,
-            images: (prev.images || []).filter((_, i) => i !== index)
         }));
     };
 
@@ -110,6 +131,9 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({ isOpen, onCl
         }
     };
 
+    const inputClass = "w-full bg-[#141414] border border-gold-500/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-gold-500/50 transition-colors";
+    const labelClass = "text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2";
+
     return (
         <AnimatePresence>
             {isOpen && (
@@ -121,229 +145,253 @@ export const EditProjectModal: React.FC<EditProjectModalProps> = ({ isOpen, onCl
                         className="relative w-full max-w-4xl bg-[#0a0a0a] rounded-3xl border border-gold-500/20 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
                     >
                         {/* Header */}
-                        <div className="p-8 border-b border-gold-500/10 flex justify-between items-center bg-gradient-to-r from-gold-500/10 to-transparent">
-                            <div>
-                                <h2 className="text-3xl font-bold text-white mb-1" style={{ fontFamily: 'Playfair Display, serif' }}>
-                                    Edit <span className="text-gold-400">Project</span>
-                                </h2>
-                                <p className="text-gray-400 text-sm italic">Update project details and management information</p>
+                        <div className="p-6 border-b border-gold-500/10 bg-gradient-to-r from-gold-500/10 to-transparent">
+                            <div className="flex justify-between items-center">
+                                <div>
+                                    <h2 className="text-2xl font-bold text-white" style={{ fontFamily: 'Playfair Display, serif' }}>
+                                        Edit <span className="text-gold-400">Project</span>
+                                    </h2>
+                                    <p className="text-gray-400 text-sm italic">Update project details and management information</p>
+                                </div>
+                                <button
+                                    onClick={onClose}
+                                    className="p-2 rounded-full hover:bg-gold-500/10 text-gray-400 hover:text-gold-400 transition-all"
+                                >
+                                    <XMarkIcon className="h-6 w-6" />
+                                </button>
                             </div>
-                            <button
-                                onClick={onClose}
-                                className="p-2 rounded-full hover:bg-gold-500/10 text-gray-400 hover:text-gold-400 transition-all"
-                            >
-                                <XMarkIcon className="h-6 w-6" />
-                            </button>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="p-8 overflow-y-auto space-y-8">
-                            <div className="grid md:grid-cols-2 gap-8 text-white">
-                                {/* Basic Info */}
-                                <div className="space-y-6">
+                        <form onSubmit={handleSubmit} className="p-6 overflow-y-auto flex-1 space-y-6">
+                            <div className="space-y-6 text-white">
+                                <div className="grid md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2">
-                                            <SparklesIcon className="h-4 w-4" />
-                                            Project Name *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={formData.name}
-                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                            className="w-full bg-[#141414] border border-gold-500/10 rounded-xl px-4 py-3 focus:outline-none focus:border-gold-500/50 transition-colors"
-                                            placeholder="e.g., Zenith Heights"
-                                        />
+                                        <label className={labelClass}><SparklesIcon className="h-4 w-4" /> Project Name *</label>
+                                        <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className={inputClass} placeholder="e.g., Zenith Heights" />
                                     </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2">
-                                                Property Type
-                                            </label>
-                                            <CustomDropdown
-                                                value={formData.type || 'Luxury Residential'}
-                                                onChange={(value) => setFormData({ ...formData, type: value })}
-                                                options={[
-                                                    { label: 'Luxury Residential', value: 'Luxury Residential' },
-                                                    { label: 'Commercial Plaza', value: 'Commercial Plaza' },
-                                                    { label: 'Modern Villa', value: 'Modern Villa' },
-                                                    { label: 'Corporate Office', value: 'Corporate Office' }
-                                                ]}
-                                                placeholder="Select property type"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2">
-                                                Status
-                                            </label>
-                                            <CustomDropdown
-                                                value={formData.status || 'pending'}
-                                                onChange={(value) => setFormData({ ...formData, status: value })}
-                                                options={[
-                                                    { label: 'Pending', value: 'pending' },
-                                                    { label: 'Approved', value: 'approved' },
-                                                    { label: 'Under Construction', value: 'construction' },
-                                                    { label: 'Completed', value: 'completed' }
-                                                ]}
-                                                placeholder="Select status"
-                                            />
-                                        </div>
-                                    </div>
-
                                     <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2">
-                                            <MapPinIcon className="h-4 w-4" />
-                                            Location *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={formData.location}
-                                            onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                            className="w-full bg-[#141414] border border-gold-500/10 rounded-xl px-4 py-3 focus:outline-none focus:border-gold-500/50 transition-colors"
-                                            placeholder="e.g., DHA Phase 6, Lahore"
-                                        />
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2">
-                                                <CurrencyDollarIcon className="h-4 w-4" />
-                                                Min Price
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={formData.priceMin}
-                                                onChange={(e) => setFormData({ ...formData, priceMin: parseInt(e.target.value) })}
-                                                className="w-full bg-[#141414] border border-gold-500/10 rounded-xl px-4 py-3 focus:outline-none focus:border-gold-500/50 transition-colors"
-                                            />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2">
-                                                Max Price
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={formData.priceMax}
-                                                onChange={(e) => setFormData({ ...formData, priceMax: parseInt(e.target.value) })}
-                                                className="w-full bg-[#141414] border border-gold-500/10 rounded-xl px-4 py-3 focus:outline-none focus:border-gold-500/50 transition-colors"
-                                            />
-                                        </div>
+                                        <label className={labelClass}><MapPinIcon className="h-4 w-4" /> Location *</label>
+                                        <input type="text" required value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className={inputClass} placeholder="e.g., DHA Phase 6, Lahore" />
                                     </div>
                                 </div>
 
-                                {/* Detailed Info */}
-                                <div className="space-y-6">
+                                <div className="grid md:grid-cols-2 gap-6">
                                     <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2">
-                                            <DocumentTextIcon className="h-4 w-4" />
-                                            Description
-                                        </label>
-                                        <textarea
-                                            value={formData.description}
-                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                            className="w-full bg-[#141414] border border-gold-500/10 rounded-xl px-4 py-3 focus:outline-none focus:border-gold-500/50 transition-colors h-32 resize-none"
-                                            placeholder="Describe the project's vision and features..."
+                                        <label className={labelClass}>Property Type</label>
+                                        <CustomDropdown
+                                            value={formData.type || 'Luxury Residential'}
+                                            onChange={(value) => setFormData({ ...formData, type: value })}
+                                            options={[
+                                                { label: 'Luxury Residential', value: 'Luxury Residential' },
+                                                { label: 'Commercial Plaza', value: 'Commercial Plaza' },
+                                                { label: 'Modern Villa', value: 'Modern Villa' },
+                                                { label: 'Corporate Office', value: 'Corporate Office' }
+                                            ]}
+                                            placeholder="Select property type"
                                         />
                                     </div>
-
                                     <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2">
-                                            Amenities
-                                        </label>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                value={amenityInput}
-                                                onChange={(e) => setAmenityInput(e.target.value)}
-                                                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAmenity())}
-                                                className="flex-1 bg-[#141414] border border-gold-500/10 rounded-xl px-4 py-3 focus:outline-none focus:border-gold-500/50 transition-colors"
-                                                placeholder="e.g., Rooftop Pool"
-                                            />
-                                            <Button
-                                                type="button"
-                                                onClick={handleAddAmenity}
-                                                className="bg-gold-500/10 text-gold-500 hover:bg-gold-500/20"
-                                            >
-                                                <PlusIcon className="h-5 w-5" />
-                                            </Button>
-                                        </div>
-                                        <div className="flex flex-wrap gap-2 mt-2">
-                                            {formData.amenities?.map((amenity, index) => (
-                                                <span key={index} className="px-3 py-1 bg-gold-500/10 text-gold-400 rounded-full text-xs flex items-center gap-2 border border-gold-500/20">
-                                                    {amenity}
-                                                    <button type="button" onClick={() => handleRemoveAmenity(index)} className="hover:text-white">×</button>
-                                                </span>
-                                            ))}
-                                        </div>
+                                        <label className={labelClass}>Status</label>
+                                        <CustomDropdown
+                                            value={formData.status || 'pending'}
+                                            onChange={(value) => setFormData({ ...formData, status: value })}
+                                            options={[
+                                                { label: 'Pending', value: 'pending' },
+                                                { label: 'Approved', value: 'approved' },
+                                                { label: 'Under Construction', value: 'construction' },
+                                                { label: 'Completed', value: 'completed' }
+                                            ]}
+                                            placeholder="Select status"
+                                        />
                                     </div>
+                                </div>
 
-                                    <div className="space-y-2">
-                                        <label className="text-xs uppercase tracking-widest font-bold text-gold-400 flex items-center gap-2">
-                                            <PhotoIcon className="h-4 w-4" />
-                                            Image URLs
+                                <div className="space-y-2">
+                                    <label className={labelClass}><DocumentTextIcon className="h-4 w-4" /> Description</label>
+                                    <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className={`${inputClass} h-28 resize-none`} placeholder="Describe the project's vision and features..." />
+                                </div>
+
+                                <div className="space-y-2">
+                                    <label className={labelClass}><CalendarIcon className="h-4 w-4" /> Booking Deadline</label>
+                                    <input type="date" value={formData.bookingDeadline ? new Date(formData.bookingDeadline).toISOString().split('T')[0] : ''} onChange={(e) => setFormData({ ...formData, bookingDeadline: e.target.value ? new Date(e.target.value) : undefined })} className={inputClass} />
+                                </div>
+
+                                {/* Amenities */}
+                                <div className="space-y-2">
+                                    <label className={labelClass}>Amenities</label>
+                                    <div className="flex gap-2">
+                                        <input type="text" value={amenityInput} onChange={(e) => setAmenityInput(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddAmenity())} className={`flex-1 ${inputClass}`} placeholder="e.g., Rooftop Pool" />
+                                        <Button type="button" onClick={handleAddAmenity} className="bg-gradient-to-r from-gold-500 to-gold-400 text-black"><PlusIcon className="h-5 w-5" /></Button>
+                                    </div>
+                                    <div className="flex flex-wrap gap-2 mt-2">
+                                        {formData.amenities?.map((amenity, index) => (
+                                            <span key={index} className="px-3 py-1 bg-gold-500/10 text-gold-400 rounded-full text-xs flex items-center gap-2 border border-gold-500/20">
+                                                {amenity}
+                                                <button type="button" onClick={() => handleRemoveAmenity(index)} className="hover:text-white">×</button>
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Images */}
+                                <div className="space-y-3">
+                                    <label className={labelClass}><PhotoIcon className="h-4 w-4" /> Project Images</label>
+                                    <ImageUpload
+                                        maxFiles={10}
+                                        onImagesUpload={(urls) => setFormData(prev => ({ ...prev, images: [...(prev.images || []), ...urls] }))}
+                                        existingImages={formData.images || []}
+                                        onRemoveExisting={(index) => setFormData(prev => ({ ...prev, images: (prev.images || []).filter((_, i) => i !== index) }))}
+                                        folder="projects"
+                                    />
+                                </div>
+
+                                {/* Inventory / Units Table */}
+                                {headers.length > 0 && (
+                                    <div className="space-y-3">
+                                        <label className={labelClass}>
+                                            <TableCellsIcon className="h-4 w-4" /> Inventory / Units
+                                            <span className="text-gray-500 text-[10px] font-normal ml-2">
+                                                ({inventory.length} {inventory.length === 1 ? 'row' : 'rows'})
+                                            </span>
                                         </label>
-                                        <p className="text-xs text-gray-500 mb-2">Add image URLs (e.g., /Commercial Projects/ABS_Mall_Residency.png or https://...)</p>
-                                        <div className="flex gap-2">
-                                            <input
-                                                type="text"
-                                                value={imageInput}
-                                                onChange={(e) => setImageInput(e.target.value)}
-                                                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddImage())}
-                                                className="flex-1 bg-[#141414] border border-gold-500/10 rounded-xl px-4 py-3 focus:outline-none focus:border-gold-500/50 transition-colors"
-                                                placeholder="https://..."
-                                            />
-                                            <Button
-                                                type="button"
-                                                onClick={handleAddImage}
-                                                className="bg-gold-500/10 text-gold-500 hover:bg-gold-500/20"
-                                            >
-                                                <PlusIcon className="h-5 w-5" />
-                                            </Button>
-                                        </div>
-                                        <div className="grid grid-cols-4 gap-2 mt-2">
-                                            {formData.images?.map((url, index) => (
-                                                <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gold-500/20">
-                                                    <img
-                                                        src={url}
-                                                        alt="project"
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => {
-                                                            (e.target as HTMLImageElement).src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23333%22 width=%22100%22 height=%22100%22/%3E%3Ctext x=%2250%22 y=%2250%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%23666%22 font-size=%2214%22%3ENo image%3C/text%3E%3C/svg%3E';
-                                                        }}
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => handleRemoveImage(index)}
-                                                        className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-white text-xl"
-                                                    >
-                                                        ×
-                                                    </button>
+
+                                        {inventoryLoading ? (
+                                            <div className="flex items-center justify-center py-8 text-gray-500 text-sm">
+                                                <div className="h-4 w-4 border-2 border-gold-500/30 border-t-gold-500 rounded-full animate-spin mr-2" />
+                                                Loading inventory...
+                                            </div>
+                                        ) : inventory.length === 0 ? (
+                                            <div className="text-center py-8 text-gray-500 text-sm border border-dashed border-gold-500/10 rounded-xl">
+                                                No inventory data uploaded for this project.
+                                            </div>
+                                        ) : (
+                                            <div className="border border-gold-500/10 rounded-xl overflow-hidden">
+                                                <div className="overflow-x-auto max-h-[350px] overflow-y-auto">
+                                                    <table className="w-full text-sm">
+                                                        <thead className="sticky top-0 z-10">
+                                                            <tr className="bg-[#1a1a1a] border-b border-gold-500/10">
+                                                                {headers.map((header) => (
+                                                                    <th key={header} className="px-3 py-2.5 text-left text-[10px] uppercase tracking-widest font-bold text-gold-400 whitespace-nowrap">
+                                                                        {header}
+                                                                    </th>
+                                                                ))}
+                                                                <th className="px-3 py-2.5 text-left text-[10px] uppercase tracking-widest font-bold text-gold-400 whitespace-nowrap">Status</th>
+                                                                <th className="px-3 py-2.5 text-center text-[10px] uppercase tracking-widest font-bold text-gold-400 whitespace-nowrap w-24">Actions</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            {inventory.map((item: InventoryItem, idx: number) => {
+                                                                const isEditing = editingRowId === item.id;
+                                                                return (
+                                                                    <tr
+                                                                        key={item.id}
+                                                                        className={`border-b border-gold-500/5 transition-colors ${
+                                                                            isEditing ? 'bg-gold-500/5' : idx % 2 === 0 ? 'bg-[#0f0f0f]' : 'bg-[#141414]'
+                                                                        } hover:bg-gold-500/5`}
+                                                                    >
+                                                                        {headers.map((header) => (
+                                                                            <td key={header} className="px-3 py-2">
+                                                                                {isEditing ? (
+                                                                                    <input
+                                                                                        type="text"
+                                                                                        value={editRowData[header] || ''}
+                                                                                        onChange={(e) => setEditRowData(prev => ({ ...prev, [header]: e.target.value }))}
+                                                                                        className="w-full min-w-[80px] bg-[#0a0a0a] border border-gold-500/20 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-gold-500/50 transition-colors"
+                                                                                    />
+                                                                                ) : (
+                                                                                    <span className="text-gray-300 text-xs whitespace-nowrap">{item.rowData[header] || '—'}</span>
+                                                                                )}
+                                                                            </td>
+                                                                        ))}
+                                                                        <td className="px-3 py-2">
+                                                                            {isEditing ? (
+                                                                                <select
+                                                                                    value={editRowStatus}
+                                                                                    onChange={(e) => setEditRowStatus(e.target.value)}
+                                                                                    className="bg-[#0a0a0a] border border-gold-500/20 rounded-lg px-2 py-1.5 text-white text-xs focus:outline-none focus:border-gold-500/50"
+                                                                                >
+                                                                                    <option value="available">Available</option>
+                                                                                    <option value="sold">Sold</option>
+                                                                                    <option value="reserved">Reserved</option>
+                                                                                    <option value="booked">Booked</option>
+                                                                                </select>
+                                                                            ) : (
+                                                                                <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wider ${
+                                                                                    item.status === 'available' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
+                                                                                    item.status === 'sold' ? 'bg-red-500/10 text-red-400 border border-red-500/20' :
+                                                                                    item.status === 'reserved' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' :
+                                                                                    'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                                                                                }`}>
+                                                                                    {item.status}
+                                                                                </span>
+                                                                            )}
+                                                                        </td>
+                                                                        <td className="px-3 py-2 text-center">
+                                                                            {isEditing ? (
+                                                                                <div className="flex items-center justify-center gap-1">
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={handleSaveRow}
+                                                                                        disabled={updateInventoryRowMutation.isPending}
+                                                                                        className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors disabled:opacity-50"
+                                                                                        title="Save"
+                                                                                    >
+                                                                                        {updateInventoryRowMutation.isPending ? (
+                                                                                            <div className="h-3.5 w-3.5 border-2 border-emerald-400/20 border-t-emerald-400 rounded-full animate-spin" />
+                                                                                        ) : (
+                                                                                            <CheckIcon className="h-3.5 w-3.5" />
+                                                                                        )}
+                                                                                    </button>
+                                                                                    <button
+                                                                                        type="button"
+                                                                                        onClick={handleCancelEdit}
+                                                                                        className="p-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                                                                                        title="Cancel"
+                                                                                    >
+                                                                                        <XCircleIcon className="h-3.5 w-3.5" />
+                                                                                    </button>
+                                                                                </div>
+                                                                            ) : (
+                                                                                <button
+                                                                                    type="button"
+                                                                                    onClick={() => handleEditRow(item)}
+                                                                                    className="p-1.5 rounded-lg bg-gold-500/10 text-gold-400 hover:bg-gold-500/20 transition-colors"
+                                                                                    title="Edit row"
+                                                                                >
+                                                                                    <PencilSquareIcon className="h-3.5 w-3.5" />
+                                                                                </button>
+                                                                            )}
+                                                                        </td>
+                                                                    </tr>
+                                                                );
+                                                            })}
+                                                        </tbody>
+                                                    </table>
                                                 </div>
-                                            ))}
-                                        </div>
+                                            </div>
+                                        )}
                                     </div>
-                                </div>
+                                )}
                             </div>
 
-                            <div className="pt-8 border-t border-gold-500/10 flex gap-4">
+                            <div className="pt-6 border-t border-gold-500/10 flex gap-4">
                                 <Button
                                     type="button"
                                     onClick={onClose}
                                     variant="outline"
-                                    className="flex-1 py-6 rounded-2xl border-gold-500/20 text-gray-400 hover:bg-gold-500/10 hover:text-gold-400 h-14"
+                                    className="flex-1 h-12 rounded-xl border-gold-500/20 text-gray-400 hover:bg-gold-500/10 hover:text-gold-400"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={loading}
-                                    className="flex-[2] py-6 rounded-2xl bg-gradient-to-r from-gold-500 to-gold-400 text-black font-bold h-14 hover:shadow-lg hover:shadow-gold-500/20 transition-all"
+                                    className="flex-[2] h-12 rounded-xl bg-gradient-to-r from-gold-500 to-gold-400 text-black font-bold hover:shadow-lg hover:shadow-gold-500/20 transition-all"
                                 >
                                     {loading ? (
                                         <div className="flex items-center gap-2">
-                                            <div className="h-4 w-4 border-2 border-black/20 border-t-black rounded-full animate-spin"></div>
-                                            Processing...
+                                            <div className="h-4 w-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
+                                            Updating...
                                         </div>
                                     ) : (
                                         'Update Project'

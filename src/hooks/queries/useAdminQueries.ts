@@ -278,6 +278,17 @@ export function useReplaceInventory() {
   });
 }
 
+export function useUpdateInventoryRow() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ itemId, rowData, status, projectId }: { itemId: string; rowData: Record<string, string>; status?: 'available' | 'sold' | 'reserved' | 'booked'; projectId: string }) =>
+      inventoryAPI.updateInventoryRow(itemId, rowData, status),
+    onSuccess: (_, { projectId }) => {
+      queryClient.invalidateQueries({ queryKey: ['common', 'inventory', projectId] });
+    },
+  });
+}
+
 export function useUploadBlueprint() {
   const queryClient = useQueryClient();
   return useMutation({

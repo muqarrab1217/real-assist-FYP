@@ -135,6 +135,7 @@ export interface PaymentProof {
     reviewedAt?: Date;
     rejectionReason?: string;
     createdAt: Date;
+    submittedAt?: Date;
     updatedAt?: Date;
     // Joined fields
     payment?: Payment;
@@ -211,6 +212,9 @@ export interface Lead {
     notes?: string;
     assignedTo?: string;
     createdAt?: Date;
+    userId?: string;
+    chatSessionId?: string;
+    classificationSource?: string;
 }
 
 export interface Analytics {

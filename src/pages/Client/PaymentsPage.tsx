@@ -23,7 +23,7 @@ export const PaymentsPage: React.FC = () => {
 
   // Payment Method Modal state
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
-  const [selectedPayment, setSelectedPayment] = useState<{ id: string; amount: number; installmentNumber: number } | null>(null);
+  const [selectedPayment, setSelectedPayment] = useState<{ id: string; amount: number; installmentNumber: number; clientId?: string } | null>(null);
 
   // 1. Data Pipeline: Group payments by project for the Matrix view
   const projectMatrix = React.useMemo(() => {
@@ -66,21 +66,11 @@ export const PaymentsPage: React.FC = () => {
 
   const handleMakePayment = (paymentId: string, amount: number) => {
     const payment = payments.find(p => p.id === paymentId);
-    setSelectedPayment({ id: paymentId, amount, installmentNumber: payment?.installmentNumber || 0 });
+    setSelectedPayment({ id: paymentId, amount, installmentNumber: payment?.installmentNumber || 0, clientId: payment?.clientId });
     setPaymentModalOpen(true);
   };
 
-  const handlePayViaPortal = (paymentId: string, amount: number) => {
-    setIsProcessingPayment(paymentId);
-    makePaymentMutation.mutate(
-      { paymentId, amount, method: 'Portal' },
-      {
-        onSettled: () => setIsProcessingPayment(null),
-        onError: (error) => console.error('Payment failed:', error),
-        onSuccess: () => console.log('Payment successful')
-      }
-    );
-  };
+
 
   const handleUploadProof = (data: { paymentId: string; proofFile: File; proofType: any; notes?: string }) => {
     setIsProcessingPayment(data.paymentId);
@@ -335,7 +325,7 @@ export const PaymentsPage: React.FC = () => {
           paymentId={selectedPayment.id}
           amount={selectedPayment.amount}
           installmentNumber={selectedPayment.installmentNumber}
-          onPayViaPortal={handlePayViaPortal}
+          clientId={selectedPayment.clientId}
           onUploadProof={handleUploadProof}
           isProcessing={isProcessingPayment === selectedPayment.id}
         />

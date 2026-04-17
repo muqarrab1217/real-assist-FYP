@@ -246,6 +246,9 @@ export const useAuth = () => {
           }
           // No usable cache → blocking fetch
           await fetchProfile(session.user.id, session.user.email!, session.user.user_metadata?.role);
+          // If fetchProfile exited early (already in-flight from onAuthStateChange),
+          // loading may not have been set to false. Ensure it's cleared.
+          setAuthState(prev => prev.loading ? { ...prev, loading: false } : prev);
         } else {
           console.log('[DEBUG] useAuth: No initial session');
           clearStorage();

@@ -92,16 +92,16 @@ export const RegisterPage: React.FC = () => {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex items-center justify-center min-h-screen"
+      className="flex items-center justify-center h-full w-full"
     >
-      <Card className="w-full max-w-2xl mx-auto" style={{
+      <Card className="w-full max-w-2xl mx-auto max-h-[95vh] flex flex-col" style={{
         background: 'rgba(26,26,26,0.75)',
         backdropFilter: 'blur(20px)',
         border: '1px solid rgba(212,175,55,0.25)',
         borderRadius: '24px',
         boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
       }}>
-        <CardHeader className="text-center">
+        <CardHeader className="text-center flex-shrink-0">
           <div className="flex justify-center">
             <img src="/images/logo.png" alt="ABS Developers" className="h-16 w-auto" />
           </div>
@@ -116,8 +116,8 @@ export const RegisterPage: React.FC = () => {
             Join RealAssist and start managing your investments
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <CardContent className="overflow-y-auto flex-1 min-h-0">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label htmlFor="firstName" className="block text-sm font-medium mb-2" style={{ color: 'rgba(212,175,55,0.9)' }}>

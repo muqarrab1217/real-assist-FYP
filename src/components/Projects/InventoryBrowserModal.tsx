@@ -10,6 +10,8 @@ import {
     ArrowLeftIcon,
     BuildingOffice2Icon,
     HomeModernIcon,
+    CheckBadgeIcon,
+    ClockIcon,
 } from '@heroicons/react/24/outline';
 import { Button } from '@/components/ui/button';
 import { Property, InventoryItem } from '@/types';
@@ -20,12 +22,15 @@ interface InventoryBrowserModalProps {
     isOpen: boolean;
     onClose: () => void;
     project: Property | null;
+    enrolledInventoryIds?: Set<string>;
+    pendingInventoryIds?: Set<string>;
+    enrollmentCount?: number;
 }
 
 type TabType = 'blueprint' | 'inventory';
 type Step = 'floor' | 'type' | 'units';
 
-export const InventoryBrowserModal: React.FC<InventoryBrowserModalProps> = ({ isOpen, onClose, project }) => {
+export const InventoryBrowserModal: React.FC<InventoryBrowserModalProps> = ({ isOpen, onClose, project, enrolledInventoryIds = new Set(), pendingInventoryIds = new Set(), enrollmentCount = 0 }) => {
     const [activeTab, setActiveTab] = useState<TabType>('inventory');
     const [selectedUnit, setSelectedUnit] = useState<InventoryItem | null>(null);
     const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
@@ -168,6 +173,12 @@ export const InventoryBrowserModal: React.FC<InventoryBrowserModalProps> = ({ is
                                             {project.name}
                                         </h2>
                                         <p className="text-gray-400 text-sm mt-1">{project.location} — {totalAvailable} units available, {totalSold} sold/reserved</p>
+                                        {enrollmentCount > 0 && (
+                                            <p className="text-green-400 text-xs mt-1 flex items-center gap-1">
+                                                <CheckBadgeIcon className="h-3.5 w-3.5" />
+                                                You have {enrollmentCount} existing enrollment{enrollmentCount !== 1 ? 's' : ''} in this project — select a different unit to enroll again
+                                            </p>
+                                        )}
                                     </div>
                                     <button onClick={onClose} className="p-2 rounded-full hover:bg-gold-500/10 text-gray-400 hover:text-gold-400 transition-all">
                                         <XMarkIcon className="h-6 w-6" />
@@ -347,6 +358,9 @@ export const InventoryBrowserModal: React.FC<InventoryBrowserModalProps> = ({ is
                                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                                                 {filteredUnits.map(item => {
                                                                     const isSelected = selectedUnit?.id === item.id;
+                                                                    const isEnrolled = enrolledInventoryIds.has(item.id);
+                                                                    const isPending = pendingInventoryIds.has(item.id);
+                                                                    const isUnavailable = isEnrolled || isPending;
                                                                     const unitNum = headers[1] ? item.rowData[headers[1]] : '';
                                                                     const area = headers[3] ? item.rowData[headers[3]] : '';
                                                                     const category = headers[4] ? item.rowData[headers[4]] : '';
@@ -355,16 +369,32 @@ export const InventoryBrowserModal: React.FC<InventoryBrowserModalProps> = ({ is
                                                                     return (
                                                                         <motion.div
                                                                             key={item.id}
-                                                                            whileHover={{ scale: 1.02 }}
-                                                                            whileTap={{ scale: 0.98 }}
-                                                                            onClick={() => handleSelectUnit(item)}
-                                                                            className={`p-4 rounded-2xl border cursor-pointer transition-all ${isSelected ? 'border-gold-400 bg-gold-500/15 ring-1 ring-gold-400/40' : 'border-gold-500/10 bg-[#141414] hover:border-gold-400/30 hover:bg-gold-500/5'}`}
+                                                                            whileHover={isUnavailable ? {} : { scale: 1.02 }}
+                                                                            whileTap={isUnavailable ? {} : { scale: 0.98 }}
+                                                                            onClick={() => !isUnavailable && handleSelectUnit(item)}
+                                                                            className={`p-4 rounded-2xl border transition-all ${
+                                                                                isUnavailable
+                                                                                    ? 'border-gray-700/30 bg-[#111] opacity-60 cursor-not-allowed'
+                                                                                    : isSelected
+                                                                                        ? 'border-gold-400 bg-gold-500/15 ring-1 ring-gold-400/40 cursor-pointer'
+                                                                                        : 'border-gold-500/10 bg-[#141414] hover:border-gold-400/30 hover:bg-gold-500/5 cursor-pointer'
+                                                                            }`}
                                                                         >
                                                                             <div className="flex items-center justify-between mb-3">
                                                                                 <span className="text-white font-bold text-base">
                                                                                     Unit {unitNum || '—'}
                                                                                 </span>
-                                                                                {isSelected && (
+                                                                                {isEnrolled && (
+                                                                                    <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                                                                                        <CheckBadgeIcon className="h-3 w-3" /> Enrolled
+                                                                                    </span>
+                                                                                )}
+                                                                                {isPending && (
+                                                                                    <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
+                                                                                        <ClockIcon className="h-3 w-3" /> Pending
+                                                                                    </span>
+                                                                                )}
+                                                                                {isSelected && !isUnavailable && (
                                                                                     <span className="text-xs bg-gold-400 text-black px-2 py-0.5 rounded-full font-bold">Selected</span>
                                                                                 )}
                                                                             </div>

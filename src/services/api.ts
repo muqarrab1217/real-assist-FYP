@@ -5,6 +5,16 @@ import {
 } from '@/data/mockData';
 import { detailedProjects, extractedProperties } from '@/data/extractedMockData';
 
+/**
+ * Get the authenticated user from the local session (no network call).
+ * RLS is enforced server-side via the JWT, so this is safe for client-side use.
+ */
+async function getAuthUser() {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user) throw new Error('Not authenticated');
+  return session.user;
+}
+
 
 // Auth API
 export const authAPI = {
@@ -148,8 +158,7 @@ export const authAPI = {
 // Client API
 export const clientAPI = {
   async getDashboardStats(): Promise<DashboardStats[]> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     // Get client records for this user
     const { data: clientRecords } = await supabase
@@ -224,15 +233,14 @@ export const clientAPI = {
   },
 
   async getClient(): Promise<Client> {
-    const { data: { user } } = await supabase.auth.getUser();
-    const { data, error } = await supabase.from('clients').select('*').eq('user_id', user?.id).single();
+    const user = await getAuthUser();
+    const { data, error } = await supabase.from('clients').select('*').eq('user_id', user.id).single();
     if (error) throw error;
     return data;
   },
 
   async getPayments(): Promise<Payment[]> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     const { data: clientRecords } = await supabase
       .from('clients')
@@ -283,8 +291,7 @@ export const clientAPI = {
   },
 
   async getClientFinancials(projectId?: string): Promise<any> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     let query = supabase.from('client_financial_ledger').select('*').eq('user_id', user.id);
     if (projectId) {
@@ -345,8 +352,7 @@ export const clientAPI = {
   },
 
   async getProjectPayments(projectId: string): Promise<Payment[]> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     // First find the client record for this user and project
     if (!isValidUUID(projectId)) {
@@ -395,21 +401,39 @@ export const clientAPI = {
       if (createClientError) throw createClientError;
       client = newClient;
 
-      // Generate full payment schedule (e.g. 12 months for 1 year)
+      // Generate payment schedule: 1 down payment + monthly installments
       const totalMonths = enrollment.installment_duration_years * 12;
-      const installments = [];
+      const installments: any[] = [];
       const startDate = new Date(enrollment.created_at || new Date());
+      const downPaymentAmount = enrollment.down_payment || 0;
 
+      // Single down payment due in the first month
+      if (downPaymentAmount > 0) {
+        const dpDueDate = new Date(startDate);
+        dpDueDate.setMonth(startDate.getMonth() + 1);
+        installments.push({
+          client_id: newClient.id,
+          amount: downPaymentAmount,
+          installment_number: 0,
+          due_date: dpDueDate.toISOString(),
+          status: 'pending',
+          type: 'downpayment'
+        });
+      }
+
+      // Regular installments start the month after down payment
+      const installmentOffset = downPaymentAmount > 0 ? 2 : 1;
       for (let i = 1; i <= totalMonths; i++) {
         const dueDate = new Date(startDate);
-        dueDate.setMonth(startDate.getMonth() + i);
+        dueDate.setMonth(startDate.getMonth() + i + (installmentOffset - 1));
 
         installments.push({
           client_id: newClient.id,
           amount: enrollment.monthly_installment,
           installment_number: i,
           due_date: dueDate.toISOString(),
-          status: 'pending'
+          status: 'pending',
+          type: 'installment'
         });
       }
 
@@ -437,6 +461,8 @@ export const clientAPI = {
       paidDate: p.paid_date ? new Date(p.paid_date) : undefined,
       billingPeriod: p.billing_period ? new Date(p.billing_period) : new Date(p.due_date),
       type: p.type || 'installment',
+      paymentMethod: p.payment_method,
+      verificationStatus: p.verification_status,
       apartmentDetails: p.apartment_details,
     }));
   }
@@ -450,8 +476,7 @@ export const paymentProofAPI = {
     proofType: PaymentProof['proofType'];
     notes?: string;
   }): Promise<PaymentProof> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     // Find client record
     const { data: client } = await supabase
@@ -557,6 +582,15 @@ export const salesRepAPI = {
         reviewedAt: p.reviewed_at ? new Date(p.reviewed_at) : undefined,
         rejectionReason: p.rejection_reason,
         createdAt: new Date(p.created_at),
+        submittedAt: new Date(p.created_at),
+        payment: p.payments ? {
+          id: p.payments.id,
+          amount: p.payments.amount != null ? Number(p.payments.amount) : undefined,
+          installmentNumber: p.payments.installment_number,
+          dueDate: p.payments.due_date,
+          status: p.payments.status,
+          clientId: p.payments.client_id,
+        } : undefined,
         client: p.clients ? {
           ...p.clients,
           fullName: profile ? `${profile.first_name} ${profile.last_name}` : undefined,
@@ -600,6 +634,15 @@ export const salesRepAPI = {
         reviewedAt: p.reviewed_at ? new Date(p.reviewed_at) : undefined,
         rejectionReason: p.rejection_reason,
         createdAt: new Date(p.created_at),
+        submittedAt: new Date(p.created_at),
+        payment: p.payments ? {
+          id: p.payments.id,
+          amount: p.payments.amount != null ? Number(p.payments.amount) : undefined,
+          installmentNumber: p.payments.installment_number,
+          dueDate: p.payments.due_date,
+          status: p.payments.status,
+          clientId: p.payments.client_id,
+        } : undefined,
         client: p.clients ? {
           ...p.clients,
           fullName: profile ? `${profile.first_name} ${profile.last_name}` : undefined,
@@ -610,8 +653,7 @@ export const salesRepAPI = {
   },
 
   async approveProof(proofId: string): Promise<PaymentProof> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     // Get the proof to find payment_id
     const { data: proof } = await supabase
@@ -649,8 +691,7 @@ export const salesRepAPI = {
   },
 
   async rejectProof(proofId: string, reason: string): Promise<PaymentProof> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     // Get the proof to find payment_id
     const { data: proof } = await supabase
@@ -728,6 +769,9 @@ export const adminAPI = {
       ...l,
       lastContact: l.last_contact ? new Date(l.last_contact) : undefined,
       assignedTo: l.assigned_to,
+      userId: l.user_id,
+      chatSessionId: l.chat_session_id,
+      classificationSource: l.classification_source,
     }));
   },
 
@@ -1152,8 +1196,7 @@ export const enrollmentAPI = {
     isFlexiblePlan?: boolean;
     downPaymentPercentage?: number;
   }): Promise<any> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     let validProjectId = data.projectId;
 
@@ -1220,7 +1263,6 @@ export const enrollmentAPI = {
     const totalInstallments = isYearly
       ? Math.ceil(data.installmentDurationYears)
       : data.installmentDurationYears * 12;
-    const downPaymentInstallmentAmount = data.downPayment / 3;
 
     // For yearly frequency, compute per-year amount from remaining balance
     const remaining = data.totalPrice - data.downPayment;
@@ -1233,27 +1275,25 @@ export const enrollmentAPI = {
     // First billing period starts precisely on the 1st of the NEXT calendar month
     const startMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
 
-    // Create 3 Down Payment Installments (Split over next 3 months)
-    for (let i = 0; i < 3; i++) {
-      const periodDate = new Date(startMonth.getFullYear(), startMonth.getMonth() + i, 1);
-      // Use registration day as due day, ensuring it doesn't exceed days in month
+    // Create a single Down Payment due in the first month
+    {
+      const periodDate = new Date(startMonth.getFullYear(), startMonth.getMonth(), 1);
       const lastDayOfMonth = new Date(periodDate.getFullYear(), periodDate.getMonth() + 1, 0).getDate();
       const actualDueDay = Math.min(dueDay, lastDayOfMonth);
       const dueDate = new Date(periodDate.getFullYear(), periodDate.getMonth(), actualDueDay);
 
       paymentRecords.push({
-        amount: downPaymentInstallmentAmount,
-        installment_number: 0, // 0 indicates downpayment
+        amount: data.downPayment,
+        installment_number: 0,
         due_date: dueDate.toISOString(),
         billing_period: periodDate.toISOString(),
         status: 'pending',
         type: 'downpayment'
-        // client_id will be mapped later when `client` resolves
       });
     }
 
-    // Create Installments starting immediately after down payment
-    const installmentStartMonth = new Date(startMonth.getFullYear(), startMonth.getMonth() + 3, 1);
+    // Create Installments starting the month after the down payment
+    const installmentStartMonth = new Date(startMonth.getFullYear(), startMonth.getMonth() + 1, 1);
     const monthStep = isYearly ? 12 : 1;
 
     for (let i = 1; i <= totalInstallments; i++) {
@@ -1324,8 +1364,7 @@ export const enrollmentAPI = {
    * Pending enrollments are NOT shown here - they must be approved by admin first
    */
   async getUserEnrollments(): Promise<any[]> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     // Only return enrollments that have been verified/approved (status = 'active' or 'completed')
     const { data: enrollments, error } = await supabase
@@ -1425,8 +1464,7 @@ export const enrollmentAPI = {
    * Admin: Approve enrollment and activate payment schedule
    */
   async approveEnrollment(enrollmentId: string, adminNotes?: string): Promise<any> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     // 1. Get enrollment details
     const { data: enrollment, error: fetchError } = await supabase
@@ -1480,8 +1518,7 @@ export const enrollmentAPI = {
    * Admin: Reject enrollment and cancel payment schedule
    */
   async rejectEnrollment(enrollmentId: string, reason: string): Promise<any> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     if (!reason || reason.trim().length === 0) {
       throw new Error('Rejection reason is required');
@@ -1616,12 +1653,11 @@ export const enrollmentAPI = {
    * This is used to show "Under Verification" status on the dashboard
    */
   async getPendingEnrollments(): Promise<any[]> {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error('Not authenticated');
+    const user = await getAuthUser();
 
     const { data: enrollments, error } = await supabase
       .from('project_enrollments')
-      .select('id, project_id, status, created_at, rejected_reason')
+      .select('id, project_id, inventory_item_id, status, created_at, rejected_reason')
       .eq('user_id', user.id)
       .in('status', ['pending', 'rejected'])
       .order('created_at', { ascending: false });
@@ -1636,6 +1672,7 @@ export const enrollmentAPI = {
       return enrollments.map(e => ({
         id: e.id,
         projectId: e.project_id,
+        inventoryItemId: e.inventory_item_id,
         status: e.status,
         createdAt: e.created_at,
         rejectedReason: e.rejected_reason,
@@ -1653,6 +1690,7 @@ export const enrollmentAPI = {
     return enrollments.map(e => ({
       id: e.id,
       projectId: e.project_id,
+      inventoryItemId: e.inventory_item_id,
       status: e.status,
       createdAt: e.created_at,
       rejectedReason: e.rejected_reason,
@@ -1766,6 +1804,19 @@ export const inventoryAPI = {
     if (error) throw error;
   },
 
+  async updateInventoryRow(itemId: string, rowData: Record<string, string>, status?: 'available' | 'sold' | 'reserved' | 'booked'): Promise<void> {
+    const updatePayload: Record<string, any> = {
+      row_data: rowData,
+      updated_at: new Date().toISOString(),
+    };
+    if (status) updatePayload.status = status;
+    const { error } = await supabase
+      .from('project_inventory')
+      .update(updatePayload)
+      .eq('id', itemId);
+    if (error) throw error;
+  },
+
   async uploadBlueprint(projectId: string, file: File): Promise<string> {
     const ext = file.name.split('.').pop();
     const filePath = `blueprints/${projectId}/blueprint.${ext}`;
@@ -1795,5 +1846,53 @@ export const inventoryAPI = {
       .getPublicUrl(filePath);
 
     return data.publicUrl;
+  },
+};
+
+// ─────────────────────────────────────────────────────────────
+// Stripe Payment API
+// ─────────────────────────────────────────────────────────────
+const STRIPE_API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:10000';
+
+const getAuthHeaders = async (): Promise<Record<string, string>> => {
+  const { data: { session } } = await supabase.auth.getSession();
+  return {
+    'Content-Type': 'application/json',
+    ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+  };
+};
+
+export const stripeAPI = {
+  async createCheckoutSession(paymentId: string, clientId: string): Promise<{ sessionId: string; url: string }> {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${STRIPE_API_BASE}/api/stripe/create-subscription`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ paymentId, clientId }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Network error' }));
+      throw new Error(err.error || 'Failed to create checkout session');
+    }
+    return res.json();
+  },
+
+  async getSessionStatus(sessionId: string): Promise<{
+    status: string;
+    customerEmail: string;
+    amountTotal: number;
+    currency: string;
+    metadata: Record<string, string>;
+  }> {
+    const headers = await getAuthHeaders();
+    const res = await fetch(`${STRIPE_API_BASE}/api/stripe/session-status/${sessionId}`, {
+      method: 'GET',
+      headers,
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: 'Network error' }));
+      throw new Error(err.error || 'Failed to get session status');
+    }
+    return res.json();
   },
 };
